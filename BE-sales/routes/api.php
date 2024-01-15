@@ -28,4 +28,8 @@ Route::prefix('/auth')->group(function () {
 
 Route::prefix('/address')->group(function () {
     Route::post('/tambah',[AddressController::class,'store'])->middleware('auth:sanctum');
+    Route::get('/get',[AddressController::class,'getAlamat'])->middleware('auth:sanctum');
+    Route::delete('/delete/{id}',[AddressController::class,'destroy'])->middleware('auth:sanctum');
+    Route::get('/edit/{id}',[AddressController::class,'edit'])->middleware('auth:sanctum');
+    Route::put('/update/{id}',[AddressController::class,'update'])->middleware('auth:sanctum');
 });
