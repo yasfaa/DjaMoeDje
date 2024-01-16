@@ -19,7 +19,8 @@ class AuthController extends Controller
         $created = User::create([
             'email' => $request->email,
             'password' => $request->password,
-            'name' => $request->name
+            'name' => $request->name,
+            'role' => 'User'
         ]);
 
         if ($created) {
@@ -51,7 +52,6 @@ class AuthController extends Controller
 
     function logout(Request $request)
     {
-        // Revoke the token that was used to authenticate the current request...
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
@@ -59,4 +59,27 @@ class AuthController extends Controller
         ], 200);
     }
 
+    public function edit(Request $request)
+    {
+        $user = User::where('email', $request->user()->email)->value('name');
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        return response()->json(['name' => $user]);
+    }
+
+
+    public function update(Request $request)
+    {
+        $user = User::where('email', $request->user()->email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+        $user->update([
+            'name' => $request->name,
+        ]);
+
+        return response()->json(['message' => 'Successfully updated User'], 200);
+    }
 }

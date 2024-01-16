@@ -55,7 +55,7 @@ class AddressController extends Controller
         $address = Address::where('email', $request->user()->email)->get();
 
         if (!$address) {
-            return response()->json(['error' => 'Order not found'], 404);
+            return response()->json(['error' => 'Address not found'], 404);
         }
 
         return response()->json($address);
