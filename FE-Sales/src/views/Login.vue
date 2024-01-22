@@ -43,7 +43,9 @@
                     <input class="input-type" type="password" v-model="confirmPassword" required />
                     <label for="">Re-Password</label>
                   </div>
-                  <div class="text-uppercase mb-3" v-if="passwordsNotMatch" style="color: red"><b>Passwords do not match</b></div>
+                  <div class="text-uppercase mb-3" v-if="passwordsNotMatch" style="color: red">
+                    <b>Passwords do not match</b>
+                  </div>
                   <button class="login-button" type="submit" style="color: white">Register</button>
                   <div class="register">
                     <p>
@@ -61,7 +63,7 @@
   </main>
 </template>
 <script>
-import Navbar from '@/components/Navbar.vue'
+import Navbar from '@/components/LoginNavbar.vue'
 import axios from 'axios'
 const BASE_URL = import.meta.env.VITE_BASE_URL_API
 export default {
@@ -80,7 +82,7 @@ export default {
       registerEmail: '',
       registerPassword: '',
       registerRePassword: '',
-      passwordsNotMatch: false,
+      passwordsNotMatch: false
     }
   },
   mounted() {
@@ -107,7 +109,7 @@ export default {
           }
         })
         .then((response) => {
-          const { role } = response.data.user
+          const { role } = response.data.role
           if (role === 'ADMIN') {
             this.$router.push('/admin/dashboard')
           } else if (role === 'USER') {
@@ -144,10 +146,11 @@ export default {
           password: this.loginPassword
         })
         localStorage.setItem('access_token', response.data.access_token)
+        localStorage.setItem('name', response.data.name)
         console.log(response.data)
 
         // Extract role from the response data
-        const { role } = response.data.user
+        const { role } = response.data.role
 
         if (role === 'Admin') {
           localStorage.setItem('access_token', response.data.access_token)
@@ -174,8 +177,8 @@ export default {
     async onRegist() {
       try {
         if (this.registerPassword !== this.confirmPassword) {
-          this.passwordsNotMatch = true;
-          return;
+          this.passwordsNotMatch = true
+          return
         }
 
         const response = await axios.post(BASE_URL + '/auth/register', {
@@ -202,34 +205,7 @@ export default {
           })
         }
       }
-    },
-    // async onRegist() {
-    //   try {
-    //     const response = await axios.post(BASE_URL + '/auth/register', {
-    //       name: this.registerName,
-    //       email: this.registerEmail,
-    //       password: this.registerPassword
-    //     })
-
-    //     console.log(response.data)
-    //     this.$router.push('/login')
-    //     // Reload the page after redirection
-    //     window.location.reload()
-    //   } catch (error) {
-    //     console.error(error)
-
-    //     if (error.response && error.response.data.message) {
-    //       const errorMessage = error.response.data.message
-    //       // Display notification with red color
-    //       this.$notify({
-    //         type: 'error',
-    //         title: 'Error',
-    //         text: errorMessage,
-    //         color: 'red'
-    //       })
-    //     }
-    //   }
-    // }
+    }
   }
 }
 </script>

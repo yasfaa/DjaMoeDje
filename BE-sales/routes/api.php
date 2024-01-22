@@ -23,7 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('/auth')->group(function () {
     Route::post('/login',[AuthController::class,'login']);
     Route::post('/register',[AuthController::class,'register']);
-    Route::get('/edit',[AuthController::class,'edit'])->middleware('auth:sanctum');
+    Route::get('/user',[AuthController::class,'edit'])->middleware('auth:sanctum');
     Route::put('/update',[AuthController::class,'update'])->middleware('auth:sanctum');
     Route::post('/logout',[AuthController::class,'logout'])->middleware('auth:sanctum');
 });
