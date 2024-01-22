@@ -103,16 +103,16 @@ export default {
     const accessToken = localStorage.getItem('access_token')
     if (accessToken) {
       axios
-        .get(BASE_URL + '/user', {
+        .get(BASE_URL + '/auth/user', {
           headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
         })
         .then((response) => {
-          const { role } = response.data.role
-          if (role === 'ADMIN') {
+          
+          if (response.data.role === 'Admin') {
             this.$router.push('/admin/dashboard')
-          } else if (role === 'USER') {
+          } else if (response.data.role === 'User') {
             this.$router.push('/dashboard')
           }
         })
@@ -149,13 +149,10 @@ export default {
         localStorage.setItem('name', response.data.name)
         console.log(response.data)
 
-        // Extract role from the response data
-        const { role } = response.data.role
-
-        if (role === 'Admin') {
+        if (response.data.role === 'Admin') {
           localStorage.setItem('access_token', response.data.access_token)
           this.$router.push('/admin/dashboard')
-        } else if (role === 'User') {
+        } else if (response.data.role === 'User') {
           localStorage.setItem('access_token', response.data.access_token)
           this.$router.push('/dashboard')
         }
