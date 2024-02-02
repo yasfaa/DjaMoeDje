@@ -102,14 +102,12 @@ export default {
 
     const accessToken = localStorage.getItem('access_token')
     if (accessToken) {
-      axios
-        .get(BASE_URL + '/auth/user', {
+      axios.get(BASE_URL + '/user', {
           headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
         })
         .then((response) => {
-          
           if (response.data.role === 'Admin') {
             this.$router.push('/admin/dashboard')
           } else if (response.data.role === 'User') {
