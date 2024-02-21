@@ -15,7 +15,7 @@
           exact
           class="nav-link"
           :class="{ 'active-link': $route.path === '/admin/daftarbuku' }"
-          >Daftar Buku</router-link
+          >Daftar Pesanan</router-link
         >
         <router-link
           to="/admin/kelolapelanggan"
@@ -84,7 +84,7 @@
           to="/dashboard"
           exact
           class="nav-link"
-          :class="{ 'active-link': $route.path === 'F/dashboard' }"
+          :class="{ 'active-link': $route.path === '/dashboard' }"
           >Home</router-link
         >
         <router-link
@@ -92,7 +92,7 @@
           exact
           class="nav-link"
           :class="{ 'active-link': $route.path === '/menu' }"
-          >Daftar Buku</router-link
+          >Daftar Menu</router-link
         >
         <router-link
           to="/pesanan"
@@ -118,9 +118,7 @@
                 aria-controls="navbarSupportedContent"
                 aria-expanded="false"
                 aria-label="Toggle navigation"
-              >
-                <ion-icon name="person"></ion-icon>
-              </button>
+              ></button>
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <div class="div">
                   <ul class="navbar-nav mb-2 mb-lg-0">
