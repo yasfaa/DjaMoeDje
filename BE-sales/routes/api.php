@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\IngredientController;
+use App\Http\Controllers\MenuController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -28,10 +30,27 @@ Route::prefix('/auth')->group(function () {
     Route::post('/logout',[AuthController::class,'logout'])->middleware('auth:sanctum');
 });
 
-Route::prefix('/address')->group(function () {
-    Route::post('/tambah',[AddressController::class,'store'])->middleware('auth:sanctum');
-    Route::get('/get',[AddressController::class,'getAlamat'])->middleware('auth:sanctum');
-    Route::delete('/delete/{id}',[AddressController::class,'destroy'])->middleware('auth:sanctum');
-    Route::get('/edit/{id}',[AddressController::class,'edit'])->middleware('auth:sanctum');
-    Route::put('/update/{id}',[AddressController::class,'update'])->middleware('auth:sanctum');
+Route::prefix('/address')->middleware(['auth:sanctum'])->group(function () {
+    Route::post('/add',[AddressController::class,'store']);
+    Route::get('/get',[AddressController::class,'getAlamat']);
+    Route::delete('/delete/{id}',[AddressController::class,'destroy']);
+    Route::get('/edit/{id}',[AddressController::class,'edit']);
+    Route::put('/update/{id}',[AddressController::class,'update']);
+});
+
+Route::prefix('/menu')->middleware(['auth:sanctum', 'role:Admin'])->group(function () {
+    Route::post('/add', [MenuController::class, 'store']);
+    Route::get('/get', [MenuController::class, 'index']);
+    Route::get('/get/{id}', [MenuController::class, 'getOne']);
+    Route::put('/update/{id}', [MenuController::class, 'update']);
+    Route::delete('/delete/{id}', [MenuController::class, 'destroy']);
+});
+
+
+Route::prefix('/ingredient')->middleware(['auth:sanctum', 'role:Admin'])->group(function () {
+    Route::post('/add',[IngredientController::class,'store']);
+    Route::get('/get',[IngredientController::class,'get']);
+    Route::get('/get/{id}',[IngredientController::class,'getOne']);
+    Route::put('/update/{id}',[IngredientController::class,'update']);
+    Route::delete('/delete/{id}',[IngredientController::class,'destroy']);
 });

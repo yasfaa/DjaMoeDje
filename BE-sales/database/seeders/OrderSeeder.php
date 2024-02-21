@@ -14,7 +14,7 @@ class OrderSeeder extends Seeder
     public function run(): void
     {
         DB::table('orders')->insert([
-            'user_id' => 3, // Replace with the actual user ID
+            'user_id' => 2, // Replace with the actual user ID
             'tanggal_pesan' => now(),
             'total_harga' => 25000, // Replace with the actual total harga
             'status_pesanan' => 'Dalam Proses',

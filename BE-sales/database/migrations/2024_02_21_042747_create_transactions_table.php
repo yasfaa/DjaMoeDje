@@ -10,13 +10,15 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::transactions('orders', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->timestamp('tanggal_pesan')->useCurrent();
-            $table->decimal('total_harga', 10, 2);
-            $table->string('status_pesanan');
+            $table->unsignedBigInteger('address_id');
+            $table->foreign('address_id')->references('id')->on('addresses');
+            $table->double('total', 10);
+            $table->enum('status', ['unpaid', 'proccess', 'shipping', 'received', 'canceled'])->default('unpaid');
+            $table->text('tracking_number')->nullable();
             $table->timestamps();
         });
     }
