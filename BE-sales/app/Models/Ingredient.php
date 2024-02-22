@@ -10,4 +10,6 @@ class Ingredient extends Model
     use HasFactory;
 
     protected $fillable = ['nama_bahan'];
+
+    public $timestamps = false;
 }
