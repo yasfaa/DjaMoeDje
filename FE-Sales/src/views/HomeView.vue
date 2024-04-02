@@ -9,7 +9,9 @@
           <div class="text-atas col-lg-6 col-md-8 mx-auto">
             <h1 class="fw-bold">DjaMoeDje</h1>
             <p class="lead">Spesialin Makanan Khas Surabaya Dengan Cita Rasa yang Nikmat</p>
-            <button class="btn btn-primary" @click="scrollToNextSection">Daftar Menu</button>
+            <button class="scroll-button btn" @click="scrollToNextSection">
+              Daftar Menu
+            </button>
           </div>
         </div>
       </section>
@@ -135,6 +137,18 @@
 .lead {
   color: antiquewhite;
 }
+
+.scroll-button {
+  background-color: #b9a119;
+  border-color: transparent;
+}
+
+.scroll-button:hover {
+  background-color: #806407;
+  border-color: transparent;
+  transition: background-color 0.5s;
+}
+
 </style>
 
 <script>

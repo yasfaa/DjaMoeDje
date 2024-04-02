@@ -22,7 +22,7 @@
                                   </div>
                                   <button class="login-button" type="submit" style="color:white">Log in</button>
                                   <div class="register">
-                                      <p>Don't have an account <a @click="toggleForm" style="cursor: pointer">Register</a>
+                                      <p>Don't have an account? <a @click="toggleForm" style="cursor: pointer">Register</a>
                                       </p>
                                   </div>
                               </form>
@@ -45,7 +45,7 @@
                                   </div>
                                   <button class="login-button" type="submit" style="color:white">Register</button>
                                   <div class="register">
-                                      <p>Already have an account <a @click="toggleForm" style="cursor: pointer">Log in</a>
+                                      <p>Already have an account? <a @click="toggleForm" style="cursor: pointer">Log in</a>
                                       </p>
                                   </div>
                               </form>
@@ -289,8 +289,8 @@ h2 {
 
 .register p a {
   text-decoration: none;
-  color: white;
-  font-weight: 600;
+  color: whitesmoke;
+  font-weight: 700;
 }
 
 .register p a:hover {

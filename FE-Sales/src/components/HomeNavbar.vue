@@ -35,7 +35,7 @@
       </div>
       <div class="d-flex px-1 align-items-center order-lg-last">
         <router-link to="/login" class="nav-link p-1">
-          <button :class="{ 'btn-success': isNavbarVisible }" class="btn">Masuk</button>
+          <button :class="{ 'btn': isNavbarVisible }" class="btn">Masuk</button>
         </router-link>
         <button
           class="navbar-toggler"
@@ -93,12 +93,12 @@ export default {
  transition: opacity 0.5s ease-in-out;
 }
 
-.btn-success {
+.btn {
  background-color: #b9a119;
  border-color: #b9a119;
 }
 
-.btn-success:hover {
+.btn:hover {
  background-color: #806407;
  border-color: #806407;
  transition: background-color 0.5s;
