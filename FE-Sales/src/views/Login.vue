@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import Navbar from '@/components/HomeNavbar.vue'
+import Navbar from '@/components/LoginNavbar.vue'
 import axios from 'axios'
 const BASE_URL = import.meta.env.VITE_BASE_URL_API
 export default {

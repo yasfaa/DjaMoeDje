@@ -8,7 +8,7 @@
         <div class="row py-lg-5">
           <div class="text-atas col-lg-6 col-md-8 mx-auto">
             <h1 class="fw-bold">DjaMoeDje</h1>
-            <p class="lead">Spesialin Makanan Khas Surabaya Dengan Cita Rasa yang Nikmat</p>
+            <p class="lead">Spesialis Makanan Khas Surabaya dengan Cita Rasa yang Nikmat</p>
             <button class="scroll-button btn" @click="scrollToNextSection">
               Daftar Menu
             </button>
@@ -131,16 +131,18 @@
 }
 
 .text-atas {
-  color: antiquewhite;
+  color: white;
 }
 
 .lead {
-  color: antiquewhite;
+  color: white;
 }
 
 .scroll-button {
   background-color: #b9a119;
   border-color: transparent;
+  color: white;
+  font-weight: bold;
 }
 
 .scroll-button:hover {

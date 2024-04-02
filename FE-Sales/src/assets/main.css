@@ -3,4 +3,5 @@
 #app {
   background-color: rgb(26, 24, 24);
   min-height: 100vh;
+  font-family: 'Noto Sans', sans-serif;
 }
