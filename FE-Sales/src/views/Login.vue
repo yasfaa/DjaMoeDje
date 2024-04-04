@@ -1,60 +1,62 @@
 <template>
   <main>
-      <Navbar />
-      <section class="login-section">
-          <div class="container">
-              <div class="form-box" :class="{ 'register-form': isRegister }">
-                  <div class="padding-container">
-                      <div class="form-value">
-                          <transition name="fade" mode="out-in">
-                              <form v-if="!isRegister && !isEmailForgotPassword && !isForgotPassword" key="login-form"
-                                  @submit.prevent="onSubmit">
-                                  <h2>Login</h2>
-                                  <div class="inputbox">
-                                      <ion-icon name="mail-outline"></ion-icon>
-                                      <input class="input-type" type="email" v-model="loginEmail" required>
-                                      <label for="">Email</label>
-                                  </div>
-                                  <div class="inputbox">
-                                      <ion-icon name="lock-closed-outline"></ion-icon>
-                                      <input class="input-type" type="password" v-model="loginPassword" required>
-                                      <label for="">Password</label>
-                                  </div>
-                                  <button class="login-button" type="submit" style="color:white">Log in</button>
-                                  <div class="register">
-                                      <p>Don't have an account? <a @click="toggleForm" style="cursor: pointer">Register</a>
-                                      </p>
-                                  </div>
-                              </form>
-                              <form v-else key="register-form" @submit.prevent="onRegist">
-                                  <h2>Register</h2>
-                                  <div class="inputbox">
-                                      <ion-icon name="person-outline"></ion-icon>
-                                      <input class="input-type" type="input" v-model="registerName" required>
-                                      <label for="">Name</label>
-                                  </div>
-                                  <div class="inputbox">
-                                      <ion-icon name="mail-outline"></ion-icon>
-                                      <input class="input-type" type="email" v-model="registerEmail" required>
-                                      <label for="">Email</label>
-                                  </div>
-                                  <div class="inputbox">
-                                      <ion-icon name="lock-closed-outline"></ion-icon>
-                                      <input class="input-type" type="password" v-model="registerPassword" required>
-                                      <label for="">Create Password</label>
-                                  </div>
-                                  <button class="login-button" type="submit" style="color:white">Register</button>
-                                  <div class="register">
-                                      <p>Already have an account? <a @click="toggleForm" style="cursor: pointer">Log in</a>
-                                      </p>
-                                  </div>
-                              </form>
-                          </transition>
-                      </div>
+    <Navbar />
+    <section class="login-section">
+      <div class="container">
+        <div class="form-box" :class="{ 'register-form': isRegister }">
+          <div class="padding-container">
+            <div class="form-value">
+              <transition name="fade" mode="out-in">
+                <form
+                  v-if="!isRegister && !isEmailForgotPassword && !isForgotPassword"
+                  key="login-form"
+                  @submit.prevent="onSubmit"
+                >
+                  <h2>Login</h2>
+                  <div class="inputbox">
+                    <input class="input-type" type="email" v-model="loginEmail" required />
+                    <label for="">Email</label>
                   </div>
-              </div>
+                  <div class="inputbox">
+                    <input class="input-type" type="password" v-model="loginPassword" required />
+                    <label for="">Password</label>
+                  </div>
+                  <button class="login-button" type="submit" style="color: white">Log in</button>
+                  <div class="register">
+                    <p>
+                      Don't have an account?
+                      <a @click="toggleForm" style="cursor: pointer">Register</a>
+                    </p>
+                  </div>
+                </form>
+                <form v-else key="register-form" @submit.prevent="onRegist">
+                  <h2>Register</h2>
+                  <div class="inputbox">
+                    <input class="input-type" type="input" v-model="registerName" required />
+                    <label for="">Name</label>
+                  </div>
+                  <div class="inputbox">
+                    <input class="input-type" type="email" v-model="registerEmail" required />
+                    <label for="">Email</label>
+                  </div>
+                  <div class="inputbox">
+                    <input class="input-type" type="password" v-model="registerPassword" required />
+                    <label for="">Create Password</label>
+                  </div>
+                  <button class="login-button" type="submit" style="color: white">Register</button>
+                  <div class="register">
+                    <p>
+                      Already have an account?
+                      <a @click="toggleForm" style="cursor: pointer">Log in</a>
+                    </p>
+                  </div>
+                </form>
+              </transition>
+            </div>
           </div>
-      </section>
+        </div>
+      </div>
+    </section>
   </main>
 </template>
 
@@ -98,7 +100,8 @@ export default {
 
     const accessToken = localStorage.getItem('access_token')
     if (accessToken) {
-      axios.get(BASE_URL + '/user', {
+      axios
+        .get(BASE_URL + '/user', {
           headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
@@ -275,7 +278,7 @@ h2 {
   font-weight: 600;
 }
 
-.login-button:hover{
+.login-button:hover {
   background-color: #806407;
   transition: background-color 0.5s;
 }

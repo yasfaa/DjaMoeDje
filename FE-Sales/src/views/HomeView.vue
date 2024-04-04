@@ -9,9 +9,7 @@
           <div class="text-atas col-lg-6 col-md-8 mx-auto">
             <h1 class="fw-bold">DjaMoeDje</h1>
             <p class="lead">Spesialis Makanan Khas Surabaya dengan Cita Rasa yang Nikmat</p>
-            <button class="scroll-button btn" @click="scrollToNextSection">
-              Daftar Menu
-            </button>
+            <button class="scroll-button btn" @click="scrollToNextSection">Daftar Menu</button>
           </div>
         </div>
       </section>
@@ -19,102 +17,69 @@
       <section class="next-section py-5 bg-dark">
         <div class="container">
           <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-            <div class="col">
-              <div class="card shadow-sm">
-                <svg
-                  class="bd-placeholder-img card-img-top"
-                  width="100%"
+            <v-col cols="12" sm="6" md="4">
+              <v-card class="black" hover @click="$router.push('/menu')">
+                <v-img
+                  src="https://via.placeholder.com/150"
                   height="225"
-                  xmlns="http://www.w3.org/2000/svg"
-                  role="img"
-                  aria-label="Placeholder: Thumbnail"
-                  preserveAspectRatio="xMidYMid slice"
-                  focusable="false"
+                  class="white--text align-end"
+                  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
                 >
-                  <title>Placeholder</title>
-                  <rect width="100%" height="100%" fill="#55595c" />
-                  <text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text>
-                </svg>
-
-                <div class="card-body">
-                  <p class="card-text">
-                    This is a wider card with supporting text below as a natural lead-in to
-                    additional content. This content is a little bit longer.
-                  </p>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-                    </div>
-                    <small class="text-muted">9 mins</small>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card shadow-sm">
-                <svg
-                  class="bd-placeholder-img card-img-top"
-                  width="100%"
+                </v-img>
+                <v-card-text class="white--text">
+                  This is a wider card with supporting text below as a natural lead-in to additional
+                  content. This content is a little bit longer.
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn small color="primary" text>View</v-btn>
+                  <v-btn small color="primary" text>Edit</v-btn>
+                  <v-spacer></v-spacer>
+                  <small class="text--secondary">9 mins</small>
+                </v-card-actions>
+              </v-card>
+            </v-col>
+            <v-col cols="12" sm="6" md="4">
+              <v-card hover>
+                <v-img
+                  src="https://via.placeholder.com/150"
                   height="225"
-                  xmlns="http://www.w3.org/2000/svg"
-                  role="img"
-                  aria-label="Placeholder: Thumbnail"
-                  preserveAspectRatio="xMidYMid slice"
-                  focusable="false"
+                  class="white--text align-end"
+                  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
                 >
-                  <title>Placeholder</title>
-                  <rect width="100%" height="100%" fill="#55595c" />
-                  <text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text>
-                </svg>
-
-                <div class="card-body">
-                  <p class="card-text">
-                    This is a wider card with supporting text below as a natural lead-in to
-                    additional content. This content is a little bit longer.
-                  </p>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-                    </div>
-                    <small class="text-muted">9 mins</small>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card shadow-sm">
-                <svg
-                  class="bd-placeholder-img card-img-top"
-                  width="100%"
+                </v-img>
+                <v-card-text class="black">
+                  This is a wider card with supporting text below as a natural lead-in to additional
+                  content. This content is a little bit longer.
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn small color="primary" text>View</v-btn>
+                  <v-btn small color="primary" text>Edit</v-btn>
+                  <v-spacer></v-spacer>
+                  <small class="text--secondary">9 mins</small>
+                </v-card-actions>
+              </v-card>
+            </v-col>
+            <v-col cols="12" sm="6" md="4">
+              <v-card hover>
+                <v-img
+                  src="https://via.placeholder.com/150"
                   height="225"
-                  xmlns="http://www.w3.org/2000/svg"
-                  role="img"
-                  aria-label="Placeholder: Thumbnail"
-                  preserveAspectRatio="xMidYMid slice"
-                  focusable="false"
+                  class="white--text align-end"
+                  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
                 >
-                  <title>Placeholder</title>
-                  <rect width="100%" height="100%" fill="#55595c" />
-                  <text x="50%" y="50%" fill="#eceeef" dy=".4em">Thumbnail</text>
-                </svg>
-
-                <div class="card-body">
-                  <p class="card-text">
-                    This is a wider card with supporting text below as a natural lead-in to
-                    additional content. This content is a little bit longer.
-                  </p>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-                    </div>
-                    <small class="text-muted">9 mins</small>
-                  </div>
-                </div>
-              </div>
-            </div>
+                </v-img>
+                <v-card-text>
+                  This is a wider card with supporting text below as a natural lead-in to additional
+                  content. This content is a little bit longer.
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn small color="primary" text>View</v-btn>
+                  <v-btn small color="primary" text>Edit</v-btn>
+                  <v-spacer></v-spacer>
+                  <small class="text--secondary">9 mins</small>
+                </v-card-actions>
+              </v-card>
+            </v-col>
           </div>
         </div>
       </section>
@@ -122,7 +87,7 @@
   </main>
 </template>
 
-<style>
+<style scoped>
 .content {
   margin-top: 177px;
   margin-bottom: 100px;
@@ -149,8 +114,15 @@
   background-color: #806407;
   border-color: transparent;
   transition: background-color 0.5s;
-}
 
+  .black {
+    transition: background-color 0.3s ease;
+  }
+
+  .black:hover {
+    background-color: #adadad; /* Warna hitam yang lebih gelap untuk efek hover */
+  }
+}
 </style>
 
 <script>
