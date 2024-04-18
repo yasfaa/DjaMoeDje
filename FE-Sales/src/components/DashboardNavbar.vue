@@ -27,11 +27,16 @@
       </div>
       <div class="content">
         <div class="button-side">
-          <nav class="navbar navbar-expand-lg navbar-light white shadow-sm bg-light fixed-top">
+          <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
             <span style="font-size: 25px; cursor: pointer" @click="isActive = !isActive"
               >&#9776;
             </span>
-            <a class="navbar-brand" href="/" style="font-size: 32px">DjaMoeDje</a>
+            <a
+              class="navbar-brand"
+              href="/"
+              style="font-size: 32px; padding-left: 20px; font-weight: bold"
+              >DjaMoeDje</a
+            >
             <div class="ms-auto mx-2">
               <button
                 class="navbar-toggler"
@@ -306,6 +311,7 @@ export default {
   .sidenav {
     padding-top: 15px;
   }
+  
 
   .sidenav a {
     font-size: 18px;

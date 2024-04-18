@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('menus', function (Blueprint $table) {
             $table->id();
             $table->string('nama_menu');
-            $table->double('total', 10);
+            $table->double('total');
             $table->string('deskripsi');
             $table->timestamps();
         });

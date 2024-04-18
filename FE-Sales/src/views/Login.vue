@@ -110,7 +110,7 @@ export default {
           if (response.data.role === 'Admin') {
             this.$router.push('/admin/dashboard')
           } else if (response.data.role === 'User') {
-            this.$router.push('/dashboard')
+            this.$router.push('/')
           }
         })
         .catch((error) => {
@@ -151,7 +151,7 @@ export default {
           this.$router.push('/admin/dashboard')
         } else if (response.data.role === 'User') {
           localStorage.setItem('access_token', response.data.access_token)
-          this.$router.push('/dashboard')
+          this.$router.push('/')
         }
       } catch (error) {
         console.error(error)

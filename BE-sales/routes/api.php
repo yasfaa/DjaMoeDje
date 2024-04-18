@@ -26,7 +26,7 @@ Route::prefix('/auth')->group(function () {
     Route::post('/login',[AuthController::class,'login']);
     Route::post('/register',[AuthController::class,'register']);
     Route::get('/user',[AuthController::class,'edit'])->middleware('auth:sanctum');
-    Route::put('/update',[AuthController::class,'update'])->middleware('auth:sanctum');
+    Route::post('/update',[AuthController::class,'update'])->middleware('auth:sanctum');
     Route::post('/logout',[AuthController::class,'logout'])->middleware('auth:sanctum');
 });
 
@@ -42,7 +42,7 @@ Route::prefix('/menu')->middleware(['auth:sanctum', 'role:Admin'])->group(functi
     Route::post('/add', [MenuController::class, 'store']);
     Route::get('/get', [MenuController::class, 'index']);
     Route::get('/get/{id}', [MenuController::class, 'getOne']);
-    Route::put('/update/{id}', [MenuController::class, 'update']);
+    Route::post('/update/{id}', [MenuController::class, 'update']);
     Route::delete('/delete/{id}', [MenuController::class, 'destroy']);
 });
 

@@ -28,11 +28,11 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
-            IngredientsSeeder::class,
+            MenuSeeder::class,
         ]);
 
         $this->call([
-            MenuSeeder::class,
+            IngredientsSeeder::class,
         ]);
 
         $this->call([

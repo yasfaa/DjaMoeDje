@@ -17,18 +17,19 @@ class MenuController extends Controller
             return response()->json(['message' => 'Failed to retrieve menus. ' . $e->getMessage()], 500);
         }
     }
+
     public function store(Request $request)
     {
         $request->validate([
             'nama_menu' => 'required|string',
-            'harga' => 'required|numeric',
+            'total' => 'required|numeric',
             'deskripsi' => 'required|string',
         ]);
 
         try {
             $menu = Menu::create([
                 'nama_menu' => $request->input('nama_menu'),
-                'harga' => $request->input('harga'),
+                'total' => $request->input('total'),
                 'deskripsi' => $request->input('deskripsi'),
             ]);
 
@@ -61,12 +62,12 @@ class MenuController extends Controller
 
         $request->validate([
             'nama_menu' => 'required|string',
-            'harga' => 'required|numeric',
+            'total' => 'required|numeric',
             'deskripsi' => 'required|string',
         ]);
 
         $menu->nama_menu = $request->input('nama_menu');
-        $menu->harga = $request->input('harga');
+        $menu->total = $request->input('total');
         $menu->deskripsi = $request->input('deskripsi');
 
         $menu->save();

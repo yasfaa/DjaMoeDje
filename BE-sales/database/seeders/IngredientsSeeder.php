@@ -14,18 +14,18 @@ class IngredientsSeeder extends Seeder
     public function run(): void
     {
         DB::table('ingredients')->insert([
-            ['nama_bahan' => 'Cingur'],
-            ['nama_bahan' => 'Tahu'],
-            ['nama_bahan' => 'Tempe'],
-            ['nama_bahan' => 'Lombok'],
-            ['nama_bahan' => 'Kupang'],
-            ['nama_bahan' => 'Lontong'],
-            ['nama_bahan' => 'Lento'],
-            ['nama_bahan' => 'Sate Kerang'],
-            ['nama_bahan' => 'Kangkung'],
-            ['nama_bahan' => 'Tauge'],
-            ['nama_bahan' => 'Bengkoang'],
-            ['nama_bahan' => 'Nanas'],
+            ['nama_bahan' => 'Cingur','menu_id' => 1],
+            ['nama_bahan' => 'Tahu','menu_id' => 1],
+            ['nama_bahan' => 'Tempe','menu_id' => 1],
+            ['nama_bahan' => 'Lombok','menu_id' => 1],
+            ['nama_bahan' => 'Kupang','menu_id' => 1],
+            ['nama_bahan' => 'Lontong','menu_id' => 1],
+            ['nama_bahan' => 'Lento','menu_id' => 2],
+            ['nama_bahan' => 'Sate Kerang','menu_id' => 2],
+            ['nama_bahan' => 'Kangkung','menu_id' => 1],
+            ['nama_bahan' => 'Tauge','menu_id' => 1],
+            ['nama_bahan' => 'Bengkoang','menu_id' => 1],
+            ['nama_bahan' => 'Nanas','menu_id' => 1],
         ]);
     }
 }
