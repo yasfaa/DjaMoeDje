@@ -13,5 +13,6 @@ class Menu extends Model
         'nama_menu',
         'total',
         'deskripsi',
+        'file_path',
     ];
 }

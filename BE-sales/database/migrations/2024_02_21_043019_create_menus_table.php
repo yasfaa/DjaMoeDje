@@ -15,8 +15,10 @@ return new class extends Migration {
             $table->string('nama_menu');
             $table->double('total');
             $table->string('deskripsi');
+            $table->json('file_path')->nullable();
             $table->timestamps();
         });
+        
     }
 
     /**

@@ -10,13 +10,19 @@ class MenuController extends Controller
     public function index()
     {
         try {
-            $menus = Menu::all();
+            $menus = Menu::paginate(5);
 
-            return response()->json(['menus' => $menus], 200);
+            foreach ($menus as $menu) {
+                $filePaths[$menu->id] = json_decode($menu->file_path, true);
+            }
+
+            return response()->json(['menus' => $menus, 'filePaths' => $filePaths], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to retrieve menus. ' . $e->getMessage()], 500);
         }
     }
+
+
 
     public function store(Request $request)
     {
@@ -24,13 +30,23 @@ class MenuController extends Controller
             'nama_menu' => 'required|string',
             'total' => 'required|numeric',
             'deskripsi' => 'required|string',
+            'gambar' => 'required|array',
+            'gambar.*' => 'image|mimes:jpeg,png,jpg,gif|max:4096',
         ]);
 
         try {
+            $filePaths = [];
+
+            foreach ($request->file('gambar') as $gambar) {
+                $path = $gambar->store('public/menu_imagess');
+                $filePaths[] = $path;
+            }
+
             $menu = Menu::create([
                 'nama_menu' => $request->input('nama_menu'),
                 'total' => $request->input('total'),
                 'deskripsi' => $request->input('deskripsi'),
+                'file_path' => json_encode($filePaths),
             ]);
 
             return response()->json(['menu' => $menu, 'message' => 'Menu added successfully'], 201);
@@ -43,11 +59,11 @@ class MenuController extends Controller
     {
         try {
             $menu = Menu::findOrFail($id);
+            $filePaths = json_decode($menu->file_path, true);
 
-            // Jika menu ditemukan, kembalikan respons
-            return response()->json(['status' => 'success', 'data' => $menu], 200);
+            return response()->json(['status' => 'success', 'menu' => $menu, 'filePaths' => $filePaths], 200);
         } catch (\Exception $e) {
-            // Jika menu tidak ditemukan, kembalikan pesan kesalahan
+
             return response()->json(['status' => 'error', 'message' => 'Menu not found.'], 404);
         }
     }
@@ -64,11 +80,22 @@ class MenuController extends Controller
             'nama_menu' => 'required|string',
             'total' => 'required|numeric',
             'deskripsi' => 'required|string',
+            'gambar' => 'array', // Validasi bahwa input gambar merupakan array
+            'gambar.*' => 'image|mimes:jpeg,png,jpg,gif|max:4096', // Validasi setiap gambar
         ]);
 
         $menu->nama_menu = $request->input('nama_menu');
         $menu->total = $request->input('total');
         $menu->deskripsi = $request->input('deskripsi');
+
+        if ($request->hasFile('gambar')) {
+            $filePaths = [];
+            foreach ($request->file('gambar') as $gambar) {
+                $path = $gambar->store('public/menu_images');
+                $filePaths[] = $path;
+            }
+            $menu->file_path = json_encode($filePaths);
+        }
 
         $menu->save();
 
