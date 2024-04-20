@@ -8,7 +8,7 @@
             <div class="form-value">
               <transition name="fade" mode="out-in">
                 <form
-                  v-if="!isRegister && !isEmailForgotPassword && !isForgotPassword"
+                  v-if="!isRegister"
                   key="login-form"
                   @submit.prevent="onSubmit"
                 >

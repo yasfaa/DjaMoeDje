@@ -83,6 +83,13 @@
           </div>
         </div>
       </section>
+      <section>
+        <footer class="bg-body-tertiary text-center text-lg-start">
+          <div class="text-center p-3" style="background-color: #806407; color: white;">
+            © 2024 Copyright: Yasfa Ainun Abdullah
+          </div>
+        </footer>
+      </section>
     </div>
   </main>
 </template>

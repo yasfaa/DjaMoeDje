@@ -47,7 +47,6 @@
                 aria-expanded="false"
                 aria-label="Toggle navigation"
               >
-                <ion-icon name="person"></ion-icon>
               </button>
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <div class="div">

@@ -15,7 +15,7 @@
     </div>
   </nav>
   <div v-else class="transition-content" :class="{ pushMainContent: isActive }">
-    <div v-if="role === 'Admin'">
+    <div v-if="user.name === 'Admin'">
       <div id="mySidenav" class="sidenav shadow" :class="{ openNavClass: isActive }">
         <a class="closebtn" @click="isActive = !isActive" style="cursor: pointer">&times;</a>
         <router-link
@@ -23,29 +23,32 @@
           exact
           class="nav-link"
           :class="{ 'active-link': $route.path === '/admin/dashboard' }"
-          >Home</router-link
         >
+          Home
+        </router-link>
         <router-link
-          to="/admin/daftarbuku"
+          to="/admin/menu"
           exact
           class="nav-link"
-          :class="{ 'active-link': $route.path === '/admin/daftarbuku' }"
-          >Daftar Pesanan</router-link
+          :class="{ 'active-link': $route.path === '/admin/menu' }"
         >
+          Kelola Menu
+        </router-link>
         <router-link
-          to="/admin/kelolapelanggan"
+          to="/admin/menu"
           exact
           class="nav-link"
-          :class="{ 'active-link': $route.path === '/admin/kelolapelanggan' }"
-          >Kelola Pelanggan</router-link
+          :class="{ 'active-link': $route.path === '/admin/order' }"
         >
+          Daftar Pesanan
+        </router-link>
       </div>
       <div class="content">
         <div class="button-side">
           <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
             <span style="font-size: 25px; cursor: pointer" @click="isActive = !isActive"
-              >&#9776;
-            </span>
+              >&#9776;</span
+            >
             <a
               class="navbar-brand"
               href="/"
@@ -62,7 +65,6 @@
                 aria-expanded="false"
                 aria-label="Toggle navigation"
               >
-                <ion-icon name="person"></ion-icon>
               </button>
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <div class="div">
@@ -73,17 +75,15 @@
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
                       >
-                        {{ username }}
+                        {{ user.name }}
                       </button>
                       <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                          <a class="dropdown-item" @click="profile"
-                            ><ion-icon name="person"></ion-icon>&nbsp;Profile</a
-                          >
+                          <a class="dropdown-item" @click="profile">Profile</a>
                         </li>
                         <li>
                           <a class="dropdown-item" @click="onLogout()" style="cursor: pointer"
-                            ><ion-icon name="log-out"></ion-icon>&nbsp;Logout</a
+                            >Logout</a
                           >
                         </li>
                       </ul>
@@ -100,27 +100,25 @@
     <div v-else>
       <div id="mySidenav" class="sidenav shadow" :class="{ openNavClass: isActive }">
         <a class="closebtn" @click="isActive = !isActive" style="cursor: pointer">&times;</a>
-        <router-link
-          to="/dashboard"
-          exact
-          class="nav-link"
-          :class="{ 'active-link': $route.path === '/' }"
-          >Home</router-link
-        >
+        <router-link to="/" exact class="nav-link" :class="{ 'active-link': $route.path === '/' }">
+          Home
+        </router-link>
         <router-link
           to="/menu"
           exact
           class="nav-link"
           :class="{ 'active-link': $route.path === '/menu' }"
-          >Daftar Menu</router-link
         >
+          Lihat Menu
+        </router-link>
         <router-link
           to="/pesanan"
           exact
           class="nav-link"
           :class="{ 'active-link': $route.path === '//pesanan' }"
-          >Kelola Pesanan</router-link
         >
+          Pesananku
+        </router-link>
       </div>
       <div class="content">
         <div class="button-side">
@@ -153,17 +151,18 @@
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
                       >
-                        {{ username }}
+                        {{ user.name }}
                       </button>
                       <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                          <a class="dropdown-item" @click="profile"
-                            ><ion-icon name="person"></ion-icon>&nbsp;Profile</a
-                          >
+                          <a class="dropdown-item text-center" @click="profile">Profile</a>
                         </li>
                         <li>
-                          <a class="dropdown-item" @click="onLogout()" style="cursor: pointer"
-                            ><ion-icon name="log-out"></ion-icon>&nbsp;Logout</a
+                          <a
+                            class="dropdown-item text-center"
+                            @click="onLogout()"
+                            style="cursor: pointer"
+                            >Logout</a
                           >
                         </li>
                       </ul>
@@ -174,7 +173,6 @@
             </div>
           </nav>
         </div>
-        <slot></slot>
       </div>
     </div>
   </div>
@@ -189,8 +187,7 @@ export default {
     return {
       isLoggedIn: false,
       isActive: false,
-      username: '',
-      id: '',
+      user: {},
       isNavbarHidden: false,
       lastScrollPosition: 0,
       isNavbarVisible: true
@@ -204,16 +201,18 @@ export default {
           Authorization: 'Bearer ' + localStorage.getItem('access_token')
         }
       })
-      this.id = response.data.id
-      this.username = response.data.name
+      this.user = {
+        name: response.data.name,
+        role: response.data.role
+      }
       this.isLoggedIn = true
     } catch (error) {
       console.error(error)
+      
       this.isLoggedIn = false
-
       if (error.response && error.response.data.message) {
         const errorMessage = error.response.data.message
-        // Display notification with red color
+        // Tampilkan notifikasi dengan warna merah
         this.$notify({
           type: 'error',
           title: 'Error',
@@ -244,7 +243,7 @@ export default {
         )
         .then((response) => {
           localStorage.removeItem('access_token')
-          window.location.reload()
+          this.$router.push('/')
         })
         .catch((error) => {
           console.error(error)
