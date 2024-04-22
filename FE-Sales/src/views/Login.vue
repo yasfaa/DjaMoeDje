@@ -7,11 +7,7 @@
           <div class="padding-container">
             <div class="form-value">
               <transition name="fade" mode="out-in">
-                <form
-                  v-if="!isRegister"
-                  key="login-form"
-                  @submit.prevent="onSubmit"
-                >
+                <form v-if="!isRegister" key="login-form" @submit.prevent="onSubmit">
                   <h2>Login</h2>
                   <div class="inputbox">
                     <input class="input-type" type="email" v-model="loginEmail" required />
@@ -142,15 +138,17 @@ export default {
           email: this.loginEmail,
           password: this.loginPassword
         })
-        localStorage.setItem('access_token', response.data.access_token)
-        localStorage.setItem('name', response.data.name)
-        console.log(response.data)
+        const { access_token, name, role } = response.data
 
-        if (response.data.role === 'Admin') {
-          localStorage.setItem('access_token', response.data.access_token)
-          this.$router.push('/admin/dashboard')
-        } else if (response.data.role === 'User') {
-          localStorage.setItem('access_token', response.data.access_token)
+        localStorage.setItem('access_token', access_token)
+        localStorage.setItem('name', name)
+        localStorage.setItem('role', role)
+
+        this.isLoggedIn = true
+        this.user = { name, role }
+
+        // Redirect user based on role
+        if (role === 'Admin' || role === 'User') {
           this.$router.push('/')
         }
       } catch (error) {
@@ -168,6 +166,7 @@ export default {
         }
       }
     },
+
     async onRegist() {
       try {
         if (this.registerPassword !== this.confirmPassword) {

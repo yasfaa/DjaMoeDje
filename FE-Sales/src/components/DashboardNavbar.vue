@@ -1,6 +1,6 @@
 <template>
   <div class="transition-content" :class="{ pushMainContent: isActive }">
-    <div v-if="role === 'Admin'">
+    <div v-if="isAdmin">
       <div id="mySidenav" class="sidenav shadow" :class="{ openNavClass: isActive }">
         <a class="closebtn" @click="isActive = !isActive" style="cursor: pointer">&times;</a>
         <router-link
@@ -8,22 +8,101 @@
           exact
           class="nav-link"
           :class="{ 'active-link': $route.path === '/admin/dashboard' }"
-          >Home</router-link
         >
+          Home
+        </router-link>
         <router-link
-          to="/admin/daftarbuku"
+          to="/admin/menu"
           exact
           class="nav-link"
-          :class="{ 'active-link': $route.path === '/admin/daftarbuku' }"
-          >Daftar Pesanan</router-link
+          :class="{ 'active-link': $route.path === '/admin/menu' }"
         >
+          Kelola Menu
+        </router-link>
         <router-link
-          to="/admin/kelolapelanggan"
+          to="/admin/menu"
           exact
           class="nav-link"
-          :class="{ 'active-link': $route.path === '/admin/kelolapelanggan' }"
-          >Kelola Pelanggan</router-link
+          :class="{ 'active-link': $route.path === '/admin/order' }"
         >
+          Daftar Pesanan
+        </router-link>
+      </div>
+      <div class="content">
+        <div class="button-side">
+          <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+            <span style="font-size: 25px; cursor: pointer" @click="isActive = !isActive"
+              >&#9776;</span
+            >
+            <a
+              class="navbar-brand"
+              href="/"
+              style="font-size: 32px; padding-left: 30px; font-weight: bold"
+              >DjaMoeDje</a
+            >
+            <div class="ms-auto mx-2">
+              <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+              ></button>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <div class="div">
+                  <ul class="navbar-nav mb-2 mb-lg-0">
+                    <li class="nav-item dropdown">
+                      <button
+                        class="btn dropdown-toggle"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                      >
+                        {{ user.name }}
+                      </button>
+                      <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                          <a class="dropdown-item" @click="profile">Profile</a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item" @click="onLogout()" style="cursor: pointer"
+                            >Logout</a
+                          >
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </nav>
+        </div>
+        <slot></slot>
+      </div>
+    </div>
+    <div v-else>
+      <div id="mySidenav" class="sidenav shadow" :class="{ openNavClass: isActive }">
+        <a class="closebtn" @click="isActive = !isActive" style="cursor: pointer">&times;</a>
+        <router-link to="/" exact class="nav-link" :class="{ 'active-link': $route.path === '/' }">
+          Home
+        </router-link>
+        <router-link
+          to="/menu"
+          exact
+          class="nav-link"
+          :class="{ 'active-link': $route.path === '/menu' }"
+        >
+          Lihat Menu
+        </router-link>
+        <router-link
+          to="/pesanan"
+          exact
+          class="nav-link"
+          :class="{ 'active-link': $route.path === '//pesanan' }"
+        >
+          Pesananku
+        </router-link>
       </div>
       <div class="content">
         <div class="button-side">
@@ -46,82 +125,6 @@
                 aria-controls="navbarSupportedContent"
                 aria-expanded="false"
                 aria-label="Toggle navigation"
-              >
-              </button>
-              <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <div class="div">
-                  <ul class="navbar-nav mb-2 mb-lg-0">
-                    <li class="nav-item dropdown">
-                      <button
-                        class="btn dropdown-toggle"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        {{ username }}
-                      </button>
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <a class="dropdown-item" @click="profile"
-                            ><ion-icon name="person"></ion-icon>&nbsp;Profile</a
-                          >
-                        </li>
-                        <li>
-                          <a class="dropdown-item" @click="onLogout()" style="cursor: pointer"
-                            ><ion-icon name="log-out"></ion-icon>&nbsp;Logout</a
-                          >
-                        </li>
-                      </ul>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </nav>
-        </div>
-        <slot></slot>
-      </div>
-    </div>
-    <div v-else>
-      <div id="mySidenav" class="sidenav shadow" :class="{ openNavClass: isActive }">
-        <a class="closebtn" @click="isActive = !isActive" style="cursor: pointer">&times;</a>
-        <router-link
-          to="/dashboard"
-          exact
-          class="nav-link"
-          :class="{ 'active-link': $route.path === '/dashboard' }"
-          >Home</router-link
-        >
-        <router-link
-          to="/menu"
-          exact
-          class="nav-link"
-          :class="{ 'active-link': $route.path === '/menu' }"
-          >Daftar Menu</router-link
-        >
-        <router-link
-          to="/pesanan"
-          exact
-          class="nav-link"
-          :class="{ 'active-link': $route.path === '//pesanan' }"
-          >Kelola Pesanan</router-link
-        >
-      </div>
-      <div class="content">
-        <div class="button-side">
-          <nav class="navbar navbar-expand-lg navbar-light white shadow-sm bg-light fixed-top">
-            <span style="font-size: 25px; cursor: pointer" @click="isActive = !isActive"
-              >&#9776;
-            </span>
-            <a class="navbar-brand" href="/" style="font-size: 32px">DjaMoeDje</a>
-            <div class="ms-auto mx-2">
-              <button
-                class="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent"
-                aria-expanded="false"
-                aria-label="Toggle navigation"
               ></button>
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <div class="div">
@@ -132,17 +135,18 @@
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
                       >
-                        {{ username }}
+                        {{ user.name }}
                       </button>
                       <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                          <a class="dropdown-item" @click="profile"
-                            ><ion-icon name="person"></ion-icon>&nbsp;Profile</a
-                          >
+                          <a class="dropdown-item text-center" @click="profile">Profile</a>
                         </li>
                         <li>
-                          <a class="dropdown-item" @click="onLogout()" style="cursor: pointer"
-                            ><ion-icon name="log-out"></ion-icon>&nbsp;Logout</a
+                          <a
+                            class="dropdown-item text-center"
+                            @click="onLogout()"
+                            style="cursor: pointer"
+                            >Logout</a
                           >
                         </li>
                       </ul>
@@ -153,7 +157,6 @@
             </div>
           </nav>
         </div>
-        <slot></slot>
       </div>
     </div>
   </div>
@@ -167,25 +170,27 @@ export default {
   data() {
     return {
       isActive: false,
-      username: '',
-      id: ''
+      user: {
+        name: '',
+        role: ''
+      },
+      isNavbarVisible: true
     }
   },
-  async mounted() {
-    try {
-      const response = await axios.get(BASE_URL + '/auth/user', {
-        headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('access_token')
+  mounted() {
+    this.fetchUserData()
+  },
+  methods: {
+    async fetchUserData() {
+      try {
+        const name = localStorage.getItem('name')
+        const role = localStorage.getItem('role')
+        if (name && role) {
+          this.user.name = name
+          this.user.role = role
         }
-      })
-      this.id = response.data.id
-      this.username = response.data.name
-    } catch (error) {
-      console.error(error)
-
-      if (error.response && error.response.data.message) {
-        const errorMessage = error.response.data.message
-        // Display notification with red color
+      } catch (error) {
+        console.error(error)
         this.$notify({
           type: 'error',
           title: 'Error',
@@ -193,13 +198,7 @@ export default {
           color: 'red'
         })
       }
-    }
-  },
-  methods: {
-    // profile() {
-    //   const id = this.id
-    //   this.$router.push({ path: `/profile/${id}` })
-    // }
+    },
     onLogout() {
       axios
         .post(
@@ -213,23 +212,42 @@ export default {
         )
         .then((response) => {
           localStorage.removeItem('access_token')
-          this.$router.push('/login')
+          localStorage.removeItem('name')
+          localStorage.removeItem('role')
+          this.$router.push('/')
+          window.location.reload()
         })
         .catch((error) => {
           console.error(error)
         })
     }
+  },
+  computed: {
+    isAdmin() {
+      return this.user.role === 'Admin'
+    }
   }
 }
 </script>
-<style scoped>
-.navbar {
-  padding-left: 15px;
+
+<style>
+.navbar-hidden {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease-in-out;
 }
 
-.navbar-brand {
+.btn {
+  background-color: #b9a119;
+  border-color: transparent;
+  color: white;
   font-weight: bold;
-  padding-left: 15px;
+}
+
+.btn:hover {
+  background-color: #806407;
+  border-color: transparent;
+  transition: background-color 0.5s;
 }
 
 .sidenav {
@@ -289,39 +307,13 @@ export default {
   padding: 16px;
 }
 
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  /* Change the alpha value to adjust transparency */
-  display: none;
-  z-index: 0;
-}
-
-.showOverlay {
-  display: block;
-  z-index: 1;
-}
-
 @media screen and (max-height: 450px) {
   .sidenav {
     padding-top: 15px;
   }
-  
 
   .sidenav a {
     font-size: 18px;
   }
-}
-
-.content {
-  min-height: 100vh;
-
-  background: url('../../../src/assets/LandingPage/Background.png');
-  background-position: center;
-  background-size: cover;
 }
 </style>

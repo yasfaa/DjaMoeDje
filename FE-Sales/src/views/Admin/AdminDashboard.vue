@@ -1,134 +1,136 @@
 <!-- Catalogue.vue -->
 <template>
-  <section class="navbar">
-    <Navbar />
-  </section>
-  <div>
-    <div class="container-fluid px-4 py-2">
-      <div class="row py-5">
-        <div class="col-md-12">
-          <div class="card border-0 px-2" style="text-align: end">
-            <div class="col text-right">
-              <div class="button-set my-4">
-                <v-btn
-                  color="#b9a119"
-                  rounded="l"
-                  data-bs-toggle="modal"
-                  data-bs-target="#addMenu"
-                  class=""
-                >
-                  Tambah Menu
-                </v-btn>
+  <main>
+    <section class="navbar">
+      <Navbar />
+    </section>
+    <div>
+      <div class="container-fluid px-4 py-2">
+        <div class="row py-5">
+          <div class="col-md-12">
+            <div class="card border-0 px-2" style="text-align: end">
+              <div class="col text-right">
+                <div class="button-set my-4">
+                  <v-btn
+                    color="#b9a119"
+                    rounded="l"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addMenu"
+                    class=""
+                  >
+                    Tambah Menu
+                  </v-btn>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="col-md-12 mt-4 mb-12">
-          <Datatables ref="datatablesMenu" />
+          <div class="col-md-12 mt-4 mb-12">
+            <Datatables ref="datatablesMenu" />
+          </div>
         </div>
       </div>
-    </div>
-    <!-- Modal Nich -->
-    <div
-      class="modal fade"
-      id="addMenu"
-      tabindex="-1"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">Tambah Menu</h1>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-              id="closeModal"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <form @submit.prevent="addMenu">
-              <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Nama Parfum</label>
-                <input
-                  type="name"
-                  class="form-control"
-                  v-model="parfum.name"
-                  aria-describedby="namaCustomer"
-                />
-              </div>
-              <div class="mb-3">
-                <label for="exampleInputDesc" class="form-label">Deskripsi</label>
-                <textarea
-                  type="text"
-                  class="form-control"
-                  v-model="parfum.desc"
-                  aria-describedby="emailCustomer"
-                ></textarea>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Tags</label>
-                <div class="form-check" v-for="tag in tags" :key="tag.id">
+      <!-- Modal Nich -->
+      <div
+        class="modal fade"
+        id="addMenu"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Tambah Menu</h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                id="closeModal"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form @submit.prevent="addMenu">
+                <div class="mb-3">
+                  <label for="exampleInputEmail1" class="form-label">Nama Menu</label>
                   <input
-                    class="form-check-input"
-                    type="checkbox"
-                    :value="tag.name"
-                    v-model="selectedTags"
+                    type="name"
+                    class="form-control"
+                    v-model="menu.name"
+                    aria-describedby="namaCustomer"
                   />
-                  <label class="form-check-label">{{ tag.name }}</label>
                 </div>
-              </div>
-              <div class="mb-3">
-                <label for="exampleKategori" class="form-label">Kategori</label>
-                <select class="form-select" v-model="parfum.category">
-                  <option v-for="category in categories" :key="category.id" :value="category.id">
-                    {{ category.name }}
-                  </option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label for="FileInput" class="form-label">Gambar Parfum</label>
-                <input
-                  type="file"
-                  class="form-control"
-                  ref="fileInput"
-                  @change="handleFileChange"
-                  multiple
-                />
-              </div>
-              <div class="mb-3">
-                <label for="exampleInputHarga" class="form-label">Harga</label>
-                <input type="number" class="form-control" v-model="parfum.price" />
-              </div>
-              <div class="mb-3">
-                <label for="exampleInputStock" class="form-label">Stok</label>
-                <input type="text" class="form-control" v-model="parfum.stok" />
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button-custom type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-              >Close</button-custom
-            >
-            <button-custom
-              class="btn btn-info"
-              type="submit"
-              @click="addMenu"
-              data-bs-dismiss="modal"
-              >Tambah Menu</button-custom
-            >
+                <div class="mb-3">
+                  <label for="exampleInputDesc" class="form-label">Deskripsi</label>
+                  <textarea
+                    type="text"
+                    class="form-control"
+                    v-model="menu.desc"
+                    aria-describedby="emailCustomer"
+                  ></textarea>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Tags</label>
+                  <div class="form-check" v-for="tag in tags" :key="tag.id">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      :value="tag.name"
+                      v-model="selectedTags"
+                    />
+                    <label class="form-check-label">{{ tag.name }}</label>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="exampleKategori" class="form-label">Kategori</label>
+                  <select class="form-select" v-model="menu.category">
+                    <option v-for="category in categories" :key="category.id" :value="category.id">
+                      {{ category.name }}
+                    </option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="FileInput" class="form-label">Gambar Menu</label>
+                  <input
+                    type="file"
+                    class="form-control"
+                    ref="fileInput"
+                    @change="handleFileChange"
+                    multiple
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="exampleInputHarga" class="form-label">Harga</label>
+                  <input type="number" class="form-control" v-model="menu.price" />
+                </div>
+                <div class="mb-3">
+                  <label for="exampleInputStock" class="form-label">Stok</label>
+                  <input type="text" class="form-control" v-model="menu.stok" />
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button-custom type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                >Close</button-custom
+              >
+              <button-custom
+                class="btn btn-info"
+                type="submit"
+                @click="addMenu"
+                data-bs-dismiss="modal"
+                >Tambah Menu</button-custom
+              >
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <script>
 import axios from 'axios'
-import Navbar from '@/components/HomeNavbar.vue'
+import Navbar from '@/components/DashboardNavbar.vue'
 import Datatables from '@/components/Vuetify/DataTablesProduk.vue'
 
 const BASE_URL = import.meta.env.VITE_BASE_URL_API
@@ -141,7 +143,7 @@ export default {
   },
   data() {
     return {
-      parfum: {
+      menu: {
         name: '',
         desc: '',
         price: '',
@@ -152,20 +154,13 @@ export default {
       selectedFile: [],
       categories: [],
       tags: [],
-      selectedTags: [],
-      breadcrumbsItems: [
-        {
-          title: 'Daftar Produk',
-          disabled: false,
-          href: '/admin/daftarproduk'
-        }
-      ]
+      selectedTags: []
     }
   },
 
   mounted() {
-    this.fetchCategories()
-    this.retrieveTags()
+    // this.fetchCategories()
+    // this.retrieveTags()
   },
 
   methods: {
@@ -175,18 +170,12 @@ export default {
     },
 
     clearForm() {
-      this.parfum.name = ''
-      this.parfum.desc = ''
-      this.parfum.price = ''
-      this.parfum.stok = ''
-      this.parfum.foto = ''
-      ;(this.parfum.category = ''), (this.$refs.fileInput.value = '')
-    },
-    openCategory() {
-      this.$router.push('/admin/kategori')
-    },
-    openTags() {
-      this.$router.push('/admin/tags')
+      this.menu.name = ''
+      this.menu.desc = ''
+      this.menu.price = ''
+      this.menu.stok = ''
+      this.menu.foto = ''
+      ;(this.menu.category = ''), (this.$refs.fileInput.value = '')
     },
 
     // Method
@@ -203,20 +192,19 @@ export default {
           formData.append(`images[${index}]`, file, file.name)
         })
 
-        formData.append('name', this.parfum.name)
-        formData.append('description', this.parfum.desc)
-        formData.append('price', this.parfum.price)
-        formData.append('stock', this.parfum.stok)
-        formData.append('tags', this.selectedTags.join(', '))
-        formData.append('category_id', this.parfum.category)
+        formData.append('name', this.menu.name)
+        formData.append('description', this.menu.desc)
+        formData.append('price', this.menu.price)
+        formData.append('stock', this.menu.stok)
+        formData.append('category_id', this.menu.category)
         document.getElementById('closeModal').click()
         const token = localStorage.getItem('access_token')
-        const response = await axios.post(BASE_URL + '/menu/get', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: 'Bearer ' + token
-          }
-        })
+        // const response = await axios.post(BASE_URL + '/menu/get', formData, {
+        //   headers: {
+        //     'Content-Type': 'multipart/form-data',
+        //     Authorization: 'Bearer ' + token
+        //   }
+        // })
         this.clearForm()
         this.selectedFiles = [] // Clear selected files
         this.selectedTags = []

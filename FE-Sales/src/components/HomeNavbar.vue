@@ -11,11 +11,12 @@
         <router-link to="/login" class="nav-link p-1">
           <button class="btn">Masuk</button>
         </router-link>
+        {{ user.name }}
       </div>
     </div>
   </nav>
   <div v-else class="transition-content" :class="{ pushMainContent: isActive }">
-    <div v-if="user.name === 'Admin'">
+    <div v-if="user.role === 'Admin'">
       <div id="mySidenav" class="sidenav shadow" :class="{ openNavClass: isActive }">
         <a class="closebtn" @click="isActive = !isActive" style="cursor: pointer">&times;</a>
         <router-link
@@ -64,8 +65,7 @@
                 aria-controls="navbarSupportedContent"
                 aria-expanded="false"
                 aria-label="Toggle navigation"
-              >
-              </button>
+              ></button>
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <div class="div">
                   <ul class="navbar-nav mb-2 mb-lg-0">
@@ -187,28 +187,25 @@ export default {
     return {
       isLoggedIn: false,
       isActive: false,
-      user: {},
+      user: '',
       isNavbarHidden: false,
       lastScrollPosition: 0,
       isNavbarVisible: true
     }
   },
   async mounted() {
-    window.addEventListener('scroll', this.handleScroll)
+    
     try {
-      const response = await axios.get(BASE_URL + '/auth/user', {
-        headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('access_token')
-        }
-      })
-      this.user = {
-        name: response.data.name,
-        role: response.data.role
+      const name = localStorage.getItem('name')
+      const role = localStorage.getItem('role')
+      if (name && role) {
+        this.user = { name, role }
+        this.isLoggedIn = true
+      } else {
+        this.isLoggedIn = false
       }
-      this.isLoggedIn = true
     } catch (error) {
       console.error(error)
-      
       this.isLoggedIn = false
       if (error.response && error.response.data.message) {
         const errorMessage = error.response.data.message
@@ -226,10 +223,6 @@ export default {
     window.removeEventListener('scroll', this.handleScroll)
   },
   methods: {
-    // profile() {
-    //   const id = this.id
-    //   this.$router.push({ path: `/profile/${id}` })
-    // },
     onLogout() {
       axios
         .post(
@@ -243,12 +236,17 @@ export default {
         )
         .then((response) => {
           localStorage.removeItem('access_token')
+          localStorage.removeItem('name')
+          localStorage.removeItem('role')
+          this.isLoggedIn = false
           this.$router.push('/')
+          window.location.reload()
         })
         .catch((error) => {
           console.error(error)
         })
     },
+
     handleScroll() {
       const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop
       if (currentScrollPosition < 0) {
