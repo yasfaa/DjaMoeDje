@@ -29,7 +29,7 @@
           </div>
         </div>
       </div>
-      <!-- Modal Nich -->
+      <!-- Modal -->
       <div
         class="modal fade"
         id="addMenu"
@@ -52,7 +52,7 @@
             <div class="modal-body">
               <form @submit.prevent="addMenu">
                 <div class="mb-3">
-                  <label for="exampleInputEmail1" class="form-label">Nama Menu</label>
+                  <label for="InputNamaMenu" class="form-label">Nama Menu</label>
                   <input
                     type="name"
                     class="form-control"
@@ -61,33 +61,13 @@
                   />
                 </div>
                 <div class="mb-3">
-                  <label for="exampleInputDesc" class="form-label">Deskripsi</label>
+                  <label for="InputDeskripsi" class="form-label">Deskripsi</label>
                   <textarea
                     type="text"
                     class="form-control"
                     v-model="menu.desc"
                     aria-describedby="emailCustomer"
                   ></textarea>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Tags</label>
-                  <div class="form-check" v-for="tag in tags" :key="tag.id">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      :value="tag.name"
-                      v-model="selectedTags"
-                    />
-                    <label class="form-check-label">{{ tag.name }}</label>
-                  </div>
-                </div>
-                <div class="mb-3">
-                  <label for="exampleKategori" class="form-label">Kategori</label>
-                  <select class="form-select" v-model="menu.category">
-                    <option v-for="category in categories" :key="category.id" :value="category.id">
-                      {{ category.name }}
-                    </option>
-                  </select>
                 </div>
                 <div class="mb-3">
                   <label for="FileInput" class="form-label">Gambar Menu</label>
@@ -102,10 +82,6 @@
                 <div class="mb-3">
                   <label for="exampleInputHarga" class="form-label">Harga</label>
                   <input type="number" class="form-control" v-model="menu.price" />
-                </div>
-                <div class="mb-3">
-                  <label for="exampleInputStock" class="form-label">Stok</label>
-                  <input type="text" class="form-control" v-model="menu.stok" />
                 </div>
               </form>
             </div>
@@ -147,14 +123,8 @@ export default {
         name: '',
         desc: '',
         price: '',
-        stok: '',
-        category: '',
-        tag: ''
       },
       selectedFile: [],
-      categories: [],
-      tags: [],
-      selectedTags: []
     }
   },
 
@@ -173,9 +143,7 @@ export default {
       this.menu.name = ''
       this.menu.desc = ''
       this.menu.price = ''
-      this.menu.stok = ''
       this.menu.foto = ''
-      ;(this.menu.category = ''), (this.$refs.fileInput.value = '')
     },
 
     // Method
@@ -189,17 +157,15 @@ export default {
       try {
         const formData = new FormData()
         this.selectedFiles.forEach((file, index) => {
-          formData.append(`images[${index}]`, file, file.name)
+          formData.append(`gambar[${index}]`, file, file.name)
         })
 
-        formData.append('name', this.menu.name)
-        formData.append('description', this.menu.desc)
-        formData.append('price', this.menu.price)
-        formData.append('stock', this.menu.stok)
-        formData.append('category_id', this.menu.category)
+        formData.append('nama_menu', this.menu.name)
+        formData.append('deskripsi', this.menu.desc)
+        formData.append('total', this.menu.price)
         document.getElementById('closeModal').click()
         const token = localStorage.getItem('access_token')
-        const response = await axios.post(BASE_URL + '/menu/get', formData, {
+        const response = await axios.post(BASE_URL + '/menu/add', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             Authorization: 'Bearer ' + token
@@ -237,6 +203,14 @@ export default {
 .dashboard-admin {
   background-position: center;
   background-size: cover;
+}
+
+.form-label {
+  color: #63560c;
+}
+
+.modal-title{
+  color: #63560c;
 }
 
 .card {

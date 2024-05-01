@@ -10,7 +10,7 @@ class MenuController extends Controller
     public function index()
     {
         try {
-            $menus = Menu::paginate(5);
+            $menus = Menu::paginate(10);
 
             // Menginisialisasi array untuk menyimpan data menu beserta satu URL dari imagePath
             $formattedMenus = [];

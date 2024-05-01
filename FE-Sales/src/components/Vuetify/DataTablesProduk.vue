@@ -22,7 +22,7 @@
       <template v-slot:item.imagePath="{ item }">
         <img
           :src="item.imagePath ? item.imagePath : 'https://via.placeholder.com/150'"
-          height="100"
+          height="150"
           alt="Menu Image"
         />
       </template>
