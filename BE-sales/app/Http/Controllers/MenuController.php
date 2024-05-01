@@ -12,17 +12,35 @@ class MenuController extends Controller
         try {
             $menus = Menu::paginate(5);
 
+            // Menginisialisasi array untuk menyimpan data menu beserta satu URL dari imagePath
+            $formattedMenus = [];
+
+            // Mengisi array formattedMenus dengan data yang diinginkan
             foreach ($menus as $menu) {
-                $filePaths[$menu->id] = json_decode($menu->file_path, true);
+                $formattedMenu = [
+                    'id' => $menu->id,
+                    'nama' => $menu->nama_menu,
+                    'total' => $menu->total,
+                    'deskripsi' => $menu->deskripsi,
+                    'imagePath' => null, // Inisialisasi imagePath menjadi null
+                ];
+
+                // Jika imagePath tidak kosong, ambil satu URL saja
+                if (!is_null($menu->file_path)) {
+                    $paths = json_decode($menu->file_path, true);
+                    $url = asset(str_replace('public/', 'storage/', $paths[0])); // Ambil URL pertama saja
+                    $formattedMenu['imagePath'] = $url;
+                }
+
+                $formattedMenus[] = $formattedMenu;
             }
 
-            return response()->json(['menus' => $menus, 'filePaths' => $filePaths], 200);
+            // Mengembalikan response dengan data formattedMenus
+            return response()->json(['menus' => $formattedMenus], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to retrieve menus. ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Gagal mengambil data menu. ' . $e->getMessage()], 500);
         }
     }
-
-
 
     public function store(Request $request)
     {
@@ -30,16 +48,20 @@ class MenuController extends Controller
             'nama_menu' => 'required|string',
             'total' => 'required|numeric',
             'deskripsi' => 'required|string',
-            'gambar' => 'required|array',
-            'gambar.*' => 'image|mimes:jpeg,png,jpg,gif|max:4096',
+            'gambar' => 'nullable|array',
+            'gambar.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
         ]);
 
         try {
             $filePaths = [];
+            $imageUrls = [];
 
             foreach ($request->file('gambar') as $gambar) {
-                $path = $gambar->store('public/menu_imagess');
+                $path = $gambar->store('public/menu_images');
                 $filePaths[] = $path;
+
+                $imageUrl = asset(str_replace('public/', 'storage/', $path));
+                $imageUrls[] = $imageUrl;
             }
 
             $menu = Menu::create([
@@ -49,7 +71,7 @@ class MenuController extends Controller
                 'file_path' => json_encode($filePaths),
             ]);
 
-            return response()->json(['menu' => $menu, 'message' => 'Menu added successfully'], 201);
+            return response()->json(['message' => 'Menu updated successfully', 'menu' => $menu, 'imageUrls' => $imageUrls]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to add menu. ' . $e->getMessage()], 500);
         }
@@ -80,27 +102,34 @@ class MenuController extends Controller
             'nama_menu' => 'required|string',
             'total' => 'required|numeric',
             'deskripsi' => 'required|string',
-            'gambar' => 'array', // Validasi bahwa input gambar merupakan array
-            'gambar.*' => 'image|mimes:jpeg,png,jpg,gif|max:4096', // Validasi setiap gambar
+            'gambar' => 'nullable|array',
+            'gambar.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
         ]);
+
 
         $menu->nama_menu = $request->input('nama_menu');
         $menu->total = $request->input('total');
         $menu->deskripsi = $request->input('deskripsi');
+
+        $imageUrls = [];
 
         if ($request->hasFile('gambar')) {
             $filePaths = [];
             foreach ($request->file('gambar') as $gambar) {
                 $path = $gambar->store('public/menu_images');
                 $filePaths[] = $path;
+
+                $imageUrl = asset(str_replace('public/', 'storage/', $path));
+                $imageUrls[] = $imageUrl;
             }
             $menu->file_path = json_encode($filePaths);
         }
 
         $menu->save();
 
-        return response()->json(['message' => 'Menu updated successfully', 'menu' => $menu]);
+        return response()->json(['message' => 'Menu updated successfully', 'menu' => $menu, 'imageUrls' => $imageUrls]);
     }
+
 
     public function destroy($id)
     {

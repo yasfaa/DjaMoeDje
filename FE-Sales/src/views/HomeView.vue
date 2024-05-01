@@ -1,3 +1,69 @@
+<script>
+import Navbar from '@/components/HomeNavbar.vue'
+import axios from 'axios'
+const BASE_URL = import.meta.env.VITE_BASE_URL_API
+export default {
+  name: 'HomePage',
+  components: {
+    Navbar
+  },
+  data() {
+    return {
+      menus: ''
+    }
+  },
+  mounted() {
+    this.retrieveMenus()
+
+    const scrollWrapper = this.$refs.scrollWrapper
+    if (scrollWrapper) {
+      scrollWrapper.addEventListener('scroll', this.handleScroll)
+    }
+  },
+  beforeMount() {
+    const scrollWrapper = this.$refs.scrollWrapper
+    if (scrollWrapper) {
+      scrollWrapper.removeEventListener('scroll', this.handleScroll)
+    }
+  },
+  methods: {
+    scrollToNextSection() {
+      // Scroll to the next section using JavaScript
+      const nextSection = this.$refs.scrollWrapper.querySelector('.next-section')
+      if (nextSection) {
+        nextSection.scrollIntoView({ behavior: 'smooth' })
+      }
+    },
+    goToMenu(menuId) {
+      this.$router.push(`/menu/${menuId}`)
+    },
+    // Metode untuk memuat data menu dari backend
+    async retrieveMenus() {
+      try {
+        const response = await axios.get(BASE_URL + '/menu/get', {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token')
+          }
+        })
+        this.menus = response.data.menus
+      } catch (error) {
+        console.error('Error fetching menus:', error)
+      }
+    },
+    // Metode untuk mendapatkan URL gambar untuk setiap menu
+    getMenuImage(menuId) {
+      if (this.menus && this.menus.length > 0) {
+        const menu = this.menus.find((menu) => menu.id === menuId)
+        if (menu && menu.imagePath) {
+          // Menggunakan imagePath dari respons JSON
+          return menu.imagePath
+        }
+      }
+      return 'https://via.placeholder.com/150' // URL default jika tidak ada gambar
+    }
+  }
+}
+</script>
 <template>
   <main>
     <section class="navbar">
@@ -13,70 +79,24 @@
           </div>
         </div>
       </section>
-
       <section class="next-section py-5 bg-dark">
         <div class="container">
           <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-            <v-col cols="12" sm="6" md="4">
-              <v-card class="black" hover @click="$router.push('/menu')">
+            <v-col v-for="menu in menus" :key="menu.id" cols="12" sm="6" md="4">
+              <v-card hover @click="goToMenu(menu.id)">
                 <v-img
-                  src="https://via.placeholder.com/150"
+                  :src="getMenuImage(menu.id)"
                   height="225"
                   class="white--text align-end"
                   gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
                 >
                 </v-img>
-                <v-card-text class="white--text">
-                  This is a wider card with supporting text below as a natural lead-in to additional
-                  content. This content is a little bit longer.
-                </v-card-text>
+                <v-card-text class="white--text">{{ menu.deskripsi }}</v-card-text>
                 <v-card-actions>
-                  <v-btn small color="primary" text>View</v-btn>
+                  <v-btn small color="primary" text @click="goToMenu(menu.id)">View</v-btn>
                   <v-btn small color="primary" text>Edit</v-btn>
                   <v-spacer></v-spacer>
-                  <small class="text--secondary">9 mins</small>
-                </v-card-actions>
-              </v-card>
-            </v-col>
-            <v-col cols="12" sm="6" md="4">
-              <v-card hover>
-                <v-img
-                  src="https://via.placeholder.com/150"
-                  height="225"
-                  class="white--text align-end"
-                  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-                >
-                </v-img>
-                <v-card-text class="black">
-                  This is a wider card with supporting text below as a natural lead-in to additional
-                  content. This content is a little bit longer.
-                </v-card-text>
-                <v-card-actions>
-                  <v-btn small color="primary" text>View</v-btn>
-                  <v-btn small color="primary" text>Edit</v-btn>
-                  <v-spacer></v-spacer>
-                  <small class="text--secondary">9 mins</small>
-                </v-card-actions>
-              </v-card>
-            </v-col>
-            <v-col cols="12" sm="6" md="4">
-              <v-card hover>
-                <v-img
-                  src="https://via.placeholder.com/150"
-                  height="225"
-                  class="white--text align-end"
-                  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-                >
-                </v-img>
-                <v-card-text>
-                  This is a wider card with supporting text below as a natural lead-in to additional
-                  content. This content is a little bit longer.
-                </v-card-text>
-                <v-card-actions>
-                  <v-btn small color="primary" text>View</v-btn>
-                  <v-btn small color="primary" text>Edit</v-btn>
-                  <v-spacer></v-spacer>
-                  <small class="text--secondary">9 mins</small>
+                  <small class="text--secondary">{{ menu.total }} Rupiah</small>
                 </v-card-actions>
               </v-card>
             </v-col>
@@ -85,7 +105,7 @@
       </section>
       <section>
         <footer class="bg-body-tertiary text-center text-lg-start">
-          <div class="text-center p-3" style="background-color: #806407; color: white;">
+          <div class="text-center p-3" style="background-color: #806407; color: white">
             © 2024 Copyright: Yasfa Ainun Abdullah
           </div>
         </footer>
@@ -93,7 +113,6 @@
     </div>
   </main>
 </template>
-
 <style scoped>
 .content {
   margin-top: 177px;
@@ -131,34 +150,3 @@
   }
 }
 </style>
-
-<script>
-import Navbar from '@/components/HomeNavbar.vue'
-export default {
-  name: 'HomePage',
-  components: {
-    Navbar
-  },
-  methods: {
-    scrollToNextSection() {
-      // Scroll to the next section using JavaScript
-      const nextSection = this.$refs.scrollWrapper.querySelector('.next-section')
-      if (nextSection) {
-        nextSection.scrollIntoView({ behavior: 'smooth' })
-      }
-    }
-  },
-  mounted() {
-    const scrollWrapper = this.$refs.scrollWrapper
-    if (scrollWrapper) {
-      scrollWrapper.addEventListener('scroll', this.handleScroll)
-    }
-  },
-  beforeMount() {
-    const scrollWrapper = this.$refs.scrollWrapper
-    if (scrollWrapper) {
-      scrollWrapper.removeEventListener('scroll', this.handleScroll)
-    }
-  }
-}
-</script>

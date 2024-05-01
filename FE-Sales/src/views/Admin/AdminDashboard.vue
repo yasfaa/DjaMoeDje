@@ -199,12 +199,12 @@ export default {
         formData.append('category_id', this.menu.category)
         document.getElementById('closeModal').click()
         const token = localStorage.getItem('access_token')
-        // const response = await axios.post(BASE_URL + '/menu/get', formData, {
-        //   headers: {
-        //     'Content-Type': 'multipart/form-data',
-        //     Authorization: 'Bearer ' + token
-        //   }
-        // })
+        const response = await axios.post(BASE_URL + '/menu/get', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: 'Bearer ' + token
+          }
+        })
         this.clearForm()
         this.selectedFiles = [] // Clear selected files
         this.selectedTags = []
