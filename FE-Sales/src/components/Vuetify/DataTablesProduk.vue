@@ -22,13 +22,13 @@
       <template v-slot:item.imagePath="{ item }">
         <img
           :src="item.imagePath ? item.imagePath : 'https://via.placeholder.com/150'"
-          height="64"
+          height="100"
           alt="Menu Image"
         />
       </template>
 
       <template v-slot:item.total="{ item }">
-        <div class="text-end">{{ item.total }}</div>
+        <div class="text-start">Rp{{ item.total }}</div>
       </template>
 
       <template v-slot:item.deskripsi="{ item }">
@@ -36,8 +36,8 @@
       </template>
 
       <template v-slot:item.actions="{ item }">
-        <v-btn small color="primary" text @click="goToMenu(item.id)">View</v-btn>
-        <v-btn small color="primary" text>Edit</v-btn>
+        <v-btn small color="blue" text @click="goToMenu(item.id)">View</v-btn>
+        <v-btn small color="blue" text>Edit</v-btn>
       </template>
     </v-data-table>
   </v-card>
@@ -69,8 +69,7 @@ onMounted(() => {
 })
 
 const goToMenu = (menuId) => {
-  // Ganti ini dengan navigasi ke halaman detail menu sesuai dengan ID
-  console.log('Navigasi ke halaman menu dengan ID:', menuId)
+  this.$router.push(`/menu/${menuId}`)
 }
 </script>
 
