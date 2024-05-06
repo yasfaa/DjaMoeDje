@@ -40,7 +40,7 @@ Route::prefix('/address')->middleware(['auth:sanctum'])->group(function () {
 
 Route::prefix('/menu')->middleware(['auth:sanctum', 'role:Admin'])->group(function () {
     Route::post('/add', [MenuController::class, 'store']);
-    Route::get('/get', [MenuController::class, 'index']);
+    Route::get('/get', [MenuController::class, 'getMenuAdmin']);
     Route::get('/get/{id}', [MenuController::class, 'getOne']);
     Route::post('/update/{id}', [MenuController::class, 'update']);
     Route::delete('/delete/{id}', [MenuController::class, 'destroy']);
@@ -54,3 +54,6 @@ Route::prefix('/ingredient')->middleware(['auth:sanctum', 'role:Admin'])->group(
     Route::put('/update/{id}',[IngredientController::class,'update']);
     Route::delete('/delete/{id}',[IngredientController::class,'destroy']);
 });
+
+Route::get('/getMenu', [MenuController::class, 'index']);
+Route::get('menu/get/{id}', [MenuController::class, 'getOne']);
