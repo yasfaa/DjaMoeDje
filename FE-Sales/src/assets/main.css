@@ -1,7 +1,7 @@
 @import './base.css';
 
 #app {
-  background-color: rgb(26, 24, 24);
   min-height: 100vh;
+  background-image: url('../assets/img/background.jpg');
   font-family: 'Noto Sans', sans-serif;
 }

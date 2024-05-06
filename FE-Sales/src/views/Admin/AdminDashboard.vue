@@ -7,24 +7,7 @@
     <div>
       <div class="container-fluid px-4 py-2">
         <div class="row py-5">
-          <div class="col-md-12">
-            <div class="card border-0 px-2" style="text-align: end">
-              <div class="col text-right">
-                <div class="button-set my-4">
-                  <v-btn
-                    color="#b9a119"
-                    rounded="l"
-                    data-bs-toggle="modal"
-                    data-bs-target="#addMenu"
-                    class=""
-                  >
-                    Tambah Menu
-                  </v-btn>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-12 mt-4 mb-12">
+          <div class="mt-3">
             <Datatables ref="datatablesMenu" />
           </div>
         </div>
@@ -122,9 +105,9 @@ export default {
       menu: {
         name: '',
         desc: '',
-        price: '',
+        price: ''
       },
-      selectedFile: [],
+      selectedFile: []
     }
   },
 
@@ -209,7 +192,7 @@ export default {
   color: #63560c;
 }
 
-.modal-title{
+.modal-title {
   color: #63560c;
 }
 

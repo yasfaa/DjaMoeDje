@@ -169,11 +169,6 @@ export default {
 
     async onRegist() {
       try {
-        if (this.registerPassword !== this.confirmPassword) {
-          this.passwordsNotMatch = true
-          return
-        }
-
         const response = await axios.post(BASE_URL + '/auth/register', {
           name: this.registerName,
           email: this.registerEmail,

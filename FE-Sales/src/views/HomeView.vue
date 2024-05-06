@@ -37,10 +37,9 @@ export default {
     goToMenu(menuId) {
       this.$router.push(`/menu/${menuId}`)
     },
-    // Metode untuk memuat data menu dari backend
     async retrieveMenus() {
       try {
-        const response = await axios.get(BASE_URL + '/menu/get', {
+        const response = await axios.get(BASE_URL + '/getMenu', {
           headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
@@ -50,16 +49,14 @@ export default {
         console.error('Error fetching menus:', error)
       }
     },
-    // Metode untuk mendapatkan URL gambar untuk setiap menu
     getMenuImage(menuId) {
       if (this.menus && this.menus.length > 0) {
         const menu = this.menus.find((menu) => menu.id === menuId)
         if (menu && menu.imagePath) {
-          // Menggunakan imagePath dari respons JSON
           return menu.imagePath
         }
       }
-      return 'https://via.placeholder.com/150' // URL default jika tidak ada gambar
+      return 'https://via.placeholder.com/150'
     }
   }
 }
@@ -93,8 +90,8 @@ export default {
                 </v-img>
                 <v-card-text class="white--text">{{ menu.deskripsi }}</v-card-text>
                 <v-card-actions>
-                  <v-btn small color="primary" text @click="goToMenu(menu.id)">View</v-btn>
-                  <v-btn small color="primary" text>Edit</v-btn>
+                  <v-btn small color="primary" text @click="goToMenu(menu.id)">view Menu</v-btn>
+                  <v-btn small color="primary" text>add to cart</v-btn>
                   <v-spacer></v-spacer>
                   <small class="text--secondary">{{ menu.total }} Rupiah</small>
                 </v-card-actions>
@@ -146,7 +143,7 @@ export default {
   }
 
   .black:hover {
-    background-color: #adadad; /* Warna hitam yang lebih gelap untuk efek hover */
+    background-color: #adadad;
   }
 }
 </style>

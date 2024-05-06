@@ -214,8 +214,8 @@ export default {
           localStorage.removeItem('access_token')
           localStorage.removeItem('name')
           localStorage.removeItem('role')
+          this.isLoggedIn = false
           this.$router.push('/')
-          window.location.reload()
         })
         .catch((error) => {
           console.error(error)
