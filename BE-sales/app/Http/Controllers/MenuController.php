@@ -11,21 +11,17 @@ class MenuController extends Controller
     {
         try {
             $menus = Menu::paginate(10);
-
-            // Menginisialisasi array untuk menyimpan data menu beserta satu URL dari imagePath
             $formattedMenus = [];
 
-            // Mengisi array formattedMenus dengan data yang diinginkan
             foreach ($menus as $menu) {
                 $formattedMenu = [
                     'id' => $menu->id,
                     'nama' => $menu->nama_menu,
                     'total' => $menu->total,
                     'deskripsi' => $menu->deskripsi,
-                    'imagePath' => null, // Inisialisasi imagePath menjadi null
+                    'imagePath' => null,
                 ];
 
-                // Jika imagePath tidak kosong, ambil satu URL saja
                 if (!is_null($menu->file_path)) {
                     $paths = json_decode($menu->file_path, true);
                     $url = asset(str_replace('public/', 'storage/', $paths[0])); // Ambil URL pertama saja
@@ -34,13 +30,44 @@ class MenuController extends Controller
 
                 $formattedMenus[] = $formattedMenu;
             }
-
-            // Mengembalikan response dengan data formattedMenus
             return response()->json(['menus' => $formattedMenus], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Gagal mengambil data menu. ' . $e->getMessage()], 500);
         }
     }
+
+    public function getMenuAdmin()
+    {
+        try {
+            $menus = Menu::paginate(10);
+            $formattedMenus = [];
+
+            foreach ($menus as $menu) {
+                $formattedMenu = [
+                    'id' => $menu->id,
+                    'nama' => $menu->nama_menu,
+                    'total' => $menu->total,
+                    'deskripsi' => $menu->deskripsi,
+                    'imagePaths' => [], // Menggunakan array untuk menyimpan semua gambar
+                ];
+
+                if (!is_null($menu->file_path)) {
+                    $paths = json_decode($menu->file_path, true);
+                    foreach ($paths as $path) {
+                        $url = asset(str_replace('public/', 'storage/', $path));
+                        $formattedMenu['imagePaths'][] = $url;
+                    }
+                }
+
+                $formattedMenus[] = $formattedMenu;
+            }
+
+            return response()->json(['menus' => $formattedMenus], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Gagal mengambil data menu. ' . $e->getMessage()], 500);
+        }
+    }
+
 
     public function store(Request $request)
     {
@@ -48,20 +75,23 @@ class MenuController extends Controller
             'nama_menu' => 'required|string',
             'total' => 'required|numeric',
             'deskripsi' => 'required|string',
-            'gambar' => 'nullable|array',
-            'gambar.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
+            'gambar' => 'required|array',
+            'gambar.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:4096',
         ]);
 
         try {
             $filePaths = [];
             $imageUrls = [];
 
-            foreach ($request->file('gambar') as $gambar) {
-                $path = $gambar->store('public/menu_images');
-                $filePaths[] = $path;
+            if ($request->hasFile('gambar')) {
 
-                $imageUrl = asset(str_replace('public/', 'storage/', $path));
-                $imageUrls[] = $imageUrl;
+                foreach ($request->file('gambar') as $gambar) {
+                    $path = $gambar->store('public/menu_images');
+                    $filePaths[] = $path;
+
+                    $imageUrl = asset(str_replace('public/', 'storage/', $path));
+                    $imageUrls[] = $imageUrl;
+                }
             }
 
             $menu = Menu::create([
@@ -80,15 +110,29 @@ class MenuController extends Controller
     public function getOne($id)
     {
         try {
-            $menu = Menu::findOrFail($id);
+            $menu = Menu::find($id);
+
+            if (!$menu) {
+                return response()->json(['status' => 'error', 'message' => 'Menu not found.'], 404);
+            }
+
             $filePaths = json_decode($menu->file_path, true);
 
-            return response()->json(['status' => 'success', 'menu' => $menu, 'filePaths' => $filePaths], 200);
-        } catch (\Exception $e) {
+            $fileLinks = [];
+            if ($filePaths) {
+                foreach ($filePaths as $path) {
+                    $fileLinks[] = str_replace('/public/', '/storage/', asset($path));
+                }
+            }
 
-            return response()->json(['status' => 'error', 'message' => 'Menu not found.'], 404);
+            return response()->json(['status' => 'success', 'menu' => $menu, 'fileLinks' => $fileLinks], 200);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
+
+
+
 
     public function update(Request $request, $id)
     {
