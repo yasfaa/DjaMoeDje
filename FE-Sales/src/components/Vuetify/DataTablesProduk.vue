@@ -1,7 +1,7 @@
 <template>
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2">
-       Daftar Menu
+      Daftar Menu
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -26,11 +26,30 @@
     </v-card-title>
 
     <v-divider></v-divider>
-    
+
     <v-data-table v-model:search="search" :items="menus">
+      <template v-slot:item.nama="{ item }">
+        <div class="text-start">{{ item.nama }}</div>
+      </template>
+
+      <template v-slot:item.harga="{ item }">
+        <div class="text-start">Rp. {{ formatPrice(item.harga) }}</div>
+      </template>
+
+      <template v-slot:item.deskripsi="{ item }">
+        <div>{{ item.deskripsi }}</div>
+      </template>
       <template v-slot:item.gambar="{ item }">
         <v-row>
-          <v-col v-for="(gambar, index) in item.gambar" :key="index" cols="12" sm="6" md="4" lg="3" class="mx-1">
+          <v-col
+            v-for="(gambar, index) in item.gambar"
+            :key="index"
+            cols="12"
+            sm="6"
+            md="4"
+            lg="3"
+            class="mx-2"
+          >
             <img
               :src="gambar ? gambar : 'https://via.placeholder.com/150'"
               height="150"
@@ -38,18 +57,6 @@
             />
           </v-col>
         </v-row>
-      </template>
-
-      <template v-slot:item.nama="{ item }">
-        <div class="text-start">{{ item.nama }}</div>
-      </template>
-
-      <template v-slot:item.harga="{ item }">
-        <div class="text-start">Rp{{ item.harga }}</div>
-      </template>
-
-      <template v-slot:item.deskripsi="{ item }">
-        <div>{{ item.deskripsi }}</div>
       </template>
     </v-data-table>
   </v-card>
@@ -75,12 +82,17 @@ const retrieveMenus = async () => {
         nama: menu.nama,
         harga: menu.total,
         deskripsi: menu.deskripsi,
-        gambar: menu.imagePaths 
+        gambar: menu.imagePaths
       }
     })
   } catch (error) {
     console.error('Error fetching menus:', error)
   }
+}
+
+const formatPrice = (price) => {
+  const numericPrice = parseFloat(price)
+  return numericPrice.toLocaleString('id-ID')
 }
 
 onMounted(() => {

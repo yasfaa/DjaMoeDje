@@ -27,6 +27,10 @@ export default {
     }
   },
   methods: {
+    formatPrice(price) {
+      const numericPrice = parseFloat(price)
+      return numericPrice.toLocaleString('id-ID')
+    },
     scrollToNextSection() {
       // Scroll to the next section using JavaScript
       const nextSection = this.$refs.scrollWrapper.querySelector('.next-section')
@@ -88,12 +92,12 @@ export default {
                   gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
                 >
                 </v-img>
-                <v-card-text class="white--text">{{ menu.deskripsi }}</v-card-text>
+                <v-card-text class="white--text">{{ menu.nama }}</v-card-text>
                 <v-card-actions>
                   <v-btn small color="primary" text @click="goToMenu(menu.id)">view Menu</v-btn>
                   <v-btn small color="primary" text>add to cart</v-btn>
                   <v-spacer></v-spacer>
-                  <small class="text--secondary">{{ menu.total }} Rupiah</small>
+                  <small class="text--secondary">Rp. {{ formatPrice(menu.total) }}</small>
                 </v-card-actions>
               </v-card>
             </v-col>
