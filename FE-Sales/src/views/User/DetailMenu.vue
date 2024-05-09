@@ -5,8 +5,8 @@
   <div class="py-4 container-fluid gradient-container">
     <div class="container">
       <div class="row mt-5">
-        <div class="card border-2 pt-5" v-if="menu.id">
-          <v-carousel  hide-delimiters height="550" >
+        <div class="card border-2 pt-3" v-if="menu.id">
+          <v-carousel  hide-delimiters  class="carousel">
             <v-carousel-item v-for="(link, index) in fileLinks" :key="index">
               <v-img :src="link || 'https://via.placeholder.com/150' "></v-img>
             </v-carousel-item>
@@ -14,7 +14,7 @@
           <div class="row p-2 pt-2 justify-content-center">
             <div class="col-md-9 d-flex flex-column">
               <a style="font-size: 32px; font-weight: bold">{{ menu.nama_menu }}</a>
-              <div class="price" style="font-weight: bold; font-size: 32px">
+              <div class="price" style="font-weight: bold; font-size: 24px">
                 Rp. {{ formatPrice(menu.total) }}
               </div>
               <div class="theme-text subtitle">Deskripsi:</div>
@@ -25,8 +25,8 @@
                 <div class="row col-md-12">
                   <div class="col-md-5">
                     <div class="text-center">
-                      <v-btn variant="tonal" class="m-1 button">Add to Cart</v-btn>
-                      <v-btn variant="tonal" class="m-1 button">Customize Menu</v-btn>
+                      <v-btn variant="tonal" class="m-2 button">Add to Cart</v-btn>
+                      <v-btn variant="tonal" class="mx-4 button">Customize Menu</v-btn>
                     </div>
                   </div>
                 </div>
@@ -41,7 +41,7 @@
 
 <script>
 import axios from 'axios'
-import Navbar from '@/components/DashboardNavbar.vue'
+import Navbar from '@/components/HomeNavbar.vue'
 
 const BASE_URL = import.meta.env.VITE_BASE_URL_API
 
@@ -104,5 +104,9 @@ export default {
 
 .card {
   border-radius: 10px !important;
+}
+
+.carousel {
+  max-height: 550px;
 }
 </style>

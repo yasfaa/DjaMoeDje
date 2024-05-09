@@ -112,8 +112,7 @@ export default {
   },
 
   mounted() {
-    // this.fetchCategories()
-    // this.retrieveTags()
+    
   },
 
   methods: {
@@ -157,7 +156,7 @@ export default {
         this.clearForm()
         this.selectedFiles = [] // Clear selected files
         this.selectedTags = []
-        this.$refs.datatablesMenu.retrieveMenu()
+        this.$refs.datatablesMenu.retrieveMenus()
 
         this.$notify({
           type: 'success',

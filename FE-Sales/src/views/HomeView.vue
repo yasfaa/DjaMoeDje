@@ -88,7 +88,6 @@ export default {
                 <v-img
                   :src="getMenuImage(menu.id)"
                   height="225"
-                  class="white--text align-end"
                   gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
                 >
                 </v-img>
