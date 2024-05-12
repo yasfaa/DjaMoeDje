@@ -25,7 +25,7 @@ class AuthController extends Controller
 
         if ($created) {
             return response()->json([
-                'message' => 'Successfuly register!'
+                'message' => 'Register berhasil!'
             ], 201);
         } else {
             return response()->json([
@@ -38,7 +38,7 @@ class AuthController extends Controller
     {
         if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
-                'message' => 'Invalid login details'
+                'message' => 'Email atau password salah'
             ], 401);
         }
         $user = User::where('email', $request['email'])->firstOrFail();
@@ -57,7 +57,7 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'message' => 'Successfully logged out!'
+            'message' => 'Logout berhasil!'
         ], 200);
     }
 
@@ -65,7 +65,7 @@ class AuthController extends Controller
     {
         $user = User::where('email', $request->user()->email)->value('name');
         if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
+            return response()->json(['error' => 'Pengguna tidak ditemukan'], 404);
         }
 
         return response()->json(['name' => $user]);
@@ -76,12 +76,12 @@ class AuthController extends Controller
     {
         $user = User::where('email', $request->user()->email)->first();
         if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+            return response()->json(['message' => 'Pengguna tidak ditemukan'], 404);
         }
         $user->update([
             'name' => $request->name,
         ]);
 
-        return response()->json(['message' => 'Successfully updated User'], 200);
+        return response()->json(['message' => 'Berhasil memperbarui data pengguna'], 200);
     }
 }

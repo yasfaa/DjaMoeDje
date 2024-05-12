@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
@@ -101,9 +102,9 @@ class MenuController extends Controller
                 'file_path' => json_encode($filePaths),
             ]);
 
-            return response()->json(['message' => 'Menu updated successfully', 'menu' => $menu, 'imageUrls' => $imageUrls]);
+            return response()->json(['message' => 'Menu berhasil ditambahkan', 'menu' => $menu, 'imageUrls' => $imageUrls]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to add menu. ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Gagal menambahkan menu' . $e->getMessage()], 500);
         }
     }
 
@@ -113,7 +114,7 @@ class MenuController extends Controller
             $menu = Menu::find($id);
 
             if (!$menu) {
-                return response()->json(['status' => 'error', 'message' => 'Menu not found.'], 404);
+                return response()->json(['status' => 'error', 'message' => 'Menu tidak ditemukan.'], 404);
             }
 
             $filePaths = json_decode($menu->file_path, true);
@@ -139,7 +140,7 @@ class MenuController extends Controller
         $menu = Menu::find($id);
 
         if (!$menu) {
-            return response()->json(['error' => 'Menu not found.'], 404);
+            return response()->json(['error' => 'Menu tidak ditemukan.'], 404);
         }
 
         $request->validate([
@@ -171,7 +172,7 @@ class MenuController extends Controller
 
         $menu->save();
 
-        return response()->json(['message' => 'Menu updated successfully', 'menu' => $menu, 'imageUrls' => $imageUrls]);
+        return response()->json(['message' => 'Menu berhasil diperbarui', 'menu' => $menu, 'imageUrls' => $imageUrls]);
     }
 
 
@@ -180,11 +181,22 @@ class MenuController extends Controller
         $menu = Menu::find($id);
 
         if (!$menu) {
-            return response()->json(['error' => 'Menu not found.'], 404);
+            return response()->json(['error' => 'Menu tidak ditemukan.'], 404);
+        }
+
+        // Hapus file foto dari storage
+        if (!is_null($menu->file_path)) {
+            $filePaths = json_decode($menu->file_path, true);
+            foreach ($filePaths as $path) {
+                if (Storage::exists($path)) {
+                    Storage::delete($path);
+                }
+            }
         }
 
         $menu->delete();
 
-        return response()->json(['message' => 'Menu deleted successfully']);
+        return response()->json(['message' => 'Menu berhasil dihapus']);
     }
+
 }

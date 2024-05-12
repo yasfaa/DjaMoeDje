@@ -64,7 +64,7 @@
                 </div>
                 <div class="mb-3">
                   <label for="exampleInputHarga" class="form-label">Harga</label>
-                  <input type="number" class="form-control" v-model="menu.price" />
+                  <input type="price" class="form-control" v-model="menu.price" />
                 </div>
               </form>
             </div>
