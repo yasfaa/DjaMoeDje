@@ -1,0 +1,98 @@
+version: '3'
+
+networks:
+    DjaMoeDje:
+        driver: bridge
+
+volumes:
+    mysql:
+
+services:
+    mysql:
+        platform: linux/amd64
+        image: mysql
+        container_name: mysql_TA
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "${DB_PORT:-3306}:3306"
+        volumes:
+            - mysql:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_DB_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_DB_PASSWORD}
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mysql
+        networks:
+            - DjaMoeDje
+
+    phpmyadmin:
+        image: phpmyadmin
+        restart: unless-stopped
+        container_name: phpmyadmin_TA
+        ports:
+            - "8002:80"
+        environment:
+            - PMA_ARBITRARY=1
+        networks:
+            - DjaMoeDje
+
+    php:
+        build:
+            context: ./BE-sales
+            dockerfile: Dockerfile
+        container_name: php_djamoedje
+        restart: unless-stopped
+        tty: true
+        working_dir: /var/www/app
+        volumes:
+            - ./BE-sales:/var/www/app
+        ports:
+            - "${PHP_HOST_PORT}:${PHP_DOCKER_CONTAINER_PORT}"
+        networks:
+            - DjaMoeDje
+
+    vue:
+        build:
+            context: ./FE-sales
+            dockerfile: Dockerfile
+        container_name: vue_djamoedje
+        restart: unless-stopped
+        tty: true
+        working_dir: /var/www/app
+        volumes:
+            - ./FE-sales:/var/www/app
+        ports:
+            - "${VUE_HOST_PORT}:${VUE_DOCKER_CONTAINER_PORT}"
+        networks:
+            - DjaMoeDje
+
+    nginx_vue:
+        image: nginx:alpine
+        container_name: nginx_djamoedje_fe
+        volumes:
+            - ./nginx/frontend.conf:/etc/nginx/conf.d/default.conf
+        ports:
+            - "80:80"
+        depends_on:
+            - vue
+        networks:
+            - DjaMoeDje
+
+    nginx_be:
+        image: nginx:alpine
+        container_name: nginx_djamoedje_be
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "8001:80"
+        volumes:
+            - ./BE-sales:/var/www/app
+            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+            - php
+            - mysql
+        networks:
+            - DjaMoeDje
