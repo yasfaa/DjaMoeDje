@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\Menu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
-    public function addMenuToCart(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'menu_id' => 'required|exists:menus,id',
@@ -20,7 +21,7 @@ class CartController extends Controller
         // Cari atau buat cart untuk pengguna dengan status 'pending'
         $cart = Cart::firstOrCreate(
             ['user_id' => $user->id, 'status' => 'pending'],
-            ['total_price' => 0]
+            ['harga' => 0]
         );
 
         // Cari apakah menu sudah ada di cart
@@ -32,7 +33,8 @@ class CartController extends Controller
             $existingCartItem->save();
 
             // Perbarui total harga cart
-            $cart->total_price += $existingCartItem->menu->price * $request->quantity;
+            $menu = Menu::find($request->menu_id); // Muat menu
+            $cart->harga += $menu->total * $request->quantity;
         } else {
             // Jika item belum ada di cart, tambahkan item baru
             $newCartItem = $cart->items()->create([
@@ -42,28 +44,28 @@ class CartController extends Controller
             ]);
 
             // Perbarui total harga cart
-            $cart->total_price += $newCartItem->menu->price * $newCartItem->quantity;
+            $menu = Menu::find($request->menu_id); // Muat menu
+            $cart->harga += $menu->total * $newCartItem->quantity;
         }
 
         $cart->save();
 
         return response()->json($cart->load('items.menu'), 201);
     }
-    
+
     //  Mendapatkan isi cart dari satu user.
-    public function getCartContents()
+    public function index()
     {
         $user = Auth::user();
         $cart = Cart::with('items.menu')
-                    ->where('user_id', $user->id)
-                    ->where('status', 'pending')
-                    ->first();
+            ->where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->first();
 
         if (!$cart) {
             return response()->json(['message' => 'Cart is empty'], 404);
         }
-        dump($cart);
-        
+
         $cartContents = $cart->items->map(function ($item) {
             return [
                 'id' => $item->id,

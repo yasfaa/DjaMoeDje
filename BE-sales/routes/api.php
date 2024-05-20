@@ -46,7 +46,7 @@ Route::prefix('/ingredient')->middleware(['auth:sanctum', 'role:Admin'])->group(
 });
 
 Route::prefix('/cart')->middleware(['auth:sanctum'])->group(function () {
-    Route::post('/add',[CartController::class,'addMenuToCart']);
+    Route::post('/add',[CartController::class,'store']);
     Route::get('/get',[CartController::class,'index']);
     Route::get('/get/{id}',[CartController::class,'getOne']);
     Route::put('/update/{id}',[CartController::class,'update']);
