@@ -7,26 +7,33 @@ use Illuminate\Http\Request;
 
 class IngredientController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $request->validate([
+            'menu_id' => 'required|integer|exists:menus,id',
+        ]);
         try {
-            $ingredients = Ingredient::all();
+            $menuId = $request->input('menu_id');
+            $ingredients = Ingredient::where('menu_id', $menuId)->get();
 
-            return response()->json(['ingredients' => $ingredients], 200);
+            return response()->json($ingredients);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to retrieve ingredients. ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Failed to get ingredient. ' . $e->getMessage()], 500);
         }
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $id)
     {
         $request->validate([
-            'nama_bahan' => 'required|string',
+            'nama' => 'required|string',
+            'harga' => 'nullable|numeric',
         ]);
 
         try {
             $ingredient = Ingredient::create([
-                'nama_bahan' => $request->input('nama_bahan'),
+                'nama' => $request->input('nama'),
+                'menu_id' => $id,
+                'harga' => $request->input('harga', 0)
             ]);
 
             return response()->json(['ingredient' => $ingredient, 'message' => 'Ingredient added successfully'], 201);
@@ -57,10 +64,18 @@ class IngredientController extends Controller
         }
 
         $request->validate([
-            'nama_bahan' => 'required|string',
+            'nama' => 'nullable|string',
+            'harga' => 'nullable|numeric',
         ]);
 
-        $ingredient->nama_bahan = $request->input('nama_bahan');
+        if ($request->has('nama')) {
+            $ingredient->nama = $request->input('nama');
+        }
+
+        if ($request->has('harga')) {
+            $ingredient->harga = $request->input('harga');
+        }
+
         $ingredient->save();
 
         return response()->json(['message' => 'Ingredient updated successfully', 'ingredient' => $ingredient]);

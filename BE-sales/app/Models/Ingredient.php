@@ -2,14 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Menu;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Ingredient extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama_bahan'];
+    protected $fillable = [
+        'nama',
+        'menu_id',
+        'harga'
+    ];
+
+    public function menu()
+    {
+        return $this->belongsTo(Menu::class, 'menu_id');
+    }
 
     public $timestamps = false;
 }

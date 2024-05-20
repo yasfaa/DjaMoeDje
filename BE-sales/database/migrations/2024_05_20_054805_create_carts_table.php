@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ingredients', function (Blueprint $table) {
+        Schema::create('carts', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->integer('menu_id')->references('menus.id');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->decimal('harga', 8, 2)->default(0);
+            $table->string('status')->default('pending');
+            $table->timestamps();
         });
     }
 
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ingredients');
+        Schema::dropIfExists('carts');
     }
 };

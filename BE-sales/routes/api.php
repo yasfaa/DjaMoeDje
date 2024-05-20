@@ -1,22 +1,12 @@
 <?php
 
-use App\Http\Controllers\AddressController;
-use App\Http\Controllers\IngredientController;
-use App\Http\Controllers\MenuController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\MenuController;
+use App\Http\Controllers\AddressController;
+use App\Http\Controllers\IngredientController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -48,11 +38,19 @@ Route::prefix('/menu')->middleware(['auth:sanctum', 'role:Admin'])->group(functi
 
 
 Route::prefix('/ingredient')->middleware(['auth:sanctum', 'role:Admin'])->group(function () {
-    Route::post('/add',[IngredientController::class,'store']);
-    Route::get('/get',[IngredientController::class,'index']);
+    Route::post('/add/{id}',[IngredientController::class,'store']);
+    Route::post('/get',[IngredientController::class,'index']);
     Route::get('/get/{id}',[IngredientController::class,'getOne']);
-    Route::put('/update/{id}',[IngredientController::class,'update']);
+    Route::post('/update/{id}',[IngredientController::class,'update']);
     Route::delete('/delete/{id}',[IngredientController::class,'destroy']);
+});
+
+Route::prefix('/cart')->middleware(['auth:sanctum'])->group(function () {
+    Route::post('/add',[CartController::class,'addMenuToCart']);
+    Route::get('/get',[CartController::class,'index']);
+    Route::get('/get/{id}',[CartController::class,'getOne']);
+    Route::put('/update/{id}',[CartController::class,'update']);
+    Route::delete('/delete/{id}',[CartController::class,'destroy']);
 });
 
 Route::get('/getMenu', [MenuController::class, 'index']);
