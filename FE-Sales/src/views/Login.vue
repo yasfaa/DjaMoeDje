@@ -212,8 +212,8 @@ export default {
   position: relative;
   width: 400px;
   height: auto;
-  background: #141001;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: #fff4cc;
+  border: 1px solid rgba(255, 237, 171, 0.5);
   border-radius: 10px;
   display: flex;
   justify-content: center;
@@ -222,7 +222,7 @@ export default {
 
 h2 {
   font-size: 2em;
-  color: white;
+  color: rgb(60, 60, 60);
   text-align: center;
 }
 
@@ -230,7 +230,7 @@ h2 {
   position: relative;
   margin: 30px 0;
   width: 310px;
-  border-bottom: 1px solid wheat;
+  border-bottom: 1px solid rgb(60, 60, 60);
 }
 
 .inputbox label {
@@ -238,7 +238,7 @@ h2 {
   top: 50%;
   left: 5px;
   transform: translateY(-50%);
-  color: white;
+  color: rgb(60, 60, 60);
   font-size: 1em;
   pointer-events: none;
   transition: 0.5s;
@@ -257,14 +257,14 @@ h2 {
   outline: none;
   font-size: 1em;
   padding: 0 35px 0 5px;
-  color: whitesmoke;
+  color: rgb(60, 60, 60);
 }
 
 .login-button {
   width: 100%;
   height: 40px;
   border-radius: 40px;
-  background: #b9a119;
+  background: #ffe279;
   border: none;
   outline: none;
   cursor: pointer;
@@ -273,20 +273,20 @@ h2 {
 }
 
 .login-button:hover {
-  background-color: #806407;
+  background-color: #e5c54f;
   transition: background-color 0.5s;
 }
 
 .register {
   font-size: 0.9em;
-  color: white;
+  color: rgb(60, 60, 60);
   text-align: center;
   margin: 25px 0 10px;
 }
 
 .register p a {
   text-decoration: none;
-  color: whitesmoke;
+  color: rgb(60, 60, 60);
   font-weight: 700;
 }
 

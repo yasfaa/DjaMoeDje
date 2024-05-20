@@ -14,29 +14,11 @@ export default {
   },
   mounted() {
     this.retrieveMenus()
-
-    const scrollWrapper = this.$refs.scrollWrapper
-    if (scrollWrapper) {
-      scrollWrapper.addEventListener('scroll', this.handleScroll)
-    }
-  },
-  beforeMount() {
-    const scrollWrapper = this.$refs.scrollWrapper
-    if (scrollWrapper) {
-      scrollWrapper.removeEventListener('scroll', this.handleScroll)
-    }
   },
   methods: {
     formatPrice(price) {
       const numericPrice = parseFloat(price)
       return numericPrice.toLocaleString('id-ID')
-    },
-    scrollToNextSection() {
-      // Scroll to the next section using JavaScript
-      const nextSection = this.$refs.scrollWrapper.querySelector('.next-section')
-      if (nextSection) {
-        nextSection.scrollIntoView({ behavior: 'smooth' })
-      }
     },
     goToMenu(menuId) {
       this.$router.push(`/menu/${menuId}`)
@@ -65,88 +47,96 @@ export default {
   }
 }
 </script>
+
 <template>
-  <main>
-    <section class="navbar">
-      <Navbar />
-    </section>
-    <div class="scroll-wrapper" ref="scrollWrapper">
-      <section class="content py-5 text-center container">
-        <div class="row py-lg-5">
-          <div class="text-atas col-lg-6 col-md-8 mx-auto">
-            <h1 class="fw-bold">DjaMoeDje</h1>
-            <p class="lead">Spesialis Makanan Khas Surabaya dengan Cita Rasa yang Nikmat</p>
-            <button class="scroll-button btn" @click="scrollToNextSection">Daftar Menu</button>
-          </div>
-        </div>
-      </section>
-      <section class="next-section py-5 bg-dark">
+  <section class="navbar">
+    <Navbar />
+  </section>
+  <div class="py-4 container-fluid">
+    <div class="row mt-6">
+      <div class="row mt-6">
+        <v-carousel class="carousel" hide-delimiters show-arrows="hover" height="400" width="100%">
+          <v-carousel-item
+            src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+            cover
+          ></v-carousel-item>
+          <v-carousel-item
+            src="https://cdn.vuetifyjs.com/images/cards/hotel.jpg"
+            cover
+          ></v-carousel-item>
+          <v-carousel-item
+            src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
+            cover
+          ></v-carousel-item>
+        </v-carousel>
+      </div>
+      <section class="next-section mt-6 py-5">
         <div class="container">
-          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+          <v-row>
             <v-col v-for="menu in menus" :key="menu.id" cols="12" sm="6" md="4">
-              <v-card hover @click="goToMenu(menu.id)">
+              <v-card hover @click="goToMenu(menu.id)" class="rounded-card">
                 <v-img
                   :src="getMenuImage(menu.id)"
                   height="225"
                   gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
+                  cover
                 >
                 </v-img>
-                <v-card-text class="white--text">{{ menu.nama }}</v-card-text>
+                <h6 class="nama-menu">{{ menu.nama }}</h6>
                 <v-card-actions>
-                  <v-btn small color="primary" text @click="goToMenu(menu.id)">view Menu</v-btn>
-                  <v-btn small color="primary" text>add to cart</v-btn>
+                  <p> Rp {{ formatPrice(menu.total) }}</p>
                   <v-spacer></v-spacer>
-                  <small class="text--secondary">Rp. {{ formatPrice(menu.total) }}</small>
+                  <button class="card-btn mx-3" @click="goToMenu(menu.id)">View Menu</button>
+                  <button class="card-btn">Add to Cart</button>
                 </v-card-actions>
               </v-card>
             </v-col>
-          </div>
+          </v-row>
         </div>
       </section>
-      <section>
-        <footer class="bg-body-tertiary text-center text-lg-start">
-          <div class="text-center p-3" style="background-color: #806407; color: white">
-            © 2024 Copyright: Yasfa Ainun Abdullah
-          </div>
-        </footer>
-      </section>
     </div>
-  </main>
+  </div>
+  <app-footer class="py-3 bg-white border-radius-lg" />
 </template>
-<style scoped>
-.content {
-  margin-top: 177px;
-  margin-bottom: 100px;
-  content: 250px;
-  padding: 50px;
+
+<style>
+.rounded-card {
+  border-radius: 15px;
+  box-shadow: 1px 1px 15px #cccccc40;
+  transition: 0.5s ease-in;
+  background-color: white;
 }
 
-.text-atas {
-  color: white;
+.rounded-card:hover {
+  box-shadow: 1px 1px 28.5px -7px #d6d6d6;
 }
 
-.lead {
-  color: white;
-}
-
-.scroll-button {
-  background-color: #b9a119;
+.card-btn {
   border-color: transparent;
-  color: white;
+  color: rgb(60, 60, 60);
   font-weight: bold;
 }
 
-.scroll-button:hover {
-  background-color: #806407;
+.card-btn:hover {
   border-color: transparent;
+  color: #c9a938;
   transition: background-color 0.5s;
+}
 
-  .black {
-    transition: background-color 0.3s ease;
-  }
+.nama-menu{
+  border-color: transparent;
+  color: rgb(60, 60, 60);
+  font-weight: bold;
+  font-size: 24px;
+  margin-left: 10px;
+  margin-top: 5px;
+}
 
-  .black:hover {
-    background-color: #adadad;
-  }
+.a{
+  border-color: transparent;
+  color: rgb(60, 60, 60);
+  font-weight: bold;
+  font-size: 16px;
+  margin-left: 10px;
 }
 </style>

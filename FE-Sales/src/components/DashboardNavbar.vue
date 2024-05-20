@@ -20,7 +20,7 @@
           Kelola Menu
         </router-link>
         <router-link
-          to="/admin/menu"
+          to="/admin/order"
           exact
           class="nav-link"
           :class="{ 'active-link': $route.path === '/admin/order' }"
@@ -30,10 +30,10 @@
       </div>
       <div class="content">
         <div class="button-side">
-          <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
-            <span style="font-size: 25px; cursor: pointer" @click="isActive = !isActive"
-              >&#9776;</span
-            >
+          <nav class="navbar fixed-top navbar-expand-lg">
+            <span style="cursor: pointer; margin-left: 16px" @click="isActive = !isActive">
+              <v-icon icon="mdi-menu" color="black"></v-icon>
+            </span>
             <a
               class="navbar-brand"
               href="/"
@@ -99,16 +99,16 @@
           to="/pesanan"
           exact
           class="nav-link"
-          :class="{ 'active-link': $route.path === '//pesanan' }"
+          :class="{ 'active-link': $route.path === '/pesanan' }"
         >
           Pesananku
         </router-link>
       </div>
       <div class="content">
         <div class="button-side">
-          <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
-            <span style="font-size: 25px; cursor: pointer" @click="isActive = !isActive"
-              >&#9776;
+          <nav class="navbar fixed-top navbar-expand-lg">
+            <span style="cursor: pointer; margin-left: 16px" @click="isActive = !isActive">
+              <v-icon icon="mdi-menu" color="black"></v-icon>
             </span>
             <a
               class="navbar-brand"
@@ -231,33 +231,14 @@ export default {
 </script>
 
 <style>
-.navbar-hidden {
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.5s ease-in-out;
-}
-
-.btn {
-  background-color: #b9a119;
-  border-color: transparent;
-  color: white;
-  font-weight: bold;
-}
-
-.btn:hover {
-  background-color: #806407;
-  border-color: transparent;
-  transition: background-color 0.5s;
-}
-
 .sidenav {
   height: 100%;
   width: 0;
   position: fixed;
-  z-index: 1;
+  z-index: 1000; /* Pastikan ini lebih tinggi dari konten lainnya */
   top: 0;
   left: -250px;
-  background-color: #4b4b4b;
+  background-color: #e5c54f;
   overflow-x: hidden;
   transition: 0.5s;
   padding-top: 80px;
@@ -292,7 +273,7 @@ export default {
 }
 
 .sidenav a:hover {
-  color: #f1f1f1;
+  color: #6a6a6a;
 }
 
 .sidenav .closebtn {
@@ -301,6 +282,7 @@ export default {
   right: 25px;
   font-size: 36px;
   margin-left: 50px;
+  z-index: 3;
 }
 
 .button-side {
@@ -315,5 +297,9 @@ export default {
   .sidenav a {
     font-size: 18px;
   }
+}
+
+.navbar {
+  z-index: 1;
 }
 </style>

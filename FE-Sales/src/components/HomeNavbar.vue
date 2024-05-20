@@ -1,5 +1,5 @@
 <template>
-  <nav v-if="!isLoggedIn" class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+  <nav v-if="!isLoggedIn" class="navbar fixed-top navbar-expand-lg">
     <div class="container-fluid d-flex justify-content-between align-items-center">
       <a
         class="navbar-brand"
@@ -46,10 +46,10 @@
       </div>
       <div class="content">
         <div class="button-side">
-          <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
-            <span style="font-size: 25px; cursor: pointer" @click="isActive = !isActive"
-              >&#9776;</span
-            >
+          <nav class="navbar fixed-top navbar-expand-lg">
+            <span style="cursor: pointer; margin-left: 16px" @click="isActive = !isActive">
+              <v-icon icon="mdi-menu" color="black"></v-icon>
+            </span>
             <a
               class="navbar-brand"
               href="/"
@@ -122,9 +122,9 @@
       </div>
       <div class="content">
         <div class="button-side">
-          <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
-            <span style="font-size: 25px; cursor: pointer" @click="isActive = !isActive"
-              >&#9776;
+          <nav class="navbar fixed-top navbar-expand-lg">
+            <span style="cursor: pointer; margin-left: 16px" @click="isActive = !isActive">
+              <v-icon icon="mdi-menu" color="black"></v-icon>
             </span>
             <a
               class="navbar-brand"
@@ -194,7 +194,6 @@ export default {
     }
   },
   async mounted() {
-    
     try {
       const name = localStorage.getItem('name')
       const role = localStorage.getItem('role')
@@ -264,6 +263,10 @@ export default {
 </script>
 
 <style>
+.navbar {
+  z-index: 1;
+}
+
 .navbar-hidden {
   opacity: 0;
   visibility: hidden;
@@ -271,15 +274,16 @@ export default {
 }
 
 .btn {
-  background-color: #b9a119;
+  background-color: #ffe279;
   border-color: transparent;
-  color: white;
+  color: rgb(60, 60, 60);
   font-weight: bold;
 }
 
 .btn:hover {
-  background-color: #806407;
+  background-color: #e5c54f;
   border-color: transparent;
+  color: rgb(60, 60, 60);
   transition: background-color 0.5s;
 }
 
@@ -290,7 +294,7 @@ export default {
   z-index: 1;
   top: 0;
   left: -250px;
-  background-color: #4b4b4b;
+  background-color: #e5c54f;
   overflow-x: hidden;
   transition: 0.5s;
   padding-top: 80px;
@@ -319,7 +323,7 @@ export default {
   padding: 8px 8px 8px 32px;
   text-decoration: none;
   font-size: 18px;
-  color: #ffffff;
+  color: #898989;
   display: block;
   transition: 0.3s;
 }
@@ -334,6 +338,7 @@ export default {
   right: 25px;
   font-size: 36px;
   margin-left: 50px;
+  z-index: 3;
 }
 
 .button-side {

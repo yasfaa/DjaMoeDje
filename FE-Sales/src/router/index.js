@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import UserProfile from '../views/user/Profile.vue'
-import login from '../views/login.vue'
+import login from '../views/Login.vue'
 import adminDashboard from '../views/Admin/AdminDashboard.vue'
 import detailMenu from '../views/User/DetailMenu.vue'
 
@@ -22,11 +21,6 @@ const router = createRouter({
       path: '/admin/dashboard',
       name: 'Admin Dashboard',
       component: adminDashboard,
-    },
-    {
-      path: '/profile',
-      name: 'User Profile',
-      component: UserProfile,
     },
     {
       path: '/menu/:id',
