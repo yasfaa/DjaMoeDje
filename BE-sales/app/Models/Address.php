@@ -10,13 +10,15 @@ class Address extends Model
 {
     use HasApiTokens, HasFactory;
     protected $fillable = [
+        'nama_penerima',
+        'nomor_telepon',
         'jalan',
         'kelurahan',
         'kecamatan',
         'kecamatan',
         'kota',
         'kode_pos',
-        'email'
+        'user_id'
     ];
 
     public function user()
