@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import login from '../views/Login.vue'
 import adminDashboard from '../views/Admin/AdminDashboard.vue'
 import detailMenu from '../views/User/DetailMenu.vue'
+import profile from '../views/User/Profile.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
       path: '/menu/:id',
       name: 'Detail Menu',
       component: detailMenu,
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: profile,
     },
   ]
 })
