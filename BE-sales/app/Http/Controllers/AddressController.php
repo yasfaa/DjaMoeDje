@@ -33,7 +33,7 @@ class AddressController extends Controller
 
     public function getAlamat(Request $request)
     {
-        $address = Address::where('email', $request->user()->email)->get();
+        $address = Address::where('user_id', $request->user()->id)->get();
 
         if (!$address) {
             return response()->json(['error' => 'Address not found'], 404);

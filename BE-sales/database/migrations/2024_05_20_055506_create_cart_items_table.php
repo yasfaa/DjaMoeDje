@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('cart_id')->constrained()->onDelete('cascade');
             $table->foreignId('menu_id')->constrained()->onDelete('cascade');
             $table->integer('quantity');
+            $table->decimal('harga_item', 8, 2);
+            $table->boolean('select')->default(0);
             $table->json('customizations')->nullable(); // To store customizations as JSON
             $table->timestamps();
         });

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('ingredients', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->integer('menu_id')->references('menus.id');
+            $table->foreignId('menu_id')->constrained()->onDelete('cascade');
             $table->decimal('harga', 8, 2)->default(0);
         });
     }
