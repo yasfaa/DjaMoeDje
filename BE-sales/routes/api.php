@@ -50,7 +50,7 @@ Route::prefix('/cart')->middleware(['auth:sanctum', 'role:User'])->group(functio
     Route::get('/get',[CartController::class,'index']);
     Route::get('/select/{id}',[CartController::class,'selectCartItem']);
     Route::get('/unselect/{id}',[CartController::class,'unselectCartItem']);
-    Route::put('/update/{id}',[CartController::class,'update']);
+    Route::post('/update/{id}',[CartController::class,'update']);
     Route::delete('/delete/{id}',[CartController::class,'destroy']);
 });
 

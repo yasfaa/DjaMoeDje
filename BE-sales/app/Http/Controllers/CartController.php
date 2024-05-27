@@ -124,4 +124,32 @@ class CartController extends Controller
             'total_harga' => $totalHarga,
         ], 200);
     }
+    public function update(Request $request, $cartItemId)
+{
+    $request->validate([
+        'quantity' => 'required|integer|min:1'
+    ]);
+
+    $cartItem = CartItem::findOrFail($cartItemId);
+    $menu = $cartItem->menu;
+
+    $cartItem->quantity = $request->quantity;
+    // Perbarui harga item 
+    $cartItem->harga_item = $menu->total * $request->quantity;
+    $cartItem->save();
+
+    // Ambil keranjang terkait
+    $cart = $cartItem->cart;
+
+    // Perbarui total harga keranjang berdasarkan kuantitas yang diperbarui
+    $cart->harga = $cart->items()->where('select', '1')->sum('harga_item');
+    $cart->save();
+
+    return response()->json([
+        'message' => 'Cart item updated successfully',
+        'quantity' => $cartItem->quantity,
+        'total_harga' => $cart->harga,
+    ], 200);
+}
+
 }
