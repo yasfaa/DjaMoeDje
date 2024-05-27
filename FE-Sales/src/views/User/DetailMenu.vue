@@ -6,30 +6,22 @@
     <div class="container">
       <div class="row mt-5">
         <div class="card border-2 pt-3" v-if="menu.id">
-          <v-carousel  hide-delimiters  class="carousel">
+          <v-carousel hide-delimiters class="carousel">
             <v-carousel-item v-for="(link, index) in fileLinks" :key="index">
-              <v-img :src="link || 'https://via.placeholder.com/150' "></v-img>
+              <v-img :src="link || 'https://via.placeholder.com/150'"></v-img>
             </v-carousel-item>
           </v-carousel>
-          <div class="row p-2 pt-2 justify-content-center">
-            <div class="col-md-9 d-flex flex-column">
-              <a style="font-size: 32px; font-weight: bold">{{ menu.nama_menu }}</a>
-              <div class="price" style="font-weight: bold; font-size: 24px">
-                Rp. {{ formatPrice(menu.total) }}
+          <div class="row p-2 pt-2">
+            <div class="d-flex flex-column">
+              <div class="d-flex justify-content-between align-items-center">
+                <h2 class="menu-title">{{ menu.nama_menu }}</h2>
               </div>
+              <div class="menu-price">Rp. {{ formatPrice(menu.total) }}</div>
               <div class="theme-text subtitle">Deskripsi:</div>
-              <div class="brief-description">
-                {{ menu.deskripsi }}
-              </div>
-              <div class="mt-auto pb-2">
-                <div class="row col-md-12">
-                  <div class="col-md-5">
-                    <div class="text-center">
-                      <v-btn variant="tonal" class="m-2 button">Add to Cart</v-btn>
-                      <v-btn variant="tonal" class="mx-4 button">Customize Menu</v-btn>
-                    </div>
-                  </div>
-                </div>
+              <div class="brief-description">{{ menu.deskripsi }}</div>
+              <div class="justify-content-end">
+                <button class="btn btn-primary" @click="goToMenu(menu.id)">Add to Cart</button>
+                <button class="btn btn-secondary mx-4 my-2">Customize Menu</button>
               </div>
             </div>
           </div>
@@ -100,13 +92,75 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
 .card {
   border-radius: 10px !important;
+  box-shadow: 1px 1px 15px #cccccc40;
+  transition: 0.5s ease-in;
+  background-color: white;
+  margin: 1rem 0;
+}
+
+.card:hover {
+  box-shadow: 1px 1px 28.5px -7px #d6d6d6;
 }
 
 .carousel {
   max-height: 550px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.menu-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #19160c;
+  margin-bottom: 0.5rem;
+}
+
+.menu-price {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #19160c;
+  margin-bottom: 1rem;
+}
+
+.brief-description {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.btn {
+  font-size: 1.2rem;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.btn-primary {
+  background-color: #ffe279;
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #e5c54f;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
 }
 </style>

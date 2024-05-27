@@ -2,6 +2,7 @@
 import Navbar from '@/components/HomeNavbar.vue'
 import axios from 'axios'
 const BASE_URL = import.meta.env.VITE_BASE_URL_API
+
 export default {
   name: 'HomePage',
   components: {
@@ -52,29 +53,32 @@ export default {
   <section class="navbar">
     <Navbar />
   </section>
-  <div class="py-4 container-fluid">
-    <div class="row mt-6">
-      <div class="row mt-6">
-        <v-carousel class="carousel" hide-delimiters show-arrows="hover" height="400" width="100%">
-          <v-carousel-item
-            src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-            cover
-          ></v-carousel-item>
-          <v-carousel-item
-            src="https://cdn.vuetifyjs.com/images/cards/hotel.jpg"
-            cover
-          ></v-carousel-item>
-          <v-carousel-item
-            src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
-            cover
-          ></v-carousel-item>
-        </v-carousel>
+  <div class="hero-section mt-6">
+    <v-carousel class="carousel" hide-delimiters show-arrows="hover" height="400" width="100%">
+      <v-carousel-item
+        src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+        cover
+      ></v-carousel-item>
+      <v-carousel-item
+        src="https://cdn.vuetifyjs.com/images/cards/hotel.jpg"
+        cover
+      ></v-carousel-item>
+      <v-carousel-item
+        src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
+        cover
+      ></v-carousel-item>
+    </v-carousel>
+  </div>
+  <div class="menu-section container">
+    <div class="row">
+      <div class="col-12">
+        <h2 class="section-title">Our Menu</h2>
       </div>
-      <section class="next-section mt-6 py-5">
-        <div class="container">
+      <div class="col-12">
+        <div class="menu-grid">
           <v-row>
             <v-col v-for="menu in menus" :key="menu.id" cols="12" sm="6" md="4">
-              <v-card hover @click="goToMenu(menu.id)" class="rounded-card">
+              <v-card hover @click="goToMenu(menu.id)" class="menu-card">
                 <v-img
                   :src="getMenuImage(menu.id)"
                   height="225"
@@ -82,61 +86,112 @@ export default {
                   cover
                 >
                 </v-img>
-                <h6 class="nama-menu">{{ menu.nama }}</h6>
-                <v-card-actions>
-                  <p> Rp {{ formatPrice(menu.total) }}</p>
+                <v-card-title class="menu-title">{{ menu.nama }}</v-card-title>
+                <v-card-actions class="menu-actions">
+                  <p class="menu-price mt-3">Rp {{ formatPrice(menu.total) }}</p>
                   <v-spacer></v-spacer>
-                  <button class="card-btn mx-3" @click="goToMenu(menu.id)">View Menu</button>
-                  <button class="card-btn">Add to Cart</button>
+                  <button class="btn btn-primary" @click="goToMenu(menu.id)">View Menu</button>
+                  <button class="btn btn-secondary mx-2">Add to Cart</button>
                 </v-card-actions>
               </v-card>
             </v-col>
           </v-row>
         </div>
-      </section>
+      </div>
     </div>
   </div>
-  <app-footer class="py-3 bg-white border-radius-lg" />
+  <app-footer class="footer-section" />
 </template>
 
-<style>
-.rounded-card {
+<style scoped>
+.hero-section {
+  position: relative;
+}
+
+.carousel {
+  max-height: 400px;
+  overflow: hidden;
+}
+
+.menu-section {
+  padding: 2rem 0;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #19160c;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.menu-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.menu-card {
   border-radius: 15px;
   box-shadow: 1px 1px 15px #cccccc40;
   transition: 0.5s ease-in;
   background-color: white;
+  margin: 1rem;
 }
 
-.rounded-card:hover {
+.menu-card:hover {
   box-shadow: 1px 1px 28.5px -7px #d6d6d6;
 }
 
-.card-btn {
-  border-color: transparent;
-  color: rgb(60, 60, 60);
+.menu-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #19160c;
+  margin-top: 1rem;
+}
+
+.menu-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+}
+
+.menu-price {
+  font-size: 1.3rem;
   font-weight: bold;
 }
 
-.card-btn:hover {
-  border-color: transparent;
-  color: #c9a938;
-  transition: background-color 0.5s;
+.btn {
+  border-radius: 5px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  transition: background-color 0.3s;
 }
 
-.nama-menu{
-  border-color: transparent;
-  color: rgb(60, 60, 60);
-  font-weight: bold;
-  font-size: 24px;
-  margin-left: 10px;
-  margin-top: 5px;
+.btn-primary {
+  background-color: #ffe279;
+  color: white;
+  border: none;
 }
 
-.a{
-  border-color: transparent;
-  color: rgb(60, 60, 60);
-  font-weight: bold;
-  font-size: 16px;
-  margin-left: 10px;
+.btn-primary:hover {
+  background-color: #e5c54f;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.footer-section {
+  padding: 1rem 0;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
 }
 </style>

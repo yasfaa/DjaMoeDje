@@ -3,19 +3,14 @@
     <div v-if="isAdmin">
       <div id="mySidenav" class="sidenav shadow" :class="{ openNavClass: isActive }">
         <a class="closebtn" @click="isActive = !isActive" style="cursor: pointer">&times;</a>
+        <router-link to="/" exact class="nav-link" :class="{ 'active-link': $route.path === '/#' }">
+          Home
+        </router-link>
         <router-link
           to="/admin/dashboard"
           exact
           class="nav-link"
           :class="{ 'active-link': $route.path === '/admin/dashboard' }"
-        >
-          Home
-        </router-link>
-        <router-link
-          to="/admin/menu"
-          exact
-          class="nav-link"
-          :class="{ 'active-link': $route.path === '/admin/menu' }"
         >
           Kelola Menu
         </router-link>
@@ -63,7 +58,9 @@
                       </button>
                       <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                          <a class="dropdown-item" @click="profile">Profile</a>
+                          <a class="dropdown-item text-center" @click="profile()" style="cursor: pointer"
+                            >Profile</a
+                          >
                         </li>
                         <li>
                           <a class="dropdown-item" @click="onLogout()" style="cursor: pointer"
@@ -139,7 +136,9 @@
                       </button>
                       <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                          <a class="dropdown-item text-center" @click="profile">Profile</a>
+                          <a class="dropdown-item text-center" @click="profile()" style="cursor: pointer"
+                            >Profile</a
+                          >
                         </li>
                         <li>
                           <a
@@ -220,6 +219,10 @@ export default {
         .catch((error) => {
           console.error(error)
         })
+    },
+    profile() {
+      // Arahkan pengguna ke halaman profil
+      this.$router.push('/profile')
     }
   },
   computed: {

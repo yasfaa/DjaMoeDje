@@ -19,19 +19,14 @@
     <div v-if="user.role === 'Admin'">
       <div id="mySidenav" class="sidenav shadow" :class="{ openNavClass: isActive }">
         <a class="closebtn" @click="isActive = !isActive" style="cursor: pointer">&times;</a>
+        <router-link to="/" exact class="nav-link" :class="{ 'active-link': $route.path === '/#' }">
+          Home
+        </router-link>
         <router-link
           to="/admin/dashboard"
           exact
           class="nav-link"
           :class="{ 'active-link': $route.path === '/admin/dashboard' }"
-        >
-          Home
-        </router-link>
-        <router-link
-          to="/admin/menu"
-          exact
-          class="nav-link"
-          :class="{ 'active-link': $route.path === '/admin/menu' }"
         >
           Kelola Menu
         </router-link>
@@ -79,10 +74,18 @@
                       </button>
                       <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                          <a class="dropdown-item" @click="profile">Profile</a>
+                          <a
+                            class="dropdown-item text-center"
+                            @click="profile()"
+                            style="cursor: pointer"
+                            >Profile</a
+                          >
                         </li>
                         <li>
-                          <a class="dropdown-item" @click="onLogout()" style="cursor: pointer"
+                          <a
+                            class="dropdown-item text-center"
+                            @click="onLogout()"
+                            style="cursor: pointer"
                             >Logout</a
                           >
                         </li>
@@ -115,7 +118,7 @@
           to="/pesanan"
           exact
           class="nav-link"
-          :class="{ 'active-link': $route.path === '//pesanan' }"
+          :class="{ 'active-link': $route.path === '/pesanan' }"
         >
           Pesananku
         </router-link>
@@ -155,7 +158,12 @@
                       </button>
                       <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                          <a class="dropdown-item text-center" @click="profile">Profile</a>
+                          <a
+                            class="dropdown-item text-center"
+                            @click="profile()"
+                            style="cursor: pointer"
+                            >Profile</a
+                          >
                         </li>
                         <li>
                           <a
@@ -245,18 +253,9 @@ export default {
           console.error(error)
         })
     },
-
-    handleScroll() {
-      const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop
-      if (currentScrollPosition < 0) {
-        return
-      }
-      if (Math.abs(currentScrollPosition - this.lastScrollPosition) < 30) {
-        return
-      }
-      this.isNavbarHidden = currentScrollPosition > this.lastScrollPosition
-      this.isNavbarVisible = !this.isNavbarHidden
-      this.lastScrollPosition = currentScrollPosition
+    profile() {
+      // Arahkan pengguna ke halaman profil
+      this.$router.push('/profile')
     }
   }
 }
