@@ -45,10 +45,11 @@ Route::prefix('/ingredient')->middleware(['auth:sanctum', 'role:Admin'])->group(
     Route::delete('/delete/{id}',[IngredientController::class,'destroy']);
 });
 
-Route::prefix('/cart')->middleware(['auth:sanctum'])->group(function () {
+Route::prefix('/cart')->middleware(['auth:sanctum', 'role:User'])->group(function () {
     Route::post('/add',[CartController::class,'store']);
     Route::get('/get',[CartController::class,'index']);
-    Route::get('/get/{id}',[CartController::class,'getOne']);
+    Route::get('/select/{id}',[CartController::class,'selectCartItem']);
+    Route::get('/unselect/{id}',[CartController::class,'unselectCartItem']);
     Route::put('/update/{id}',[CartController::class,'update']);
     Route::delete('/delete/{id}',[CartController::class,'destroy']);
 });

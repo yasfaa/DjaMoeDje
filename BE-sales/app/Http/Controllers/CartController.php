@@ -1,10 +1,10 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\Cart;
-use App\Models\Menu;
 use Illuminate\Http\Request;
+use App\Models\Cart;
+use App\Models\CartItem;
+use App\Models\Menu;
 use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
@@ -17,6 +17,7 @@ class CartController extends Controller
         ]);
 
         $user = Auth::user();
+        $menu = Menu::findOrFail($request->menu_id);
 
         // Cari atau buat cart untuk pengguna dengan status 'pending'
         $cart = Cart::firstOrCreate(
@@ -30,33 +31,31 @@ class CartController extends Controller
         if ($existingCartItem) {
             // Jika item sudah ada di cart, tambahkan kuantitasnya
             $existingCartItem->quantity += $request->quantity;
+            $existingCartItem->harga_item = $menu->total * $existingCartItem->quantity;
             $existingCartItem->save();
-
-            // Perbarui total harga cart
-            $menu = Menu::find($request->menu_id); // Muat menu
-            $cart->harga += $menu->total * $request->quantity;
         } else {
             // Jika item belum ada di cart, tambahkan item baru
             $newCartItem = $cart->items()->create([
                 'menu_id' => $request->menu_id,
                 'quantity' => $request->quantity,
-                'customizations' => null // Tidak ada kustomisasi
+                'harga_item' => $menu->total * $request->quantity,
+                'customizations' => null,
             ]);
-
-            // Perbarui total harga cart
-            $menu = Menu::find($request->menu_id); // Muat menu
-            $cart->harga += $menu->total * $newCartItem->quantity;
         }
 
+        // Perbarui total harga cart
+        $cart->harga = $cart->items()->where('select', '1')->sum('harga_item');
         $cart->save();
+
 
         return response()->json($cart->load('items.menu'), 201);
     }
 
-    //  Mendapatkan isi cart dari satu user.
     public function index()
     {
         $user = Auth::user();
+
+        // Ambil cart dengan status 'pending' untuk user yang sedang login
         $cart = Cart::with('items.menu')
             ->where('user_id', $user->id)
             ->where('status', 'pending')
@@ -65,16 +64,64 @@ class CartController extends Controller
         if (!$cart) {
             return response()->json(['message' => 'Cart is empty'], 404);
         }
+        $totalHarga = $cart->harga;
 
         $cartContents = $cart->items->map(function ($item) {
             return [
                 'id' => $item->id,
-                'name' => $item->menu->name,
+                'name' => $item->menu->nama_menu,
                 'quantity' => $item->quantity,
-                'price' => $item->menu->price,
+                'harga' => $item->harga_item,
             ];
         });
 
-        return response()->json($cartContents, 200);
+        return response()->json([
+            'items' => $cartContents,
+            'total_harga' => $totalHarga,
+        ], 200);
+    }
+
+    public function selectCartItem($cartItemId)
+    {
+        $cartItem = CartItem::findOrFail($cartItemId);
+
+        $cartItem->select = 1;
+        $cartItem->save();
+
+        // Ambil cart terkait
+        $cart = $cartItem->cart;
+
+        // Hitung harga total 
+        $totalHarga = $cart->items()->where('select', '1')->sum('harga_item');
+
+        $cart->harga = $totalHarga;
+        $cart->save();
+
+        return response()->json([
+            'message' => 'Cart item selected successfully',
+            'total_harga' => $totalHarga,
+        ], 200);
+    }
+
+    public function unselectCartItem($cartItemId)
+    {
+        $cartItem = CartItem::findOrFail($cartItemId);
+
+        $cartItem->select = 0;
+        $cartItem->save();
+
+        // Ambil cart terkait
+        $cart = $cartItem->cart;
+
+        // Hitung harga total 
+        $totalHarga = $cart->items()->where('select', '1')->sum('harga_item');
+
+        $cart->harga = $totalHarga;
+        $cart->save();
+
+        return response()->json([
+            'message' => 'Cart item unselected successfully',
+            'total_harga' => $totalHarga,
+        ], 200);
     }
 }
