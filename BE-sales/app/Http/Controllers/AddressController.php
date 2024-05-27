@@ -11,12 +11,14 @@ class AddressController extends Controller
     {
         $created = Address::create(
             [
+                'nama_penerima' => $request->nama_penerima,
+                'nomor_telepon' => $request->nomor_telepon,
                 'jalan' => $request->jalan,
                 'kelurahan' => $request->kelurahan,
                 'kecamatan' => $request->kecamatan,
                 'kota' => $request->kota,
                 'kode_pos' => $request->kode_pos,
-                'email' => $request->user()->email
+                'user_id' => $request->user()->id
             ]
         );
 

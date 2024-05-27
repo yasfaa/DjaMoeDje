@@ -80,6 +80,7 @@ class AuthController extends Controller
         }
         $user->update([
             'name' => $request->name,
+            'email' => $request->email,
         ]);
 
         return response()->json(['message' => 'Berhasil memperbarui data pengguna'], 200);
