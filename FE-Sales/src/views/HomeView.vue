@@ -10,7 +10,8 @@ export default {
   },
   data() {
     return {
-      menus: ''
+      menus: '',
+      showSuccessDialog: false
     }
   },
   mounted() {
@@ -34,6 +35,23 @@ export default {
         this.menus = response.data.menus
       } catch (error) {
         console.error('Error fetching menus:', error)
+      }
+    },
+    async addToCart(menuId) {
+      try {
+        const formData = new FormData()
+        formData.append('menu_id', menuId)
+        formData.append('quantity', '1')
+
+        await axios.post(BASE_URL + '/cart/add', formData, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token'),
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        this.showSuccessDialog = true;
+      } catch (error) {
+        console.error('Error adding menu to cart:', error)
       }
     },
     getMenuImage(menuId) {
@@ -78,7 +96,7 @@ export default {
         <div class="menu-grid">
           <v-row>
             <v-col v-for="menu in menus" :key="menu.id" cols="12" sm="6" md="4">
-              <v-card hover @click="goToMenu(menu.id)" class="menu-card">
+              <v-card hover class="menu-card">
                 <v-img
                   :src="getMenuImage(menu.id)"
                   height="225"
@@ -91,7 +109,7 @@ export default {
                   <p class="menu-price mt-3">Rp {{ formatPrice(menu.total) }}</p>
                   <v-spacer></v-spacer>
                   <button class="btn btn-primary" @click="goToMenu(menu.id)">View Menu</button>
-                  <button class="btn btn-secondary mx-2">Add to Cart</button>
+                  <button class="btn btn-secondary mx-2" @click.prevent="addToCart(menu.id)">Add to Cart</button>
                 </v-card-actions>
               </v-card>
             </v-col>
@@ -99,6 +117,19 @@ export default {
         </div>
       </div>
     </div>
+  </div>
+  <div>
+    <v-dialog v-model="showSuccessDialog" max-width="400">
+      <v-card>
+        <v-card-title>Success</v-card-title>
+        <v-card-text>
+          Menu berhasil dimasukkan ke dalam keranjang!
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="primary" @click="showSuccessDialog = false">OK</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
   <app-footer class="footer-section" />
 </template>
