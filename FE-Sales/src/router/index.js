@@ -5,6 +5,7 @@ import adminDashboard from '../views/Admin/AdminDashboard.vue'
 import editMenu from '../views/Admin/EditMenu.vue'
 import detailMenu from '../views/User/DetailMenu.vue'
 import profile from '../views/User/Profile.vue'
+import order from '../views/User/UserOrder.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,6 +14,11 @@ const router = createRouter({
       path: '/profile',
       name: 'Profile',
       component: profile,
+    },
+    {
+      path: '/cart',
+      name: 'cart',
+      component: order,
     },
     {
       path: '/',
