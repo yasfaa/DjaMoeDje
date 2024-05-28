@@ -129,24 +129,16 @@ export default {
     },
     async toggleSelect(index) {
       const orderId = this.orders[index].id
-      const url = orderId.selected
-        ? `${BASE_URL}/cart/select/${orderId}`
-        : `${BASE_URL}/cart/unselect/${orderId}`
+      const url = this.orders[index].selected
+        ? `${BASE_URL}/cart/unselect/${orderId}`
+        : `${BASE_URL}/cart/select/${orderId}`
 
       try {
-        const response = await axios.get(
-          url,
-          {
-            headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('access_token')
-            }
-          },
-          {
-            headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('access_token')
-            }
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
-        )
+        })
         this.orders[index].selected = !this.orders[index].selected
         this.totalPayment = response.data.total_harga
       } catch (error) {

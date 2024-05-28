@@ -111,6 +111,7 @@ class CartController extends Controller
         return response()->json([
             'message' => 'Cart item selected successfully',
             'total_harga' => $totalHarga,
+            'select' => $cartItem->select,
         ], 200);
     }
 
@@ -133,6 +134,7 @@ class CartController extends Controller
         return response()->json([
             'message' => 'Cart item unselected successfully',
             'total_harga' => $totalHarga,
+            'select' => $cartItem->select,
         ], 200);
     }
     public function update(Request $request, $cartItemId)
