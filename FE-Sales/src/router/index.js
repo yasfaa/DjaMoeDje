@@ -5,7 +5,7 @@ import adminDashboard from '../views/Admin/AdminDashboard.vue'
 import editMenu from '../views/Admin/EditMenu.vue'
 import detailMenu from '../views/User/DetailMenu.vue'
 import profile from '../views/User/Profile.vue'
-import order from '../views/User/UserOrder.vue'
+import order from '../views/User/Cart.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

@@ -25,7 +25,7 @@ class MenuController extends Controller
 
                 if (!is_null($menu->file_path)) {
                     $paths = json_decode($menu->file_path, true);
-                    $url = asset(str_replace('public/', 'storage/', $paths[0])); // Ambil URL pertama saja
+                    $url = asset(str_replace('public/', 'storage/', $paths[0]));
                     $formattedMenu['imagePath'] = $url;
                 }
 
@@ -49,7 +49,7 @@ class MenuController extends Controller
                     'nama' => $menu->nama_menu,
                     'total' => $menu->total,
                     'deskripsi' => $menu->deskripsi,
-                    'imagePaths' => [], // Menggunakan array untuk menyimpan semua gambar
+                    'imagePaths' => [],
                 ];
 
                 if (!is_null($menu->file_path)) {

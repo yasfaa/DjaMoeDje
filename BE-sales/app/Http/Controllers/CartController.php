@@ -67,12 +67,22 @@ class CartController extends Controller
         $totalHarga = $cart->harga;
 
         $cartContents = $cart->items->map(function ($item) {
+            $menu = $item->menu;
+            $imagePath = null;
+
+            if (!is_null($menu->file_path)) {
+                $paths = json_decode($menu->file_path, true);
+                $imagePath = asset(str_replace('public/', 'storage/', $paths[0]));
+            }
+
             return [
                 'id' => $item->id,
                 'name' => $item->menu->nama_menu,
-                'harga_menu'=> $item->menu->total,
+                'harga_menu' => $item->menu->total,
                 'quantity' => $item->quantity,
                 'harga' => $item->harga_item,
+                'select' => $item->select,
+                'foto' => $imagePath,
             ];
         });
 
@@ -126,31 +136,32 @@ class CartController extends Controller
         ], 200);
     }
     public function update(Request $request, $cartItemId)
-{
-    $request->validate([
-        'quantity' => 'required|integer|min:1'
-    ]);
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1'
+        ]);
 
-    $cartItem = CartItem::findOrFail($cartItemId);
-    $menu = $cartItem->menu;
+        $cartItem = CartItem::findOrFail($cartItemId);
+        $menu = $cartItem->menu;
 
-    $cartItem->quantity = $request->quantity;
-    // Perbarui harga item 
-    $cartItem->harga_item = $menu->total * $request->quantity;
-    $cartItem->save();
+        $cartItem->quantity = $request->quantity;
+        // Perbarui harga item 
+        $cartItem->harga_item = $menu->total * $request->quantity;
+        $cartItem->save();
 
-    // Ambil keranjang terkait
-    $cart = $cartItem->cart;
+        // Ambil keranjang terkait
+        $cart = $cartItem->cart;
 
-    // Perbarui total harga keranjang berdasarkan kuantitas yang diperbarui
-    $cart->harga = $cart->items()->where('select', '1')->sum('harga_item');
-    $cart->save();
+        // Perbarui total harga keranjang berdasarkan kuantitas yang diperbarui
+        $cart->harga = $cart->items()->where('select', '1')->sum('harga_item');
+        $cart->save();
 
-    return response()->json([
-        'message' => 'Cart item updated successfully',
-        'quantity' => $cartItem->quantity,
-        'total_harga' => $cart->harga,
-    ], 200);
-}
+        return response()->json([
+            'message' => 'Cart item updated successfully',
+            'quantity' => $cartItem->quantity,
+            'harga' => $cartItem->harga_item,
+            'total_harga' => $cart->harga
 
+        ], 200);
+    }
 }
