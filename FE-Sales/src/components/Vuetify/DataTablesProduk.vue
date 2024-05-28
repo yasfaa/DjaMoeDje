@@ -64,7 +64,7 @@
         </v-row>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-icon size="large" class="me-2" @click="editProduk(item)" color="blue">
+        <v-icon size="large" class="me-2" @click="editMenu(item)" color="blue">
           mdi-pencil
         </v-icon>
         <v-icon size="large" @click="confirmDelete(item)" color="red"> mdi-delete </v-icon>
@@ -123,6 +123,10 @@ export default {
     formatPrice(price) {
       const numericPrice = parseFloat(price)
       return numericPrice.toLocaleString('id-ID')
+    },
+    editMenu(item) {
+      localStorage.setItem('editMenuId', item.id)
+      this.$router.push('/admin/edit')
     },
     confirmDelete(item) {
       this.itemToDeleteId = item.id

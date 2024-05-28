@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import login from '../views/Login.vue'
 import adminDashboard from '../views/Admin/AdminDashboard.vue'
+import editMenu from '../views/Admin/EditMenu.vue'
 import detailMenu from '../views/User/DetailMenu.vue'
 import profile from '../views/User/Profile.vue'
 
@@ -27,6 +28,11 @@ const router = createRouter({
       path: '/admin/dashboard',
       name: 'Admin Dashboard',
       component: adminDashboard,
+    },
+    {
+      path: '/admin/edit',
+      name: 'Edit Menu',
+      component: editMenu,
     },
     {
       path: '/menu/:id',
