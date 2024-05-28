@@ -11,20 +11,12 @@
         flat
         hide-details
         single-line
-        
       ></v-text-field>
       <div class="button-set mx-4">
-        <button class="btn btn-primary" rounded="l"
-          data-bs-toggle="modal"
-          data-bs-target="#addMenu"
-          >
-          Tambah Menu
-        </button>
+        <button class="btn btn-primary" @click="emitOpenDialog">Tambah Menu</button>
       </div>
     </v-card-title>
-
     <v-divider></v-divider>
-
     <v-data-table v-model:search="search" :items="menus">
       <template v-slot:item.id="{ item }">
         <div v-if="false">{{ item.id }}</div>
@@ -95,6 +87,9 @@ export default {
     }
   },
   methods: {
+    emitOpenDialog() {
+      this.$emit('open-dialog')
+    },
     async retrieveMenus() {
       try {
         const response = await axios.get(this.BASE_URL + '/menu/get', {
@@ -159,7 +154,6 @@ export default {
 </script>
 
 <style scoped>
-
 .button-set {
   display: flex;
   gap: 10px;

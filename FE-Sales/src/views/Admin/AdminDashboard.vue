@@ -8,31 +8,19 @@
       <div class="container-fluid px-4 py-2">
         <div class="row py-5">
           <div class="mt-3">
-            <Datatables ref="datatablesMenu" />
+            <Datatables @open-dialog="openDialog" />
           </div>
         </div>
       </div>
       <!-- Modal -->
-      <div
-        class="modal fade"
-        id="addMenu"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog">
+      <v-dialog v-model="dialog" max-width="600">
+        <v-card>
+          <v-card-title>
+            <span class="text-h5">Tambah Menu</span>
+          </v-card-title>
+          <v-spacer></v-spacer>
           <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">Tambah Menu</h1>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                id="closeModal"
-              ></button>
-            </div>
-            <div class="modal-body">
+            <div class="modal-body mx-3">
               <form @submit.prevent="addMenu">
                 <div class="mb-3">
                   <label for="InputNamaMenu" class="form-label">Nama Menu</label>
@@ -64,25 +52,26 @@
                 </div>
                 <div class="mb-3">
                   <label for="exampleInputHarga" class="form-label">Harga</label>
-                  <input type="price" class="form-control" v-model="menu.price" />
+                  <input type="number" class="form-control" v-model="menu.price" />
                 </div>
               </form>
             </div>
-            <div class="modal-footer">
-              <button class="btn btn-primary" data-bs-dismiss="modal"
-                >Close</button>
-              <button
-                class="btn btn-primary"
-                type="submit"
-                @click="addMenu"
-                data-bs-dismiss="modal"
-              >
-                Tambah Menu
-              </button>
-            </div>
           </div>
-        </div>
-      </div>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <button class="btn btn-primary mx-2" @click="closeDialog">Close</button>
+            <button
+              class="btn btn-primary mx-1"
+              type="submit"
+              @onclick="addMenu"
+              data-bs-dismiss="modal"
+            >
+              Tambah Menu
+            </button>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <div class="modal-dialog"></div>
     </div>
   </main>
 </template>
@@ -107,16 +96,20 @@ export default {
         desc: '',
         price: ''
       },
-      selectedFile: []
+      selectedFile: [],
+      dialog: false
     }
   },
 
   mounted() {},
 
   methods: {
-    // Prompt
-    closeModal() {
-      document.getElementById('closeModal').click()
+    openDialog() {
+      this.dialog = true
+    },
+    closeDialog() {
+      this.clearForm()
+      this.dialog = false
     },
 
     clearForm() {
@@ -126,9 +119,7 @@ export default {
       this.menu.foto = ''
     },
 
-    // Method
     handleFileChange(event) {
-      // Handle file change event
       const fileInput = this.$refs.fileInput
       this.selectedFiles = Array.from(fileInput.files)
     },
@@ -185,16 +176,10 @@ export default {
   background-size: cover;
 }
 
-.form-label {
-  color: #63560c;
-}
 
-.modal-title {
-  color: #63560c;
-}
 
-.card {
-  margin-top: 30px;
+input[type='number'] {
+  -moz-appearance: textfield;
 }
 
 .btn-primary {

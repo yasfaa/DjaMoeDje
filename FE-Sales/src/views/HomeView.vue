@@ -49,7 +49,7 @@ export default {
             'Content-Type': 'multipart/form-data'
           }
         })
-        this.showSuccessDialog = true;
+        this.showSuccessDialog = true
       } catch (error) {
         console.error('Error adding menu to cart:', error)
       }
@@ -96,7 +96,7 @@ export default {
         <div class="menu-grid">
           <v-row>
             <v-col v-for="menu in menus" :key="menu.id" cols="12" sm="6" md="4">
-              <v-card hover class="menu-card">
+              <v-card class="menu-card">
                 <v-img
                   :src="getMenuImage(menu.id)"
                   height="225"
@@ -109,7 +109,9 @@ export default {
                   <p class="menu-price mt-3">Rp {{ formatPrice(menu.total) }}</p>
                   <v-spacer></v-spacer>
                   <button class="btn btn-primary" @click="goToMenu(menu.id)">View Menu</button>
-                  <button class="btn btn-secondary mx-2" @click.prevent="addToCart(menu.id)">Add to Cart</button>
+                  <button class="btn btn-secondary mx-2" @click.prevent="addToCart(menu.id)">
+                    Add to Cart
+                  </button>
                 </v-card-actions>
               </v-card>
             </v-col>
@@ -122,9 +124,7 @@ export default {
     <v-dialog v-model="showSuccessDialog" max-width="400">
       <v-card>
         <v-card-title>Success</v-card-title>
-        <v-card-text>
-          Menu berhasil dimasukkan ke dalam keranjang!
-        </v-card-text>
+        <v-card-text> Menu berhasil dimasukkan ke dalam keranjang! </v-card-text>
         <v-card-actions>
           <v-btn color="primary" @click="showSuccessDialog = false">OK</v-btn>
         </v-card-actions>

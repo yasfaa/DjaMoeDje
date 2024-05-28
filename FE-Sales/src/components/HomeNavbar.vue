@@ -107,12 +107,12 @@
           Home
         </router-link>
         <router-link
-          to="/menu"
+          to="/cart"
           exact
           class="nav-link"
-          :class="{ 'active-link': $route.path === '/menu' }"
+          :class="{ 'active-link': $route.path === '/cart' }"
         >
-          Lihat Menu
+          Keranjang saya
         </router-link>
         <router-link
           to="/pesanan"
