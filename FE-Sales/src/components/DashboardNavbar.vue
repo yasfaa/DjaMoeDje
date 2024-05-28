@@ -63,7 +63,7 @@
                           >
                         </li>
                         <li>
-                          <a class="dropdown-item" @click="onLogout()" style="cursor: pointer"
+                          <a class="dropdown-item text-center" @click="onLogout()" style="cursor: pointer"
                             >Logout</a
                           >
                         </li>

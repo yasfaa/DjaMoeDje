@@ -11,17 +11,15 @@
         flat
         hide-details
         single-line
+        
       ></v-text-field>
       <div class="button-set mx-4">
-        <v-btn
-          color="#b9a119"
-          rounded="l"
+        <button class="btn btn-primary" rounded="l"
           data-bs-toggle="modal"
           data-bs-target="#addMenu"
-          class=""
-        >
+          >
           Tambah Menu
-        </v-btn>
+        </button>
       </div>
     </v-card-title>
 
@@ -64,9 +62,7 @@
         </v-row>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-icon size="large" class="me-2" @click="editMenu(item)" color="blue">
-          mdi-pencil
-        </v-icon>
+        <v-icon size="large" class="me-2" @click="editMenu(item)" color="blue"> mdi-pencil </v-icon>
         <v-icon size="large" @click="confirmDelete(item)" color="red"> mdi-delete </v-icon>
       </template>
     </v-data-table>
@@ -161,3 +157,27 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+
+.button-set {
+  display: flex;
+  gap: 10px;
+}
+
+.v-data-table .v-data-table__actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.v-icon {
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .search-input {
+    display: none;
+  }
+}
+</style>

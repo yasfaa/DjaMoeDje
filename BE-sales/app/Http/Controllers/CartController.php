@@ -70,6 +70,7 @@ class CartController extends Controller
             return [
                 'id' => $item->id,
                 'name' => $item->menu->nama_menu,
+                'harga_menu'=> $item->menu->total,
                 'quantity' => $item->quantity,
                 'harga' => $item->harga_item,
             ];

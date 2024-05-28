@@ -69,16 +69,16 @@
               </form>
             </div>
             <div class="modal-footer">
-              <button-custom type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                >Close</button-custom
-              >
-              <button-custom
-                class="btn btn-info"
+              <button class="btn btn-primary" data-bs-dismiss="modal"
+                >Close</button>
+              <button
+                class="btn btn-primary"
                 type="submit"
                 @click="addMenu"
                 data-bs-dismiss="modal"
-                >Tambah Menu</button-custom
               >
+                Tambah Menu
+              </button>
             </div>
           </div>
         </div>
@@ -111,9 +111,7 @@ export default {
     }
   },
 
-  mounted() {
-    
-  },
+  mounted() {},
 
   methods: {
     // Prompt
@@ -199,34 +197,13 @@ export default {
   margin-top: 30px;
 }
 
-.button-set {
-  display: block;
-  width: 100%;
-  clear: both;
-  margin: 15px 0;
+.btn-primary {
+  background-color: #ffe279;
+  color: black;
+  border: none;
 }
 
-button-custom,
-.button {
-  outline: 0 none;
-  border: 0 none;
-  padding: 13px 30px;
-  background-color: #b9a119;
-  background-position: 100% 0;
-  background-size: 200% 200%;
-  color: #fff;
-  font-size: 12px;
-  text-transform: uppercase;
-  border-radius: 20px;
-  letter-spacing: 2px;
-  transition: 0.3s;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.5s ease;
-
-  &:hover {
-    background-position: 0 0;
-    transition: background-color 0.5s;
-  }
+.btn-primary:hover {
+  background-color: #e5c54f;
 }
 </style>
