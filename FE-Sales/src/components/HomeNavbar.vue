@@ -11,8 +11,6 @@
         <router-link to="/login" class="nav-link p-1">
           <button class="btn">Masuk</button>
         </router-link>
-        <v-icon> mdi-account </v-icon>
-        {{ user.name }}
       </div>
     </div>
   </nav>
@@ -70,7 +68,8 @@
                         class="btn dropdown-toggle"
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
-                      ><v-icon> mdi-account </v-icon>
+                      >
+                        <v-icon> mdi-account </v-icon>
                         {{ user.name }}
                       </button>
                       <ul class="dropdown-menu dropdown-menu-end">
@@ -155,6 +154,7 @@
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
                       >
+                        <v-icon> mdi-account </v-icon>
                         {{ user.name }}
                       </button>
                       <ul class="dropdown-menu dropdown-menu-end">

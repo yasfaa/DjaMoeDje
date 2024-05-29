@@ -166,14 +166,14 @@ export default {
           <div class="col-lg-8">
             <div v-for="(order, index) in orders" :key="index" class="mb-4 card">
               <div class="card-body">
-                <h5 class="card-title">Pesanan {{ index + 1 }}</h5>
-                <div class="row">
+                <h5 class="card-title mx-6 py-2 mb-4">{{ order.name }}</h5>
+                <div class="row d-flex align-items-center">
                   <div class="col-md-3">
                     <div class="row">
                       <div class="col-1 align-items-center d-flex">
                         <input
                           type="checkbox"
-                          class="large-checkbox"
+                          
                           v-model="order.selected"
                           @change="toggleSelect(index)"
                         />
@@ -183,10 +183,9 @@ export default {
                       </div>
                     </div>
                   </div>
-                  <div class="col-md-9">
+                  <div class="col-md-9 ">
                     <div class="row">
                       <div class="col">
-                        <h6>{{ order.name }}</h6>
                         <p>Rp {{ formatPrice(order.harga_menu) }}</p>
                       </div>
                       <div class="col">
@@ -223,10 +222,10 @@ export default {
             <div class="card">
               <div class="card-body">
                 <h5 class="card-title">Rincian Belanja</h5>
-                <p>Ringkasan Pembayaran</p>
+                <p>Total biaya belanja</p>
                 <p>Rp {{ formatPrice(totalPayment) }}</p>
                 <button class="btn btn-primary w-100" @click="proceedToCheckout">
-                  Lanjut ke Pembayaran
+                  Checkout
                 </button>
               </div>
             </div>
