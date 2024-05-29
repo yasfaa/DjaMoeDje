@@ -16,7 +16,8 @@ Route::prefix('/auth')->group(function () {
     Route::post('/login',[AuthController::class,'login']);
     Route::post('/register',[AuthController::class,'register']);
     Route::get('/user',[AuthController::class,'edit'])->middleware('auth:sanctum');
-    Route::post('/update',[AuthController::class,'update'])->middleware('auth:sanctum');
+    Route::post('/update',[AuthController::class,'update'])->middleware('auth:sanctum', 'role:User');
+    Route::post('/update/admin',[AuthController::class,'updateAdmin'])->middleware('auth:sanctum','role:Admin');
     Route::post('/logout',[AuthController::class,'logout'])->middleware('auth:sanctum');
 });
 
@@ -56,3 +57,8 @@ Route::prefix('/cart')->middleware(['auth:sanctum', 'role:User'])->group(functio
 
 Route::get('/getMenu', [MenuController::class, 'index']);
 Route::get('menu/get/{id}', [MenuController::class, 'getOne']);
+
+Route::prefix('/biteship')->group(function () {
+    Route::get('/areas', [AddressController::class, 'getAreas']);
+    
+});

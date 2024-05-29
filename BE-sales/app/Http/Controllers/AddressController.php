@@ -3,20 +3,39 @@
 namespace App\Http\Controllers;
 
 use App\Models\Address;
+use App\Services\Biteship;
 use Illuminate\Http\Request;
 
 class AddressController extends Controller
 {
+    protected $biteship;
+
+    public function __construct(Biteship $biteship)
+    {
+        $this->biteship = $biteship;
+    }
+    public function getAreas(Request $request)
+    {
+        $input = $request->query('input', '');
+
+        try {
+            $areas = $this->biteship->getAreas($input);
+            return response()->json($areas);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
     public function store(Request $request)
     {
         $created = Address::create(
             [
+                'id' => $request->id,
                 'nama_penerima' => $request->nama_penerima,
                 'nomor_telepon' => $request->nomor_telepon,
                 'jalan' => $request->jalan,
-                'kelurahan' => $request->kelurahan,
                 'kecamatan' => $request->kecamatan,
                 'kota' => $request->kota,
+                'provinsi' => $request->provinsi,
                 'kode_pos' => $request->kode_pos,
                 'user_id' => $request->user()->id
             ]
@@ -43,17 +62,7 @@ class AddressController extends Controller
 
         return response()->json($address);
     }
-    /**
-     * Display the specified resource.
-     */
-    public function show(Address $address)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Request $request, $id)
     {
         $address = Address::find($id);
@@ -65,10 +74,6 @@ class AddressController extends Controller
         return response()->json($address);
     }
 
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         $address = Address::find($id);
@@ -88,9 +93,6 @@ class AddressController extends Controller
         return response()->json(['message' => 'Successfully updated Address'], 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         $address = Address::where('id', $id)->first();
