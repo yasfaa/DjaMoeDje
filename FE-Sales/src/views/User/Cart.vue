@@ -116,7 +116,7 @@ export default {
     async removeOrder(index) {
       const orderId = this.orders[index].id
       try {
-        await axios.post(`${BASE_URL}/cart/delete/${orderId}`, {
+        await axios.delete(`${BASE_URL}/cart/delete/${orderId}`, {
           headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
@@ -130,8 +130,8 @@ export default {
     async toggleSelect(index) {
       const orderId = this.orders[index].id
       const url = this.orders[index].selected
-        ? `${BASE_URL}/cart/unselect/${orderId}`
-        : `${BASE_URL}/cart/select/${orderId}`
+        ? `${BASE_URL}/cart/select/${orderId}`
+        : `${BASE_URL}/cart/unselect/${orderId}`
 
       try {
         const response = await axios.get(url, {
@@ -139,7 +139,7 @@ export default {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
         })
-        this.orders[index].selected = !this.orders[index].selected
+        this.orders[index].selected = response.data.select === 1
         this.totalPayment = response.data.total_harga
       } catch (error) {
         console.error(error)
@@ -154,7 +154,12 @@ export default {
   <div class="py-4 container">
     <div class="row mt-6">
       <v-overlay :model-value="overlay" class="d-flex align-items-center justify-content-center">
-        <v-progress-circular color="primary" size="96" indeterminate></v-progress-circular>
+        <v-progress-circular
+          color="amber"
+          indeterminate
+          :size="69"
+          :width="6"
+        ></v-progress-circular>
       </v-overlay>
       <div class="container">
         <div class="row">
@@ -197,10 +202,14 @@ export default {
                             style="cursor: pointer"
                             @click="incrementQuantity(index)"
                           ></v-icon>
-                          <button class="btn btn-link text-danger ms-3" @click="removeOrder(index)">
-                            <i class="bi bi-trash"></i> Hapus
-                          </button>
                           <span class="ms-auto">Rp {{ formatPrice(order.totalPrice) }}</span>
+                          <v-icon
+                            class="mx-3 justify-content-end"
+                            icon="mdi-delete"
+                            color="red"
+                            style="cursor: pointer"
+                            @click="removeOrder(index)"
+                          ></v-icon>
                         </div>
                       </div>
                     </div>

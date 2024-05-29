@@ -166,4 +166,17 @@ class CartController extends Controller
 
         ], 200);
     }
+
+    public function destroy($cartItemId)
+    {
+        $cartItem = CartItem::find($cartItemId);
+
+        if (!$cartItem) {
+            return response()->json(['error' => 'Ingredient not found.'], 404);
+        }
+
+        $cartItem->delete();
+
+        return response()->json(['message' => 'Ingredient deleted successfully']);
+    }
 }
