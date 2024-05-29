@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import login from '../views/Login.vue'
 import adminDashboard from '../views/Admin/AdminDashboard.vue'
 import editMenu from '../views/Admin/EditMenu.vue'
+import adminProfile from '../views/Admin/AdminProfile.vue'
 import detailMenu from '../views/User/DetailMenu.vue'
 import profile from '../views/User/Profile.vue'
 import order from '../views/User/Cart.vue'
@@ -44,6 +45,11 @@ const router = createRouter({
       path: '/menu/:id',
       name: 'Detail Menu',
       component: detailMenu,
+    },
+    {
+      path: '/admin/profile',
+      name: 'Admin PRofile',
+      component: adminProfile,
     },
   ]
 })

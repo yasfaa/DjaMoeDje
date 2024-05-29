@@ -4,7 +4,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL_API
 import Navbar from '@/components/DashboardNavbar.vue'
 
 export default {
-  name: 'Profile',
+  name: 'tes',
   components: {
     Navbar
   },
