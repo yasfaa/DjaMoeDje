@@ -3,47 +3,50 @@
     <section class="navbar">
       <Navbar />
     </section>
-    <div class="container-fluid px-4 py-2">
-      <div class="row py-5">
-        <div class="mt-3">
-          <v-form @submit.prevent="updateMenu">
-            <div class="mb-3">
-              <label for="InputNamaMenu" class="form-label">Nama Menu</label>
-              <input
-                type="text"
-                class="form-control"
-                v-model="menu.name"
-                aria-describedby="namaCustomer"
-              />
-            </div>
-            <div class="mb-3">
-              <label for="InputDeskripsi" class="form-label">Deskripsi</label>
-              <textarea
-                type="text"
-                class="form-control"
-                v-model="menu.desc"
-                aria-describedby="emailCustomer"
-              ></textarea>
-            </div>
-            <div class="mb-3">
-              <label for="FileInput" class="form-label">Gambar Menu</label>
-              <input
-                type="file"
-                class="form-control"
-                ref="fileInput"
-                @change="handleFileChange"
-                multiple
-              />
-            </div>
-            <div class="mb-3">
-              <label for="exampleInputHarga" class="form-label">Harga</label>
-              <input type="number" class="form-control" v-model="menu.price" />
-            </div>
-            <div class="modal-footer">
-              <button class="btn btn-primary" @click="cancelEdit">Cancel</button>
-              <button class="btn btn-primary mx-4" type="submit">Update Menu</button>
-            </div>
-          </v-form>
+    <div class="container">
+      <div class="form-box">
+        <div class="padding-container">
+          <div class="row ">
+            <v-form @submit.prevent="updateMenu">
+              <h2>Edit Menu</h2>
+              <div class="mb-3">
+                <label for="InputNamaMenu" class="form-label">Nama Menu</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="menu.name"
+                  aria-describedby="namaCustomer"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="InputDeskripsi" class="form-label">Deskripsi</label>
+                <textarea
+                  type="text"
+                  class="form-control"
+                  v-model="menu.desc"
+                  aria-describedby="emailCustomer"
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="FileInput" class="form-label">Gambar Menu</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  ref="fileInput"
+                  @change="handleFileChange"
+                  multiple
+                />
+              </div>
+              <div class="mb-3">
+                <label for="exampleInputHarga" class="form-label">Harga</label>
+                <input type="number" class="form-control" v-model="menu.price" />
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-primary mx-4" @click="cancelEdit">Cancel</button>
+                <button class="btn btn-primary " type="submit">Update Menu</button>
+              </div>
+            </v-form>
+          </div>
         </div>
       </div>
     </div>
@@ -135,12 +138,62 @@ export default {
 </script>
 
 <style scoped>
+.container {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.padding-container {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-box {
+  position: relative;
+  width: 450px;
+  height: auto;
+  background: #fff4cc;
+  border: 1px solid rgba(255, 237, 171, 0.5);
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .form-label {
   color: #63560c;
 }
 
-.modal-title {
+h2 {
+  font-size: 2em;
   color: #63560c;
+  text-align: center;
+}
+
+.label {
+  position: absolute;
+  top: 50%;
+  left: 5px;
+  transform: translateY(-50%);
+  color: rgb(60, 60, 60);
+  font-size: 1em;
+  pointer-events: none;
+  transition: 0.5s;
+}
+
+.input {
+  width: 100%;
+  height: 120px;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 1em;
+  padding: 0 35px 0 5px;
+  color: rgb(60, 60, 60);
 }
 
 .btn {
