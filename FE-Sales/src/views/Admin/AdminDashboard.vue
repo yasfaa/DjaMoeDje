@@ -1,4 +1,3 @@
-<!-- Catalogue.vue -->
 <template>
   <main>
     <section class="navbar">
@@ -12,63 +11,50 @@
           </div>
         </div>
       </div>
-      <!-- Modal -->
-      <v-dialog v-model="dialog" max-width="600">
-        <v-card>
-          <v-card-title>
-            <span class="text-h5">Tambah Menu</span>
-          </v-card-title>
-          <v-spacer></v-spacer>
-          <div class="modal-content">
-            <div class="modal-body mx-3">
-              <form @submit.prevent="addMenu">
-                <div class="mb-3">
-                  <label for="InputNamaMenu" class="form-label">Nama Menu</label>
-                  <input
-                    type="name"
-                    class="form-control"
-                    v-model="menu.name"
-                    aria-describedby="namaCustomer"
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="InputDeskripsi" class="form-label">Deskripsi</label>
-                  <textarea
-                    type="text"
-                    class="form-control"
-                    v-model="menu.desc"
-                    aria-describedby="emailCustomer"
-                  ></textarea>
-                </div>
-                <div class="mb-3">
-                  <label for="FileInput" class="form-label">Gambar Menu</label>
-                  <input
-                    type="file"
-                    class="form-control"
-                    ref="fileInput"
-                    @change="handleFileChange"
-                    multiple
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="exampleInputHarga" class="form-label">Harga</label>
-                  <input type="number" class="form-control" v-model="menu.price" />
-                </div>
-              </form>
+      <!-- Dialog -->
+      <v-dialog v-model="dialog" max-width="450">
+        <v-card class="padding-container form-box">
+          <v-form @submit.prevent="addMenu">
+            <h2>Tambah Menu</h2>
+            <div class="mb-3">
+              <label for="InputNamaMenu" class="form-label">Nama Menu</label>
+              <input
+                type="text"
+                class="form-control"
+                v-model="menu.name"
+                aria-describedby="namaCustomer"
+                required
+              />
             </div>
-          </div>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <button class="btn btn-primary mx-2" @click="closeDialog">Close</button>
-            <button
-              class="btn btn-primary mx-1"
-              type="submit"
-              @onclick="addMenu"
-              data-bs-dismiss="modal"
-            >
-              Tambah Menu
-            </button>
-          </v-card-actions>
+            <div class="mb-3">
+              <label for="InputDeskripsi" class="form-label">Deskripsi</label>
+              <textarea
+                type="text"
+                class="form-control"
+                v-model="menu.desc"
+                aria-describedby="emailCustomer"
+                required
+              ></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="FileInput" class="form-label">Gambar Menu</label>
+              <input
+                type="file"
+                class="form-control"
+                ref="fileInput"
+                @change="handleFileChange"
+                multiple
+              />
+            </div>
+            <div class="mb-3">
+              <label for="exampleInputHarga" class="form-label">Harga</label>
+              <input type="number" class="form-control" v-model="menu.price" required />
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary mx-4" @click="closeDialog">Cancel</button>
+              <button class="btn btn-primary" type="submit">Tambah Menu</button>
+            </div>
+          </v-form>
         </v-card>
       </v-dialog>
       <div class="modal-dialog"></div>
@@ -176,15 +162,71 @@ export default {
   background-size: cover;
 }
 
+.container {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
+.padding-container {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-input[type='number'] {
-  -moz-appearance: textfield;
+.form-box {
+  position: relative;
+  width: 450px;
+  height: auto;
+  background: #fffcf1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-label {
+  color: #63560c;
+}
+
+h2 {
+  font-size: 2em;
+  color: #63560c;
+  text-align: center;
+}
+
+.label {
+  position: absolute;
+  top: 50%;
+  left: 5px;
+  transform: translateY(-50%);
+  color: rgb(60, 60, 60);
+  font-size: 1em;
+  pointer-events: none;
+  transition: 0.5s;
+}
+
+.input {
+  width: 100%;
+  height: 120px;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 1em;
+  padding: 0 35px 0 5px;
+  color: rgb(60, 60, 60);
+}
+
+.btn {
+  font-size: 1.1rem;
+  border-radius: 5px;
+  transition: background-color 0.3s;
 }
 
 .btn-primary {
   background-color: #ffe279;
-  color: black;
+  color: #19160c;
   border: none;
 }
 

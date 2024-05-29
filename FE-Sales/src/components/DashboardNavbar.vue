@@ -54,16 +54,23 @@
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
                       >
+                        <v-icon> mdi-account </v-icon>
                         {{ user.name }}
                       </button>
                       <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                          <a class="dropdown-item text-center" @click="profile()" style="cursor: pointer"
+                          <a
+                            class="dropdown-item text-center"
+                            @click="AdminProfile()"
+                            style="cursor: pointer"
                             >Profile</a
                           >
                         </li>
                         <li>
-                          <a class="dropdown-item text-center" @click="onLogout()" style="cursor: pointer"
+                          <a
+                            class="dropdown-item text-center"
+                            @click="onLogout()"
+                            style="cursor: pointer"
                             >Logout</a
                           >
                         </li>
@@ -132,11 +139,15 @@
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
                       >
+                        <v-icon> mdi-account </v-icon>
                         {{ user.name }}
                       </button>
                       <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                          <a class="dropdown-item text-center" @click="profile()" style="cursor: pointer"
+                          <a
+                            class="dropdown-item text-center"
+                            @click="profile()"
+                            style="cursor: pointer"
                             >Profile</a
                           >
                         </li>
@@ -221,8 +232,10 @@ export default {
         })
     },
     profile() {
-      // Arahkan pengguna ke halaman profil
       this.$router.push('/profile')
+    },
+    AdminProfile() {
+      this.$router.push('/admin/profile')
     }
   },
   computed: {

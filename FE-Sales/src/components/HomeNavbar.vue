@@ -11,6 +11,7 @@
         <router-link to="/login" class="nav-link p-1">
           <button class="btn">Masuk</button>
         </router-link>
+        <v-icon> mdi-account </v-icon>
         {{ user.name }}
       </div>
     </div>
@@ -69,14 +70,14 @@
                         class="btn dropdown-toggle"
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
-                      >
+                      ><v-icon> mdi-account </v-icon>
                         {{ user.name }}
                       </button>
                       <ul class="dropdown-menu dropdown-menu-end">
                         <li>
                           <a
                             class="dropdown-item text-center"
-                            @click="profile()"
+                            @click="AdminProfile()"
                             style="cursor: pointer"
                             >Profile</a
                           >
@@ -254,8 +255,10 @@ export default {
         })
     },
     profile() {
-      // Arahkan pengguna ke halaman profil
       this.$router.push('/profile')
+    },
+    AdminProfile() {
+      this.$router.push('/admin/profile')
     }
   }
 }
