@@ -78,7 +78,7 @@ export default {
   <section class="navbar pb-6">
     <Navbar />
   </section>
-  <div class="hero-section mt-6">
+  <div class="hero-section mt-2">
     <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
       <div class="carousel-inner">
         <div class="carousel-item active">
@@ -173,7 +173,6 @@ export default {
 <style scoped>
 .hero-section {
   position: relative;
-  padding-top: 1rem;
 }
 
 .carousel {
