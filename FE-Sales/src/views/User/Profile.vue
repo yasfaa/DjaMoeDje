@@ -22,7 +22,7 @@ export default {
       searchResults: [],
       selectedAddress: null,
       address: {
-        id: '',
+        kode_alamat: '',
         nama_penerima: '',
         nomor_telepon: '',
         jalan: '',
@@ -84,16 +84,17 @@ export default {
     },
     fillAddress() {
       if (this.selectedAddress) {
-        this.address.id = this.selectedAddress.id
+        this.address.kode_alamat = this.selectedAddress.id
         this.address.provinsi = this.selectedAddress.administrative_division_level_1_name
         this.address.kota = this.selectedAddress.administrative_division_level_2_name
         this.address.kecamatan = this.selectedAddress.administrative_division_level_3_name
         this.address.kode_pos = this.selectedAddress.postal_code
       }
+      console.log(this.address.kode_alamat)
     },
     async saveAddress() {
       const addressData = {
-        id: this.address.id,
+        kode_alamat: this.address.kode_alamat,
         nama_penerima: this.address.nama_penerima,
         nomor_telepon: this.address.nomor_telepon,
         jalan: this.address.jalan,
@@ -171,10 +172,15 @@ export default {
       this.confirmdeletion = true
     },
     confirmDelete() {
+      console.log(this.selectedAddressId)
       if (this.selectedAddressId) {
         this.deleteAddress(this.selectedAddressId)
         this.confirmdeletion = false
       }
+    },
+    closeModal(){
+      this.resetForm(),
+      this.dialog = false
     },
     async getUser() {
       try {
@@ -387,7 +393,7 @@ export default {
                         />
                       </div>
                       <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="dialog = false">
+                        <button type="button" class="btn btn-secondary" @click="closeModal">
                           Close
                         </button>
                         <button type="button" class="btn btn-primary" @click="saveAddress">

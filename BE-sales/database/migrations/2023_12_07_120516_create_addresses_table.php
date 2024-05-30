@@ -11,7 +11,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('addresses', function (Blueprint $table) {
-            $table->string('id')->primary();
+            $table->id();
+            $table->string('kode_alamat');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('nama_penerima');

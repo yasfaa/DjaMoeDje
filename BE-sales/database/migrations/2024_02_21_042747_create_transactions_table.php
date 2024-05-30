@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->string('address_id');
+            $table->unsignedBigInteger('address_id');
             $table->foreign('address_id')->references('id')->on('addresses');
             $table->double('total', 10);
             $table->enum('status', ['unpaid', 'proccess', 'shipping', 'received', 'canceled'])->default('unpaid');

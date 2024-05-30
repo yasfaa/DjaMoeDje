@@ -29,7 +29,7 @@ class AddressController extends Controller
     {
         $created = Address::create(
             [
-                'id' => $request->id,
+                'kode_alamat' => $request->kode_alamat,
                 'nama_penerima' => $request->nama_penerima,
                 'nomor_telepon' => $request->nomor_telepon,
                 'jalan' => $request->jalan,
