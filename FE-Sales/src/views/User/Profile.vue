@@ -16,8 +16,6 @@ export default {
       users: {
         name: '',
         email: '',
-        no_telp: '',
-        password: ''
       },
       loadingRegist: false,
       searchQuery: '',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -74,7 +75,14 @@ class AuthController extends Controller
 
     public function update(Request $request)
     {
-        $user = User::where('email', $request->user()->email)->first();
+        $request->validate([
+            'email' => 'required|email',
+            'name' => 'required',
+        ]);
+
+        $auth = Auth::user();
+        $user = User::where('id', $auth->id)->first();
+
         if (!$user) {
             return response()->json(['message' => 'Pengguna tidak ditemukan'], 404);
         }
@@ -82,6 +90,37 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
         ]);
+
+        return response()->json(['message' => 'Berhasil memperbarui data pengguna'], 200);
+    }
+
+    public function updateAdmin(Request $request)
+    {
+        $validate = $request->validate([
+            'email' => 'required',
+            'name' => 'required',
+            'password' => 'nullable|string|min:6',
+        ]);
+
+        $auth = Auth::user();
+
+        $user = User::where('id', $auth->id)->first();
+        if (!$user) {
+            return response()->json(['message' => 'Pengguna tidak ditemukan'], 404);
+        }
+
+        if ($request->filled('password') && Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Password baru tidak boleh sama dengan password lama'], 400);
+        }
+
+        $user->name = $validate['name'];
+        $user->email = $validate['email'];
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($validate['password']);
+        }
+
+        $user->save();
 
         return response()->json(['message' => 'Berhasil memperbarui data pengguna'], 200);
     }

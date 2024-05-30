@@ -4,7 +4,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL_API
 import Navbar from '@/components/DashboardNavbar.vue'
 
 export default {
-  name: 'tes',
+  name: 'Profile',
   components: {
     Navbar
   },
@@ -24,12 +24,13 @@ export default {
       searchResults: [],
       selectedAddress: null,
       address: {
+        id: '',
         nama_penerima: '',
         nomor_telepon: '',
         jalan: '',
-        kelurahan: '',
         kecamatan: '',
         kota: '',
+        provinsi: '',
         kode_pos: ''
       },
       alamat: [],
@@ -49,14 +50,58 @@ export default {
     this.fetchUserAddresses()
   },
   methods: {
+    searchWithDelay() {
+      this.loadingRegist = true
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout)
+      }
+      this.searchTimeout = setTimeout(this.searchAddress, 2000)
+    },
+    async searchAddress() {
+      if (this.searchQuery && this.searchQuery.length > 2) {
+        try {
+          const response = await axios.get(`${BASE_URL}/biteship/areas`, {
+            params: {
+              countries: 'ID',
+              input: this.searchQuery,
+              type: 'single'
+            }
+          })
+          this.searchResults = response.data.areas
+        } catch (error) {
+          console.error('Error fetching address:', error)
+          this.searchResults = []
+        } finally {
+          this.loadingRegist = false
+        }
+      } else {
+        this.searchResults = []
+      }
+    },
+    selectAddress(address) {
+      this.selectedAddress = address
+      this.fillAddress()
+      this.searchResults = []
+      this.searchQuery = address.name
+    },
+    fillAddress() {
+      if (this.selectedAddress) {
+        this.address.id = this.selectedAddress.id
+        this.address.provinsi = this.selectedAddress.administrative_division_level_1_name
+        this.address.kota = this.selectedAddress.administrative_division_level_2_name
+        this.address.kecamatan = this.selectedAddress.administrative_division_level_3_name
+        this.address.kode_pos = this.selectedAddress.postal_code
+      }
+    },
     async saveAddress() {
       const addressData = {
+        id: this.address.id,
         nama_penerima: this.address.nama_penerima,
         nomor_telepon: this.address.nomor_telepon,
         jalan: this.address.jalan,
-        kelurahan: this.address.kelurahan,
         kecamatan: this.address.kecamatan,
         kota: this.address.kota,
+        provinsi: this.address.provinsi,
         kode_pos: this.address.kode_pos,
         user_id: this.users.id
       }
@@ -81,13 +126,15 @@ export default {
       }
     },
     resetForm() {
+      this.searchQuery = ''
+      this.searchResults = []
       this.address = {
         nama_penerima: '',
         nomor_telepon: '',
         jalan: '',
-        kelurahan: '',
         kecamatan: '',
         kota: '',
+        provinsi: '',
         kode_pos: ''
       }
     },
@@ -148,14 +195,24 @@ export default {
       }
     },
     async updateUser() {
+      const userData = {
+        name: this.users.name,
+        email: this.users.email,
+        no_telp: this.users.no_telp
+      }
+
+      if (this.users.password) {
+        userData.password = this.users.password
+      }
+
       try {
-        const response = await axios.post(`${BASE_URL}/auth/update`, this.users, {
+        const response = await axios.post(`${BASE_URL}/auth/update/admin`, userData, {
           headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
         })
         localStorage.setItem('name', this.users.name)
-        window.location.reload();
+        window.location.reload()
         this.$notify({
           type: 'success',
           title: 'Success',
@@ -168,23 +225,6 @@ export default {
           const errorMessage = error.response.data.message
           console.log(errorMessage)
         }
-      }
-    },
-    async onLogout() {
-      try {
-        await axios.post(
-          `${BASE_URL}/logout`,
-          {},
-          {
-            headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('access_token')
-            }
-          }
-        )
-        localStorage.removeItem('access_token')
-        this.$router.push('/login')
-      } catch (error) {
-        console.error('Logout failed:', error)
       }
     }
   }
@@ -204,15 +244,36 @@ export default {
               </div>
             </div>
             <div class="card-body">
-              <p class="text-uppercase fw-bolder">Informasi Pengguna</p>
+              <p class="text-uppercase fw-bolder">Informasi Admin</p>
               <div class="row">
                 <div class="col-md-6">
                   <label for="username" class="form-control-label">Username</label>
-                  <input type="text" v-model="users.name" class="form-control" id="username" required/>
+                  <input
+                    type="text"
+                    v-model="users.name"
+                    class="form-control"
+                    id="username"
+                    required
+                  />
                 </div>
                 <div class="col-md-6">
-                  <label for="email" class="form-control-label">Email address</label>
-                  <input type="email" v-model="users.email" class="form-control" id="email" required/>
+                  <label for="email" class="form-control-label">Email</label>
+                  <input
+                    type="email"
+                    v-model="users.email"
+                    class="form-control"
+                    id="email"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="password" class="form-control-label">Password</label>
+                  <input
+                    type="password"
+                    v-model="users.password"
+                    class="form-control"
+                    id="password"
+                  />
                 </div>
               </div>
               <hr class="horizontal dark" />
@@ -226,17 +287,17 @@ export default {
           <div class="card shadow-lg">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
-                <h4>Alamat</h4>
+                <h4>Alamat Pengambilan</h4>
               </div>
             </div>
             <div class="card-body">
               <div v-for="alamatItem in alamat" :key="alamatItem.id" class="mb-3">
                 <div class="row">
-                  <p class="text-xs">Nama Penerima: {{ alamatItem.nama_penerima }}</p>
+                  <p class="text-xs">Nama Pengirim: {{ alamatItem.nama_penerima }}</p>
                   <p class="text-xs">Nomor Telepon: {{ alamatItem.nomor_telepon }}</p>
                   <p class="text-xs">
-                    Alamat: {{ alamatItem.jalan }}, {{ alamatItem.kelurahan }},
-                    {{ alamatItem.kecamatan }}, {{ alamatItem.kota }}, {{ alamatItem.kode_pos }}
+                    Alamat: {{ alamatItem.jalan }}, {{ alamatItem.kecamatan }},
+                    {{ alamatItem.kota }}, {{ alamatItem.provinsi }}, {{ alamatItem.kode_pos }}
                   </p>
                 </div>
                 <button
@@ -247,7 +308,11 @@ export default {
                 </button>
                 <hr class="horizontal dark" />
               </div>
-              <button class="btn btn-primary btn-sm ms-auto" @click="dialog = true">
+              <button
+                class="btn btn-primary btn-sm ms-auto"
+                @click="dialog = true"
+                v-if="alamat.length === 0"
+              >
                 Tambah Alamat
               </button>
               <!-- Modal for adding address -->
@@ -261,12 +326,47 @@ export default {
                         <button type="button" class="btn-close" @click="dialog = false"></button>
                       </div>
                       <div class="modal-body">
-                        <label for="">Nama Penerima</label>
+                        <div class="">
+                          <label for="searchQuery" class="form-label">Cari Lokasi</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="searchQuery"
+                            v-model="searchQuery"
+                            @input="searchWithDelay"
+                          />
+                        </div>
+
+                        <div v-if="searchResults.length" class="mb-3 mt-3">
+                          <label for="addressSelect" class="form-label">Pilih Alamat</label>
+                          <select
+                            class="form-select"
+                            id="addressSelect"
+                            v-model="selectedAddress"
+                            @change="fillAddress"
+                          >
+                            <option
+                              v-for="result in searchResults"
+                              :key="result.id"
+                              :value="result"
+                            >
+                              {{ result.name }}
+                            </option>
+                          </select>
+                        </div>
+                        <div v-else>
+                          <a style="font-size: 11px; color: red"
+                            ><i class="fas fa-info-circle" style="color: #ff0000"></i>&nbsp;Masukkan
+                            kode pos atau kelurahan atau kota anda</a
+                          >
+                        </div>
+                        <v-progress-linear v-if="loadingRegist" indeterminate></v-progress-linear>
+                        <label for="">Nama Pengirim</label>
                         <input
                           type="text"
                           v-model="address.nama_penerima"
                           class="form-control mb-2"
-                          placeholder="Masukkan nama penerima"
+                          placeholder="Masukkan nama pengirim"
                         />
                         <label for="">Nomor Telepon</label>
                         <input
@@ -282,13 +382,6 @@ export default {
                           class="form-control mb-2"
                           placeholder="Masukkan nama jalan dan nomor jalannya"
                         />
-                        <label for="">Kelurahan</label>
-                        <input
-                          type="text"
-                          v-model="address.kelurahan"
-                          class="form-control mb-2"
-                          placeholder="Masukkan kelurahan penerima"
-                        />
                         <label for="">Kecamatan</label>
                         <input
                           type="text"
@@ -303,12 +396,19 @@ export default {
                           class="form-control mb-2"
                           placeholder="Masukkan kota penerima"
                         />
+                        <label for="">Provinsi</label>
+                        <input
+                          type="text"
+                          v-model="address.provinsi"
+                          class="form-control mb-2"
+                          placeholder="Masukkan provinsi penerima"
+                        />
                         <label for="">Kode Pos</label>
                         <input
                           type="text"
                           v-model="address.kode_pos"
                           class="form-control mb-2"
-                          placeholder="Masukkan pode pos penerima"
+                          placeholder="Masukkan kode pos penerima"
                         />
                       </div>
                       <div class="modal-footer">
@@ -358,7 +458,7 @@ export default {
 
 <style scoped>
 .border-main {
-  padding: 20px; 
+  padding: 20px;
 }
 
 .card {
