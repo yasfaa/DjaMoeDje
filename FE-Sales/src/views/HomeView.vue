@@ -38,6 +38,13 @@ export default {
       }
     },
     async addToCart(menuId) {
+      const isLoggedIn = !!localStorage.getItem('access_token') // Check if the user is logged in
+
+      if (!isLoggedIn) {
+        this.$router.push('/login') // Redirect to login if not logged in
+        return
+      }
+
       try {
         const formData = new FormData()
         formData.append('menu_id', menuId)
@@ -68,24 +75,53 @@ export default {
 </script>
 
 <template>
-  <section class="navbar">
+  <section class="navbar pb-6">
     <Navbar />
   </section>
   <div class="hero-section mt-6">
-    <v-carousel class="carousel" hide-delimiters show-arrows="hover" height="400" width="100%">
-      <v-carousel-item
-        src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-        cover
-      ></v-carousel-item>
-      <v-carousel-item
-        src="https://cdn.vuetifyjs.com/images/cards/hotel.jpg"
-        cover
-      ></v-carousel-item>
-      <v-carousel-item
-        src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
-        cover
-      ></v-carousel-item>
-    </v-carousel>
+    <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img
+            src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+            class="d-block w-100"
+            alt="..."
+          />
+        </div>
+        <div class="carousel-item">
+          <img
+            src="https://cdn.vuetifyjs.com/images/cards/hotel.jpg"
+            class="d-block w-100"
+            alt="..."
+          />
+        </div>
+        <div class="carousel-item">
+          <img
+            src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
+            class="d-block w-100"
+            alt="..."
+          />
+        </div>
+      </div>
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#carouselExampleControls"
+        data-bs-slide="prev"
+      >
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#carouselExampleControls"
+        data-bs-slide="next"
+      >
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
   </div>
   <div class="menu-section container">
     <div class="row">
@@ -137,11 +173,18 @@ export default {
 <style scoped>
 .hero-section {
   position: relative;
+  padding-top: 1rem;
 }
 
 .carousel {
   max-height: 400px;
   overflow: hidden;
+}
+
+.carousel-item img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 21/9;
 }
 
 .menu-section {
@@ -220,9 +263,9 @@ export default {
   background-color: #5a6268;
 }
 
-.footer-section {
-  padding: 1rem 0;
-  background-color: #f8f9fa;
-  border-top: 1px solid #e9ecef;
+@media (max-width: 600px) {
+  .carousel {
+    max-height: 200px;
+  }
 }
 </style>
