@@ -39,7 +39,7 @@ Route::prefix('/menu')->middleware(['auth:sanctum', 'role:Admin'])->group(functi
 
 
 Route::prefix('/ingredient')->middleware(['auth:sanctum', 'role:Admin'])->group(function () {
-    Route::post('/add/{id}',[IngredientController::class,'store']);
+    Route::post('/add',[IngredientController::class,'store']);
     Route::post('/get',[IngredientController::class,'index']);
     Route::get('/get/{id}',[IngredientController::class,'getOne']);
     Route::post('/update/{id}',[IngredientController::class,'update']);

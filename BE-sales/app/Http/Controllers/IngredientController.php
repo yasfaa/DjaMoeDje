@@ -22,18 +22,19 @@ class IngredientController extends Controller
         }
     }
 
-    public function store(Request $request, $id)
+    public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string',
-            'harga' => 'nullable|numeric',
+            'nama_bahan' => 'required|string',
+            'harga_bahan' => 'nullable|numeric',
+            'menu_id' => 'required|integer|exists:menus,id',
         ]);
 
         try {
             $ingredient = Ingredient::create([
-                'nama' => $request->input('nama'),
-                'menu_id' => $id,
-                'harga' => $request->input('harga', 0)
+                'nama' => $request->input('nama_bahan'),
+                'menu_id' => $request->input('menu_id'),
+                'harga' => $request->input('harga_bahan', 0)
             ]);
 
             return response()->json(['ingredient' => $ingredient, 'message' => 'Ingredient added successfully'], 201);
@@ -64,16 +65,16 @@ class IngredientController extends Controller
         }
 
         $request->validate([
-            'nama' => 'nullable|string',
-            'harga' => 'nullable|numeric',
+            'nama_bahan' => 'nullable|string',
+            'harga_bahan' => 'nullable|numeric',
         ]);
 
         if ($request->has('nama')) {
-            $ingredient->nama = $request->input('nama');
+            $ingredient->nama = $request->input('nama_bahan');
         }
 
         if ($request->has('harga')) {
-            $ingredient->harga = $request->input('harga');
+            $ingredient->harga = $request->input('harga_bahan');
         }
 
         $ingredient->save();

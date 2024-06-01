@@ -171,6 +171,10 @@ export default {
 </template>
 
 <style scoped>
+.navbar {
+  z-index: 999;
+}
+
 .hero-section {
   position: relative;
 }
@@ -178,6 +182,7 @@ export default {
 .carousel {
   max-height: 400px;
   overflow: hidden;
+  z-index: 0;
 }
 
 .carousel-item img {
