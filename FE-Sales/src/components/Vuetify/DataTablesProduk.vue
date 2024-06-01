@@ -4,6 +4,7 @@
       Daftar Menu
       <v-spacer></v-spacer>
       <v-text-field
+        class="search-input"
         v-model="search"
         density="compact"
         label="Search"
@@ -54,6 +55,7 @@
         </v-row>
       </template>
       <template v-slot:item.actions="{ item }">
+        <v-icon size="large" class="me-2" @click="detailMenu(item)"> mdi-eye </v-icon>
         <v-icon size="large" class="me-2" @click="editMenu(item)" color="blue"> mdi-pencil </v-icon>
         <v-icon size="large" @click="confirmDelete(item)" color="red"> mdi-delete </v-icon>
       </template>

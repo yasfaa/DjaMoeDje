@@ -316,6 +316,6 @@ export default {
 }
 
 .navbar {
-  z-index: 1;
+  z-index: 999;
 }
 </style>

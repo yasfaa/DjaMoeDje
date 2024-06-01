@@ -44,7 +44,7 @@
               />
             </div>
             <div class="modal-footer">
-              <button class="btn btn-primary mx-4" @click="closeDialog">Cancel</button>
+              <button class="btn btn-primary cancel-button" @click="closeDialog">Cancel</button>
               <button class="btn btn-primary" type="submit">Tambah Menu</button>
             </div>
           </v-form>
@@ -87,14 +87,9 @@
                 v-model="ingredient.price"
               />
             </div>
-            <v-icon
-              size="large"
-              class="justify-content-center"
-              @click="addOrUpdateIngredient"
-              color="blue"
-            >
-              mdi-plus
-            </v-icon>
+            <button type="button" class="btn btn-primary mb-5" @click="addOrUpdateIngredient">
+              Tambah Bahan Lainnya
+            </button>
             <div class="modal-footer">
               <button class="btn btn-primary me-4 justify-content-start" @click="closeDialog">
                 Batal
@@ -405,8 +400,24 @@ h2 {
   color: white;
 }
 
-.delete-icon {
-  cursor: pointer;
-  margin-left: auto;
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.cancel-button {
+  margin-left: 0;
+}
+
+@media (max-width: 600px) {
+  .form-box {
+  position: relative;
+  width: 95%;
+  height: auto;
+  background: #fffcf1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 }
 </style>

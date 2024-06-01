@@ -6,11 +6,39 @@
     <div class="container">
       <div class="row mt-5">
         <div class="card border-2 pt-3" v-if="menu.id">
-          <v-carousel hide-delimiters class="carousel">
-            <v-carousel-item v-for="(link, index) in fileLinks" :key="index">
-              <v-img :src="link || 'https://via.placeholder.com/150'"></v-img>
-            </v-carousel-item>
-          </v-carousel>
+          <div id="menuCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              <div
+                v-for="(link, index) in fileLinks"
+                :key="index"
+                :class="['carousel-item', { active: index === 0 }]"
+              >
+                <img
+                  :src="link || 'https://via.placeholder.com/150'"
+                  class="d-block w-100"
+                  alt="Menu Image"
+                />
+              </div>
+            </div>
+            <button
+              class="carousel-control-prev"
+              type="button"
+              data-bs-target="#menuCarousel"
+              data-bs-slide="prev"
+            >
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button
+              class="carousel-control-next"
+              type="button"
+              data-bs-target="#menuCarousel"
+              data-bs-slide="next"
+            >
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
           <div class="row p-2 pt-2">
             <div class="d-flex flex-column">
               <div class="d-flex justify-content-between align-items-center">
@@ -20,8 +48,10 @@
               <div class="theme-text subtitle">Deskripsi:</div>
               <div class="brief-description">{{ menu.deskripsi }}</div>
               <div class="justify-content-end">
-                <button class="btn btn-primary" @click="goToMenu(menu.id)">Add to Cart</button>
-                <button class="btn btn-secondary mx-4 my-2">Customize Menu</button>
+                <button class="btn btn-primary me-4" @click.prevent="addToCart(menu.id)">
+                  Add to Cart
+                </button>
+                <button class="btn btn-secondary my-2">Customize Menu</button>
               </div>
             </div>
           </div>
@@ -87,6 +117,30 @@ export default {
       } finally {
         this.overlay = false
       }
+    },
+    async addToCart(menuId) {
+      const isLoggedIn = !!localStorage.getItem('access_token') // Check if the user is logged in
+
+      if (!isLoggedIn) {
+        this.$router.push('/login') // Redirect to login if not logged in
+        return
+      }
+
+      try {
+        const formData = new FormData()
+        formData.append('menu_id', menuId)
+        formData.append('quantity', '1')
+
+        await axios.post(BASE_URL + '/cart/add', formData, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token'),
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        this.showSuccessDialog = true
+      } catch (error) {
+        console.error('Error adding menu to cart:', error)
+      }
     }
   }
 }
@@ -96,13 +150,8 @@ export default {
 .card {
   border-radius: 10px !important;
   box-shadow: 1px 1px 15px #cccccc40;
-  transition: 0.5s ease-in;
   background-color: white;
   margin: 1rem 0;
-}
-
-.card:hover {
-  box-shadow: 1px 1px 28.5px -7px #d6d6d6;
 }
 
 .carousel {
@@ -162,5 +211,13 @@ export default {
 
 .btn-secondary:hover {
   background-color: #5a6268;
+}
+
+@media (max-width: 600px) {
+  .carousel {
+    max-height: 200px;
+    overflow: hidden;
+    border-radius: 10px;
+  }
 }
 </style>

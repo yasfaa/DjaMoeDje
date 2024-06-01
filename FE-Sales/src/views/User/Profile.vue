@@ -15,7 +15,7 @@ export default {
       dialog: false,
       users: {
         name: '',
-        email: '',
+        email: ''
       },
       loadingRegist: false,
       searchQuery: '',
@@ -178,9 +178,8 @@ export default {
         this.confirmdeletion = false
       }
     },
-    closeModal(){
-      this.resetForm(),
-      this.dialog = false
+    closeModal() {
+      this.resetForm(), (this.dialog = false)
     },
     async getUser() {
       try {
@@ -220,14 +219,14 @@ export default {
           console.log(errorMessage)
         }
       }
-    },
+    }
   }
 }
 </script>
 
 <template>
+  <navbar />
   <div class="border-main">
-    <navbar />
     <div class="py-4 container-fluid">
       <div class="row">
         <div class="col-md-7 mt-6">
@@ -282,7 +281,7 @@ export default {
                   <p class="text-xs">Nomor Telepon: {{ alamatItem.nomor_telepon }}</p>
                   <p class="text-xs">
                     Alamat: {{ alamatItem.jalan }}, {{ alamatItem.kecamatan }},
-                    {{ alamatItem.kota }},  {{ alamatItem.provinsi }}, {{ alamatItem.kode_pos }}
+                    {{ alamatItem.kota }}, {{ alamatItem.provinsi }}, {{ alamatItem.kode_pos }}
                   </p>
                 </div>
                 <button
