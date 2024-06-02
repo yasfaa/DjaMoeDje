@@ -47,8 +47,20 @@
               <div class="menu-price">Rp. {{ formatPrice(menu.total) }}</div>
               <div class="theme-text subtitle">Deskripsi:</div>
               <div class="brief-description">{{ menu.deskripsi }}</div>
+              <div class="quantity-control my-3">
+                <v-icon icon="mdi-minus" class="icon-btn" @click="decreaseQuantity"></v-icon>
+                <input
+                  type="number"
+                  min="1"
+                  v-model="quantity"
+                  @change="updateQuantity(index, order.id, order.quantity)"
+                  class="form-control text-center quantity-input mx-2"
+                  style="width: 55px"
+                />
+                <v-icon icon="mdi-plus" class="icon-btn" @click="increaseQuantity"></v-icon>
+              </div>
               <div class="justify-content-end">
-                <button class="btn btn-primary me-4" @click.prevent="addToCart(menu.id)">
+                <button class="btn btn-primary me-4" @click.prevent="addToCart(menu.id, quantity)">
                   Add to Cart
                 </button>
                 <button class="btn btn-secondary my-2">Customize Menu</button>
@@ -75,7 +87,9 @@ export default {
     return {
       menu: {},
       fileLinks: [],
-      overlay: false
+      overlay: false,
+      quantity: 1,
+      showSuccessDialog: false
     }
   },
   mounted() {
@@ -118,7 +132,15 @@ export default {
         this.overlay = false
       }
     },
-    async addToCart(menuId) {
+    increaseQuantity() {
+      this.quantity++
+    },
+    decreaseQuantity() {
+      if (this.quantity > 1) {
+        this.quantity--
+      }
+    },
+    async addToCart(menuId, quantity) {
       const isLoggedIn = !!localStorage.getItem('access_token') // Check if the user is logged in
 
       if (!isLoggedIn) {
@@ -129,7 +151,7 @@ export default {
       try {
         const formData = new FormData()
         formData.append('menu_id', menuId)
-        formData.append('quantity', '1')
+        formData.append('quantity', quantity)
 
         await axios.post(BASE_URL + '/cart/add', formData, {
           headers: {
@@ -137,9 +159,23 @@ export default {
             'Content-Type': 'multipart/form-data'
           }
         })
+
         this.showSuccessDialog = true
+        this.$notify({
+          type: 'success',
+          title: 'Success',
+          text: 'Menu added to cart successfully!',
+          color: 'green'
+        })
       } catch (error) {
         console.error('Error adding menu to cart:', error)
+        const errorMessage = error.response?.data.message || 'An error occurred'
+        this.$notify({
+          type: 'error',
+          title: 'Error',
+          text: errorMessage,
+          color: 'red'
+        })
       }
     }
   }
@@ -211,6 +247,17 @@ export default {
 
 .btn-secondary:hover {
   background-color: #5a6268;
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+}
+
+.quantity-input {
+  width: 50px;
+  text-align: center;
+  margin: 0 10px;
 }
 
 @media (max-width: 600px) {
