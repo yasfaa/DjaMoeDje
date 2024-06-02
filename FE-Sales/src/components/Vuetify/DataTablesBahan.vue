@@ -79,6 +79,9 @@
               class="form-control"
               v-model="ingredient.price"
             />
+            <a style="font-size: 11px; color: red"
+              ><i class="fas fa-info-circle" style="color: #ff0000"></i>&nbsp;Masukkan harga jika mempengaruhi harga menu</a
+            >
           </div>
           <button type="button" class="btn btn-primary mb-5" @click="addOrUpdateIngredient">
             Tambah Bahan Lainnya
@@ -108,6 +111,9 @@
               class="form-control"
               v-model="ingredient.price"
             />
+            <a style="font-size: 11px; color: red"
+              ><i class="fas fa-info-circle" style="color: #ff0000"></i>&nbsp;Masukkan harga jika mempengaruhi harga menu</a
+            >
           </div>
           <div class="modal-footer">
             <button class="btn me-4 justify-content-start" @click="closeEditDialog">Batal</button>
