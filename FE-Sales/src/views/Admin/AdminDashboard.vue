@@ -212,7 +212,7 @@ export default {
       }
     },
     addOrUpdateIngredient() {
-      if (!this.ingredient.name || !this.ingredient.price) {
+      if (!this.ingredient.name) {
         this.$notify({
           type: 'error',
           title: 'Error',

@@ -12,7 +12,10 @@ export default {
     return {
       overlay: false,
       orders: [],
-      totalPayment: 0
+      totalPayment: 0,
+      noteModal: false,
+      note: '',
+      noteIndex: null
     }
   },
   mounted() {
@@ -41,7 +44,6 @@ export default {
           }
         )
         this.orders[index].quantity = response.data.quantity
-        this.orders[index].totalPrice = response.data.harga
         this.totalPayment = response.data.total_harga
       } catch (error) {
         console.error(error)
@@ -97,8 +99,7 @@ export default {
 
         this.orders = response.data.items.map((item) => ({
           ...item,
-          selected: item.select === 1, // Automatically select if select is 1
-          totalPrice: item.harga
+          selected: item.select === 1 // Automatically select if select is 1
         }))
         this.totalPayment = response.data.total_harga
       } catch (error) {
@@ -144,6 +145,36 @@ export default {
       } catch (error) {
         console.error(error)
       }
+    },
+    showNoteModal(index) {
+      this.noteIndex = index
+      this.note = this.orders[index].catatan || ''
+      this.noteModal = true
+    },
+    closeNoteModal() {
+      this.noteModal = false
+      this.note = ''
+      this.noteIndex = null
+    },
+    async saveNote() {
+      const index = this.noteIndex
+      const orderId = this.orders[index].id
+
+      try {
+        await axios.post(
+          `${BASE_URL}/cart/addNote/${orderId}`,
+          { catatan: this.note },
+          {
+            headers: {
+              Authorization: 'Bearer ' + localStorage.getItem('access_token')
+            }
+          }
+        )
+        this.orders[index].catatan = this.note
+        this.closeNoteModal()
+      } catch (error) {
+        console.error(error)
+      }
     }
   }
 }
@@ -166,50 +197,54 @@ export default {
           <div class="col-lg-8">
             <div v-for="(order, index) in orders" :key="index" class="mb-4 card">
               <div class="card-body">
-                <h5 class="card-title mx-6 py-2 mb-4">{{ order.name }}</h5>
                 <div class="row d-flex align-items-center">
-                  <div class="col-md-3">
-                    <div class="row">
-                      <div class="col-1 align-items-center d-flex">
-                        <input
-                          type="checkbox"
-                          
-                          v-model="order.selected"
-                          @change="toggleSelect(index)"
-                        />
-                      </div>
-                      <div class="col">
-                        <img :src="order.foto" class="img-fluid" alt="Book image" />
-                      </div>
-                    </div>
+                  <div class="col-md-2 d-flex align-items-center">
+                    <input
+                      type="checkbox"
+                      class="large-checkbox me-1"
+                      v-model="order.selected"
+                      @change="toggleSelect(index)"
+                    />
+                    <img :src="order.foto" class="foto img-fluid" />
                   </div>
-                  <div class="col-md-9 ">
+                  <div class="col-md-10">
                     <div class="row">
-                      <div class="col">
+                      <div class="col detailMenu">
+                        <h5>{{ order.name }}</h5>
                         <p>Rp {{ formatPrice(order.harga_menu) }}</p>
                       </div>
-                      <div class="col">
-                        <div class="d-flex align-items-center">
-                          <v-icon
-                            icon="mdi-minus"
-                            style="cursor: pointer"
-                            @click="decrementQuantity(index)"
-                          ></v-icon>
-                          <span class="mx-2">{{ order.quantity }}</span>
-                          <v-icon
-                            icon="mdi-plus"
-                            style="cursor: pointer"
-                            @click="incrementQuantity(index)"
-                          ></v-icon>
-                          <span class="ms-auto">Rp {{ formatPrice(order.totalPrice) }}</span>
-                          <v-icon
-                            class="mx-3 justify-content-end"
-                            icon="mdi-delete"
-                            color="red"
-                            style="cursor: pointer"
-                            @click="removeOrder(index)"
-                          ></v-icon>
-                        </div>
+                      <div class="col d-flex align-items-center justify-content-end">
+                        <v-icon
+                          icon="mdi-minus"
+                          class="icon-btn"
+                          @click="decrementQuantity(index)"
+                        ></v-icon>
+                        <input
+                          type="number"
+                          min="1"
+                          v-model.number="order.quantity"
+                          @change="updateQuantity(index, order.id, order.quantity)"
+                          class="form-control text-center quantity-input mx-2"
+                          style="width: 55px"
+                        />
+                        <v-icon
+                          icon="mdi-plus"
+                          class="icon-btn"
+                          @click="incrementQuantity(index)"
+                        ></v-icon>
+                        <v-icon
+                          class="mx-3 justify-content-end"
+                          icon="mdi-delete"
+                          color="red"
+                          style="cursor: pointer"
+                          @click="removeOrder(index)"
+                        ></v-icon>
+                        <v-icon
+                          class="mx-3 justify-content-end"
+                          icon="mdi-note-edit"
+                          style="cursor: pointer"
+                          @click="showNoteModal(index)"
+                        ></v-icon>
                       </div>
                     </div>
                   </div>
@@ -224,9 +259,7 @@ export default {
                 <h5 class="card-title">Rincian Belanja</h5>
                 <p>Total biaya belanja</p>
                 <p>Rp {{ formatPrice(totalPayment) }}</p>
-                <button class="btn btn-primary w-100" @click="proceedToCheckout">
-                  Checkout
-                </button>
+                <button class="btn btn-primary w-100" @click="proceedToCheckout">Checkout</button>
               </div>
             </div>
           </div>
@@ -234,6 +267,23 @@ export default {
       </div>
     </div>
   </div>
+
+  <!-- Note Modal -->
+  <v-dialog v-model="noteModal" max-width="500px">
+    <v-card>
+      <v-card-title>
+        <span class="headline">Tambah Catatan</span>
+      </v-card-title>
+      <v-card-text>
+        <v-textarea v-model="note" label="Catatan" rows="3"></v-textarea>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="blue darken-1" text @click="closeNoteModal">Batal</v-btn>
+        <v-btn color="blue darken-1" text @click="saveNote">Simpan</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <style>
@@ -249,5 +299,27 @@ a {
 .large-checkbox {
   width: 1.5rem;
   height: 1.5rem;
+}
+
+.h5{
+  overflow: hidden;
+}
+.foto {
+  max-width: 100px;
+  overflow: hidden;
+}
+
+.icon-btn {
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .large-checkbox {
+    width: 1rem;
+    height: 1rem;
+  }
+  .detailMenu{
+    margin-left: 30px;
+  }
 }
 </style>

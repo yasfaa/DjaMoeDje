@@ -1,6 +1,6 @@
 <template>
   <v-card flat>
-    <v-card-title class="d-flex align-center pe-2">
+    <v-card-title class="d-flex align-center pe-0">
       Daftar Menu
       <v-spacer></v-spacer>
       <v-text-field
@@ -23,7 +23,11 @@
         <div v-if="false">{{ item.id }}</div>
       </template>
       <template v-slot:header.id> </template>
-
+      <template v-slot:item.no="{ item }">
+        <div class="text-start">
+          {{ item.no }}
+        </div>
+      </template>
       <template v-slot:item.nama="{ item }">
         <div class="text-start">{{ item.nama }}</div>
       </template>
@@ -88,6 +92,16 @@ export default {
       dialogDelete: false
     }
   },
+  mounted() {
+    this.retrieveMenus()
+  },
+  computed: {
+    getitems() {
+      return this.items.map((item, index) => {
+        return { ...item, no: index + 1 }
+      })
+    }
+  },
   methods: {
     emitOpenDialog() {
       this.$emit('open-dialog')
@@ -99,9 +113,10 @@ export default {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
         })
-        this.menus = response.data.menus.map((menu) => {
+        this.menus = response.data.menus.map((menu, index) => {
           return {
             id: menu.id,
+            no: index + 1,
             nama: menu.nama,
             harga: menu.total,
             deskripsi: menu.deskripsi,
@@ -118,8 +133,14 @@ export default {
       return numericPrice.toLocaleString('id-ID')
     },
     editMenu(item) {
-      localStorage.setItem('editMenuId', item.id)
+      const id = item.id
+      localStorage.setItem('editMenuId', id)
       this.$router.push('/admin/edit')
+    },
+    detailMenu(item) {
+      const id = item.id
+      localStorage.setItem('editMenuId', id)
+      this.$router.push(`/admin/menu/${id}`)
     },
     confirmDelete(item) {
       this.itemToDeleteId = item.id
@@ -145,12 +166,6 @@ export default {
         console.error(error)
       }
     },
-    goToMenu(item) {
-      this.$router.push('/menu/' + item.id)
-    }
-  },
-  mounted() {
-    this.retrieveMenus()
   }
 }
 </script>

@@ -4,6 +4,7 @@ import login from '../views/Login.vue'
 import adminDashboard from '../views/Admin/AdminDashboard.vue'
 import editMenu from '../views/Admin/EditMenu.vue'
 import adminProfile from '../views/Admin/AdminProfile.vue'
+import adminMenu from '../views/Admin/AdminMenu.vue'
 import detailMenu from '../views/User/DetailMenu.vue'
 import profile from '../views/User/Profile.vue'
 import order from '../views/User/Cart.vue'
@@ -35,6 +36,11 @@ const router = createRouter({
       path: '/admin/dashboard',
       name: 'Admin Dashboard',
       component: adminDashboard,
+    },
+    {
+      path: '/admin/menu/:id',
+      name: 'Admin Menu',
+      component: adminMenu,
     },
     {
       path: '/admin/edit',
