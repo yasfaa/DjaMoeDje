@@ -17,7 +17,6 @@ class CartItem extends Model
         'menu_id',
         'quantity',
         'harga_item',
-        'base_price',
         'customization_price',
         'select',
         'customization'
