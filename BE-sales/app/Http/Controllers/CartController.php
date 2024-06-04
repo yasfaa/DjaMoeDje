@@ -180,4 +180,69 @@ class CartController extends Controller
 
         return response()->json(['message' => 'Ingredient deleted successfully']);
     }
+
+    public function addCustomization(Request $request, $cartItemId)
+    {
+        $request->validate([
+            'ingredient_id' => 'required|exists:ingredients,id',
+            'quantity' => 'required|integer|min:1'
+        ]);
+        // Ambil item cart berdasarkan ID
+        $cartItem = CartItem::findOrFail($cartItemId);
+        // Cari atau buat entri kustomisasi di cart_item_ingredients
+        $cartItemIngredient = CartItemIngredient::firstOrCreate(
+            [
+                'cart_item_id' => $cartItemId,
+                'ingredient_id' => $request->ingredient_id
+            ],
+            [
+                'quantity' => $request->quantity
+            ]
+        );
+        // Jika entri sudah ada, tambahkan kuantitasnya
+        if (!$cartItemIngredient->wasRecentlyCreated) {
+            $cartItemIngredient->quantity += $request->quantity;
+            $cartItemIngredient->save();
+        }
+
+        // Perbarui kustomisasi dan harga item
+        $this->updateCartItemCustomization($cartItem);
+
+        return response()->json([
+            'message' => 'Customization added successfully',
+            'customizations' => $cartItem->customizations,
+            'harga_item' => $cartItem->harga_item,
+            'total_harga' => $cartItem->cart->harga
+        ], 200);
+    }
+
+    private function updateCartItemCustomization(CartItem $cartItem)
+    {
+        // Ambil semua kustomisasi dari item cart
+        $ingredients = $cartItem->ingredients;
+        $totalCustomPrice = 0;
+        $customizationDetails = [];
+
+        // Hitung total harga kustomisasi dan buat detail kustomisasi
+        foreach ($ingredients as $ingredient) {
+            $ingredientModel = $ingredient->ingredient;
+            $totalCustomPrice += $ingredientModel->harga * $ingredient->quantity;
+
+            $customizationDetails[] = [
+                'nama' => $ingredientModel->nama,
+                'quantity' => $ingredient->quantity
+            ];
+        }
+
+        // Simpan detail kustomisasi dan harga item yang baru
+        $cartItem->customizations = json_encode($customizationDetails);
+        $cartItem->customization_price = $totalCustomPrice;
+        $cartItem->harga_item = $cartItem->base_price + $totalCustomPrice;
+        $cartItem->save();
+
+        // Perbarui total harga cart
+        $cart = $cartItem->cart;
+        $cart->harga = $cart->items()->where('select', 1)->sum('harga_item');
+        $cart->save();
+    }
 }

@@ -49,6 +49,7 @@ Route::prefix('/ingredient')->middleware(['auth:sanctum', 'role:Admin'])->group(
 Route::prefix('/cart')->middleware(['auth:sanctum', 'role:User'])->group(function () {
     Route::post('/add',[CartController::class,'store']);
     Route::get('/get',[CartController::class,'index']);
+    Route::post('/customize/{cartItemId}',[CartController::class,'addCustomization']);
     Route::get('/select/{id}',[CartController::class,'selectCartItem']);
     Route::get('/unselect/{id}',[CartController::class,'unselectCartItem']);
     Route::post('/update/{id}',[CartController::class,'update']);
