@@ -1,10 +1,11 @@
 <?php
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Cart;
-use App\Models\CartItem;
 use App\Models\Menu;
+use App\Models\CartItem;
+use Illuminate\Http\Request;
+use App\Models\CartItemIngredient;
 use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
@@ -31,13 +32,14 @@ class CartController extends Controller
         if ($existingCartItem) {
             // Jika item sudah ada di cart, tambahkan kuantitasnya
             $existingCartItem->quantity += $request->quantity;
-            $existingCartItem->harga_item = $menu->total * $existingCartItem->quantity;
+            $existingCartItem->harga_item = $existingCartItem->customization_price * $existingCartItem->quantity;
             $existingCartItem->save();
         } else {
             // Jika item belum ada di cart, tambahkan item baru
-            $newCartItem = $cart->items()->create([
+            $cart->items()->create([
                 'menu_id' => $request->menu_id,
                 'quantity' => $request->quantity,
+                'customization_price' => $menu->total,
                 'harga_item' => $menu->total * $request->quantity,
                 'customizations' => null,
             ]);
@@ -46,7 +48,6 @@ class CartController extends Controller
         // Perbarui total harga cart
         $cart->harga = $cart->items()->where('select', '1')->sum('harga_item');
         $cart->save();
-
 
         return response()->json($cart->load('items.menu'), 201);
     }
@@ -64,8 +65,10 @@ class CartController extends Controller
         if (!$cart) {
             return response()->json(['message' => 'Cart is empty'], 404);
         }
+
         $totalHarga = $cart->harga;
 
+        // Mapping data cart items untuk response JSON
         $cartContents = $cart->items->map(function ($item) {
             $menu = $item->menu;
             $imagePath = null;
@@ -81,8 +84,10 @@ class CartController extends Controller
                 'deskripsi' => $item->menu->deskripsi,
                 'harga_menu' => $item->menu->total,
                 'quantity' => $item->quantity,
-                'harga' => $item->harga_item,
+                'harga_total_item' => $item->harga_item,
+                'harga_dasar' => $item->customization_price,
                 'select' => $item->select,
+                'customization' => $item->customization,
                 'foto' => $imagePath,
             ];
         });
@@ -95,15 +100,17 @@ class CartController extends Controller
 
     public function selectCartItem($cartItemId)
     {
+        // Ambil item cart berdasarkan ID
         $cartItem = CartItem::findOrFail($cartItemId);
 
+        // Tandai item sebagai dipilih
         $cartItem->select = 1;
         $cartItem->save();
 
         // Ambil cart terkait
         $cart = $cartItem->cart;
 
-        // Hitung harga total 
+        // Hitung total harga
         $totalHarga = $cart->items()->where('select', '1')->sum('harga_item');
 
         $cart->harga = $totalHarga;
@@ -118,15 +125,17 @@ class CartController extends Controller
 
     public function unselectCartItem($cartItemId)
     {
+        // Ambil item cart berdasarkan ID
         $cartItem = CartItem::findOrFail($cartItemId);
 
+        // Tandai item sebagai tidak dipilih
         $cartItem->select = 0;
         $cartItem->save();
 
         // Ambil cart terkait
         $cart = $cartItem->cart;
 
-        // Hitung harga total 
+        // Hitung total harga
         $totalHarga = $cart->items()->where('select', '1')->sum('harga_item');
 
         $cart->harga = $totalHarga;
@@ -138,38 +147,38 @@ class CartController extends Controller
             'select' => $cartItem->select,
         ], 200);
     }
+
     public function update(Request $request, $cartItemId)
     {
         $request->validate([
             'quantity' => 'required|integer|min:1'
         ]);
 
+        // Ambil item cart berdasarkan ID
         $cartItem = CartItem::findOrFail($cartItemId);
-        $menu = $cartItem->menu;
 
+        // Perbarui kuantitas dan harga item
         $cartItem->quantity = $request->quantity;
-        // Perbarui harga item 
-        $cartItem->harga_item = $menu->total * $request->quantity;
+        $cartItem->harga_item = $cartItem->customization_price * $request->quantity + $cartItem->customization_price * $request->quantity;
         $cartItem->save();
 
-        // Ambil keranjang terkait
+        // Perbarui total harga cart
         $cart = $cartItem->cart;
-
-        // Perbarui total harga keranjang berdasarkan kuantitas yang diperbarui
         $cart->harga = $cart->items()->where('select', '1')->sum('harga_item');
         $cart->save();
 
         return response()->json([
             'message' => 'Cart item updated successfully',
             'quantity' => $cartItem->quantity,
-            'harga' => $cartItem->harga_item,
+            'harga_dasar' => $cartItem->customization_price,
+            'harga_total_item' => $cartItem->harga_item,
             'total_harga' => $cart->harga
-
         ], 200);
     }
 
     public function destroy($cartItemId)
     {
+        // Ambil item cart berdasarkan ID
         $cartItem = CartItem::find($cartItemId);
 
         if (!$cartItem) {
