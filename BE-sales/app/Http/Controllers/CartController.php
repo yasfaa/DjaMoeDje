@@ -219,6 +219,7 @@ class CartController extends Controller
             'message' => 'Customization added successfully',
             'customizations' => $cartItem->customizations,
             'harga_item' => $cartItem->harga_item,
+            'harga_dasar' => $cartItem->customization_price,
             'total_harga' => $cartItem->cart->harga
         ], 200);
     }
