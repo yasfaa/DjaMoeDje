@@ -19,7 +19,7 @@ class CartItem extends Model
         'harga_item',
         'customization_price',
         'select',
-        'customization'
+        'customizations'
 
     ];
 

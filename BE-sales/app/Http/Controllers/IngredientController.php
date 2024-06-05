@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CartItem;
 use App\Models\Ingredient;
 use Illuminate\Http\Request;
 
@@ -22,6 +23,20 @@ class IngredientController extends Controller
         }
     }
 
+    public function indexCart(Request $request, $cartItemId)
+    {
+        $cartItem = CartItem::findOrFail($cartItemId);
+        if (!$cartItem) {
+                return response()->json(['message' => 'CartItem tidak ditemukan!'], 404);
+            }
+        try {
+            $ingredients = Ingredient::where('menu_id', $cartItem->menu_id)->get();
+
+            return response()->json($ingredients);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to get ingredient. ' . $e->getMessage()], 500);
+        }
+    }
     public function store(Request $request)
     {
         $request->validate([

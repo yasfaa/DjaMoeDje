@@ -88,7 +88,7 @@ class CartController extends Controller
                 'harga_total_item' => $item->harga_item,
                 'harga_dasar' => $item->customization_price,
                 'select' => $item->select,
-                'customization' => $item->customization,
+                'customization' => $item->customizations,
                 'foto' => $imagePath,
             ];
         });
@@ -191,7 +191,56 @@ class CartController extends Controller
         return response()->json(['message' => 'Ingredient deleted successfully']);
     }
 
-    public function addCustomization(Request $request, $cartItemId)
+    public function addCustomizationMenu(Request $request)
+    {
+        $request->validate([
+            'menu_id' => 'required|exists:menus,id',
+            'customizations' => 'nullable|array',
+            'customizations.*.ingredient_id' => 'required_with:customizations|exists:ingredients,id',
+            'customizations.*.quantity' => 'required_with:customizations|integer|min:1'
+        ]);
+
+        $menu = Menu::findOrFail($request->menu_id);
+        $user = auth()->user();
+        $cart = Cart::where('user_id', $user->id)->where('status', 'pending')->first();
+
+        if (!$cart) {
+            $cart = new Cart();
+            $cart->user_id = $user->id;
+            $cart->status = 'pending';
+            $cart->save();
+        }
+
+        $cartItem = new CartItem();
+        $cartItem->cart_id = $cart->id;
+        $cartItem->menu_id = $menu->id;
+        $cartItem->quantity = 1; // Default quantity
+        $cartItem->save();
+
+        if ($request->customizations) {
+            foreach ($request->customizations as $customization) {
+                CartItemIngredient::create([
+                    'cart_item_id' => $cartItem->id,
+                    'ingredient_id' => $customization['ingredient_id'],
+                    'quantity' => $customization['quantity']
+                ]);
+            }
+        }
+
+        $this->updateCartItemCustomization($cartItem);
+
+        return response()->json([
+            'message' => 'Item added to cart with customizations successfully',
+            'cartItem' => $cartItem,
+            'customizations' => $cartItem->customizations,
+            'harga_item' => $cartItem->harga_item,
+            'harga_dasar' => $cartItem->customization_price,
+            'total_harga' => $cart->harga
+        ], 200);
+    }
+
+
+    public function addCustomizationCart(Request $request, $cartItemId)
     {
         $request->validate([
             'ingredient_id' => 'required|exists:ingredients,id',
@@ -272,5 +321,19 @@ class CartController extends Controller
         $cart = $cartItem->cart;
         $cart->harga = $cart->items()->where('select', 1)->sum('harga_item');
         $cart->save();
+    }
+
+    public function getCustomization($cartItemId)
+    {
+        $cartItem = CartItem::findOrFail($cartItemId);
+        if (!$cartItem) {
+            return response()->json(['message' => 'CartItem tidak ditemukan!'], 404);
+        }
+
+        $cartItemIngredients = CartItemIngredient::where('cart_item_id', $cartItem->id)->get();
+
+        return response()->json([
+            'cart_item_ingredients' => $cartItemIngredients,
+        ], 200);
     }
 }
