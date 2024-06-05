@@ -6,6 +6,7 @@ use App\Models\Menu;
 use App\Models\CartItem;
 use Illuminate\Http\Request;
 use App\Models\CartItemIngredient;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
@@ -227,15 +228,14 @@ class CartController extends Controller
     {
         // Ambil semua kustomisasi dari item cart
         $ingredients = $cartItem->ingredients ?? collect();
-        $totalCustomPrice = 0;
+        // print_r($ingredients);
         $customizationDetails = [];
 
         // Ambil harga menu
         $menu = $cartItem->menu;
-
-        // Ambil bahan dari menu
-        $menuIngredients = $menu->ingredients ?? collect();
         $basePriceWithoutIngredients = $menu->total;
+        // Ambil bahan dari menu
+        $menuIngredients = $menu->ingredient ?? collect();
 
         // Hitung harga item dasar tanpa bahan yang tidak ada di CartItemIngredient
         foreach ($menuIngredients as $menuIngredient) {
@@ -244,15 +244,16 @@ class CartController extends Controller
 
             if ($quantityInCart == 0) {
                 $basePriceWithoutIngredients -= $menuIngredient->harga;
-            } elseif ($quantityInCart > 1) {
-                $basePriceWithoutIngredients += $menuIngredient->harga * ($quantityInCart - 1);
             }
         }
 
         // Hitung total harga kustomisasi dan buat detail kustomisasi
+        $totalCustomPrice = $basePriceWithoutIngredients;  // Start with base price without ingredients
         foreach ($ingredients as $ingredient) {
             $ingredientModel = $ingredient->ingredient;
-            $totalCustomPrice += $ingredientModel->harga * $ingredient->quantity;
+            if ($ingredient->quantity > 1) {
+                $totalCustomPrice += $ingredientModel->harga * ($ingredient->quantity - 1);
+            }
 
             $customizationDetails[] = [
                 'nama' => $ingredientModel->nama,
@@ -262,8 +263,8 @@ class CartController extends Controller
 
         // Simpan detail kustomisasi dan harga item yang baru
         $cartItem->customizations = json_encode($customizationDetails);
-        $cartItem->customization_price = $totalCustomPrice;
-        $cartItem->harga_item = $basePriceWithoutIngredients * $cartItem->quantity + $totalCustomPrice * $cartItem->quantity;
+        $cartItem->customization_price = $totalCustomPrice;  // Total price including customizations
+        $cartItem->harga_item = $totalCustomPrice * $cartItem->quantity;  // Custom price multiplied by quantity
         $cartItem->save();
 
         // Perbarui total harga cart
