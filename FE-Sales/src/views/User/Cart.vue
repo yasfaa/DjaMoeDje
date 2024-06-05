@@ -2,7 +2,7 @@
 // import { useRoute } from "vue-router";
 import axios from 'axios'
 const BASE_URL = import.meta.env.VITE_BASE_URL_API
-import Navbar from '@/components/HomeNavbar.vue'
+import Navbar from '@/components/DashboardNavbar.vue'
 
 export default {
   components: {
@@ -211,7 +211,7 @@ export default {
                     <div class="row">
                       <div class="col detailMenu">
                         <h5>{{ order.name }}</h5>
-                        <p>Rp {{ formatPrice(order.harga_menu) }}</p>
+                        <p>Rp {{ formatPrice(order.harga_dasar) }}</p>
                       </div>
                       <div class="col d-flex align-items-center justify-content-end">
                         <v-icon
