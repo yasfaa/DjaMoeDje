@@ -366,10 +366,6 @@ class CartController extends Controller
     {
         $cartItemIngredients = CartItemIngredient::where('cart_item_id', $cartItemId)->get();
 
-        if ($cartItemIngredients->isEmpty()) {
-            return response()->json(['message' => 'CartItemIngredient tidak ditemukan!'], 404);
-        }
-
         $cartItem = CartItem::findOrFail($cartItemId);
         $menuId = $cartItem->menu_id;
         $menu = Menu::where('id', $menuId)->first();
@@ -380,7 +376,7 @@ class CartController extends Controller
 
         $cartItem->customizations = null;
         $cartItem->customization_price = $menu->total;
-        $cartItem->harga_item->$cartItem->customization_price * $cartItem->quantity;
+        $cartItem->harga_item = $cartItem->customization_price * $cartItem->quantity;
         $cartItem->save();
 
         $cart = $cartItem->cart;
