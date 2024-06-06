@@ -63,7 +63,8 @@ Route::prefix('/customize')->middleware(['auth:sanctum', 'role:User'])->group(fu
     Route::post('/cart/{cartItemId}', [CartController::class, 'addCustomizationCart']);
     Route::post('/menu/{menuId}', [CartController::class, 'addCustomizationMenu']);
     Route::get('/get/{cartItemId}', [CartController::class, 'getCustomization']);
-    Route::delete('/delete/{cartItemIngredientId}', [CartController::class, 'deleteCustomization']);
+    Route::delete('/delete/item/{cartItemIngredientId}', [CartController::class, 'deleteCustomizationItem']);
+    Route::delete('/delete/cartItem/{cartItemId}', [CartController::class, 'deleteCustomization']);
 });
 
 Route::get('/getMenu', [MenuController::class, 'index']);

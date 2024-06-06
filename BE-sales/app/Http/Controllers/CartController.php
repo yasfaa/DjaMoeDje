@@ -177,6 +177,20 @@ class CartController extends Controller
         ], 200);
     }
 
+    public function destroy($cartItemId)
+    {
+        // Ambil item cart berdasarkan ID
+        $cartItem = CartItem::find($cartItemId);
+
+        if (!$cartItem) {
+            return response()->json(['error' => 'Ingredient not found.'], 404);
+        }
+
+        $cartItem->delete();
+
+        return response()->json(['message' => 'Ingredient deleted successfully']);
+    }
+
     public function addCustomizationMenu(Request $request, $menuId)
     {
         $request->validate([
@@ -199,7 +213,7 @@ class CartController extends Controller
         $cartItem->cart_id = $cart->id;
         $cartItem->menu_id = $menu->id;
         $cartItem->quantity = 1;
-        $cartItem->customization_price = $menu-> total;
+        $cartItem->customization_price = $menu->total;
         $cartItem->harga_item = $cartItem->customization_price * $cartItem->quantity;
         $cartItem->save();
 
@@ -324,7 +338,7 @@ class CartController extends Controller
         ], 200);
     }
 
-    public function deleteCustomization($cartItemIngredientId)
+    public function deleteCustomizationItem($cartItemIngredientId)
     {
         $cartItemIngredient = CartItemIngredient::find($cartItemIngredientId);
 
@@ -348,17 +362,37 @@ class CartController extends Controller
         ], 200);
     }
 
-    public function destroy($cartItemId)
+    public function deleteCustomization($cartItemId)
     {
-        // Ambil item cart berdasarkan ID
-        $cartItem = CartItem::find($cartItemId);
+        $cartItemIngredients = CartItemIngredient::where('cart_item_id', $cartItemId)->get();
 
-        if (!$cartItem) {
-            return response()->json(['error' => 'Ingredient not found.'], 404);
+        if ($cartItemIngredients->isEmpty()) {
+            return response()->json(['message' => 'CartItemIngredient tidak ditemukan!'], 404);
         }
 
-        $cartItem->delete();
+        $cartItem = CartItem::findOrFail($cartItemId);
+        $menuId = $cartItem->menu_id;
+        $menu = Menu::where('id', $menuId)->first();
 
-        return response()->json(['message' => 'Ingredient deleted successfully']);
+        foreach ($cartItemIngredients as $cartItemIngredient) {
+            $cartItemIngredient->delete();
+        }
+
+        $cartItem->customizations = null;
+        $cartItem->customization_price = $menu->total;
+        $cartItem->harga_item->$cartItem->customization_price * $cartItem->quantity;
+        $cartItem->save();
+
+        $cart = $cartItem->cart;
+        $cart->harga = $cart->items()->where('select', 1)->sum('harga_item');
+        $cart->save();
+
+        return response()->json([
+            'message' => 'Ingredient has been deleted from customization',
+            'customizations' => $cartItem->customizations,
+            'harga_item' => $cartItem->harga_item,
+            'harga_dasar' => $cartItem->customization_price,
+            'total_harga' => $cartItem->cart->harga
+        ], 200);
     }
 }
