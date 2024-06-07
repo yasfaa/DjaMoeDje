@@ -1,20 +1,23 @@
 <template>
   <navbar />
-  <div class="py-4 container">
+  <div class="mt-6 p-4 container">
     <v-card>
       <v-card-title>Kustomisasi Item</v-card-title>
-      <v-card-text>
+      <v-card-text class="py-2">
         <div v-for="ingredient in ingredients" :key="ingredient.id" class="ingredient-item">
-          <div class="d-flex align-items-center">
+          <div class="d-flex py-4 align-items-center" style="height: 70px">
             <input
               type="checkbox"
               v-model="ingredient.selected"
               @change="toggleSelectIngredient(ingredient.id, ingredient.selected)"
             />
-            <span :class="{ 'text-disabled': !ingredient.selected }">
+            <span class="ms-2" :class="{ 'text-disabled': !ingredient.selected }">
               {{ ingredient.nama }} - Rp {{ formatPrice(ingredient.harga) }}
             </span>
-            <div class="quantity-controls ml-auto" v-if="ingredient.selected">
+            <div
+              class="row quantity-controls align-items-center ml-auto"
+              v-if="ingredient.selected"
+            >
               <v-icon
                 icon="mdi-minus"
                 class="icon-btn"
@@ -25,7 +28,7 @@
                 v-model.number="ingredient.quantity"
                 @change="updateIngredientQuantity(ingredient.id, ingredient.quantity)"
                 class="form-control text-center quantity-input mx-2"
-                style="width: 55px"
+                style="width: 45px"
               />
               <v-icon
                 icon="mdi-plus"
@@ -35,10 +38,13 @@
             </div>
           </div>
         </div>
+        <div class="d-flex justify-content-end">
+          <strong>Harga Menu: Rp {{ formatPrice(menuPrice) }}</strong>
+        </div>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" @click="saveCustomizations">Simpan</v-btn>
+        <v-btn color="primary" @click="navigateToCart">Simpan</v-btn>
       </v-card-actions>
     </v-card>
   </div>
@@ -56,12 +62,14 @@ export default {
   data() {
     return {
       ingredients: [],
-      cartItemId: this.$route.params.id
+      cartItemId: this.$route.params.id,
+      menuPrice: 0
     }
   },
   mounted() {
     this.retrieveIngredients()
     this.retrieveCustomizations()
+    this.retrieveMenuPrice()
   },
   methods: {
     formatPrice(price) {
@@ -87,7 +95,7 @@ export default {
     },
     async retrieveCustomizations() {
       try {
-        const response = await axios.get(`${BASE_URL}/cart/customize/get/${this.cartItemId}`, {
+        const response = await axios.get(`${BASE_URL}/customize/get/${this.cartItemId}`, {
           headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
@@ -102,6 +110,24 @@ export default {
           }
         })
       } catch (error) {
+        if (error.response && error.response.status === 404) {
+          this.ingredients.forEach((ingredient) => {
+            ingredient.selected = true
+          })
+        } else {
+          console.error(error)
+        }
+      }
+    },
+    async retrieveMenuPrice() {
+      try {
+        const response = await axios.get(`${BASE_URL}/cart/item/${this.cartItemId}`, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token')
+          }
+        })
+        this.menuPrice = response.data.data.customization_price
+      } catch (error) {
         console.error(error)
       }
     },
@@ -109,6 +135,7 @@ export default {
       if (quantity < 0) return
       const ingredient = this.ingredients.find((ing) => ing.id === ingredientId)
       ingredient.quantity = quantity
+      await this.saveCustomization(ingredientId, quantity)
     },
     incrementIngredientQuantity(ingredientId, currentQuantity) {
       const newQuantity = currentQuantity + 1
@@ -120,30 +147,34 @@ export default {
         this.updateIngredientQuantity(ingredientId, newQuantity)
       }
     },
-    toggleSelectIngredient(ingredientId, isSelected) {
+    async toggleSelectIngredient(ingredientId, isSelected) {
       const ingredient = this.ingredients.find((ing) => ing.id === ingredientId)
-      if (!isSelected) {
-        ingredient.quantity = 1
-      }
+      const quantity = isSelected ? 1 : 0
+      ingredient.selected = isSelected
+      ingredient.quantity = quantity
+      await this.saveCustomization(ingredientId, quantity)
     },
-    async saveCustomizations() {
-      const customizations = this.ingredients
-        .filter((ing) => ing.selected)
-        .map((ing) => ({
-          ingredient_id: ing.id,
-          quantity: ing.quantity
-        }))
-
+    async saveCustomization(ingredientId, quantity) {
       try {
-        await axios.post(`${BASE_URL}/cart/customize/cart/${this.cartItemId}`, customizations, {
-          headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('access_token')
+        const response = await axios.post(
+          `${BASE_URL}/customize/cart/${this.cartItemId}`,
+          {
+            ingredient_id: ingredientId,
+            quantity: quantity
+          },
+          {
+            headers: {
+              Authorization: 'Bearer ' + localStorage.getItem('access_token')
+            }
           }
-        })
-        this.$router.push('/cart') // Redirect back to cart after saving
+        )
+        this.menuPrice = response.data.harga_dasar
       } catch (error) {
         console.error(error)
       }
+    },
+    navigateToCart() {
+      this.$router.push('/cart') // Redirect back to cart after saving
     }
   }
 }

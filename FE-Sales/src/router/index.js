@@ -8,7 +8,7 @@ import adminMenu from '../views/Admin/AdminMenu.vue'
 import detailMenu from '../views/User/DetailMenu.vue'
 import profile from '../views/User/Profile.vue'
 import cart from '../views/User/Cart.vue'
-import customization from '../views/User/Customization.vue'
+import customization from '../views/User/CartCustomization.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

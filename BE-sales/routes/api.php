@@ -53,6 +53,7 @@ Route::prefix('/ingredient')->middleware(['auth:sanctum'])->group(function () {
 Route::prefix('/cart')->middleware(['auth:sanctum', 'role:User'])->group(function () {
     Route::post('/add', [CartController::class, 'store']);
     Route::get('/get', [CartController::class, 'index']);
+    Route::get('/item/{cartItemId}', [CartController::class, 'getCartItem']);
     Route::get('/select/{id}', [CartController::class, 'selectCartItem']);
     Route::get('/unselect/{id}', [CartController::class, 'unselectCartItem']);
     Route::post('/update/{id}', [CartController::class, 'update']);
@@ -63,7 +64,6 @@ Route::prefix('/customize')->middleware(['auth:sanctum', 'role:User'])->group(fu
     Route::post('/cart/{cartItemId}', [CartController::class, 'addCustomizationCart']);
     Route::post('/menu/{menuId}', [CartController::class, 'addCustomizationMenu']);
     Route::get('/get/{cartItemId}', [CartController::class, 'getCustomization']);
-    Route::delete('/delete/item/{cartItemIngredientId}', [CartController::class, 'deleteCustomizationItem']);
     Route::delete('/delete/cartItem/{cartItemId}', [CartController::class, 'deleteCustomization']);
 });
 

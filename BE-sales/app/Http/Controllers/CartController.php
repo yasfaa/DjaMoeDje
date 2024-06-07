@@ -56,7 +56,6 @@ class CartController extends Controller
     public function index()
     {
         $user = Auth::user();
-
         // Ambil cart dengan status 'pending' untuk user yang sedang login
         $cart = Cart::with('items.menu')
             ->where('user_id', $user->id)
@@ -240,31 +239,43 @@ class CartController extends Controller
         ], 200);
     }
 
+    public function getCartItem(Request $request, $cartItemId)
+    {
+        $cartItem = CartItem::find($cartItemId);
 
+        return response()->json([
+            'data' => $cartItem,
+        ], 200);
+    }
 
     public function addCustomizationCart(Request $request, $cartItemId)
     {
         $request->validate([
             'ingredient_id' => 'required|exists:ingredients,id',
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer'
         ]);
 
         // Ambil item cart berdasarkan ID
         $cartItem = CartItem::findOrFail($cartItemId);
 
-        // Cari atau buat entri kustomisasi di cart_item_ingredients
-        $cartItemIngredient = CartItemIngredient::updateOrCreate(
-            [
-                'cart_item_id' => $cartItemId,
-                'ingredient_id' => $request->ingredient_id
-            ],
-            [
-                'quantity' => $request->quantity
-            ]
-        );
+        if ($request->quantity == 0) {
+            // Jika quantity adalah 0, panggil metode deleteCustomizationItem
+            $this->deleteCustomizationItem($cartItemId, $request->ingredient_id, $cartItem);
+        } else {
+            // Cari atau buat entri kustomisasi di cart_item_ingredients
+            $cartItemIngredient = CartItemIngredient::updateOrCreate(
+                [
+                    'cart_item_id' => $cartItemId,
+                    'ingredient_id' => $request->ingredient_id
+                ],
+                [
+                    'quantity' => $request->quantity
+                ]
+            );
 
-        // Perbarui kustomisasi dan harga item
-        $this->updateCartItemCustomization($cartItem);
+            // Perbarui kustomisasi dan harga item
+            $this->updateCartItemCustomization($cartItem);
+        }
 
         return response()->json([
             'message' => 'Customization added successfully',
@@ -274,6 +285,31 @@ class CartController extends Controller
             'total_harga' => $cartItem->cart->harga
         ], 200);
     }
+
+    private function deleteCustomizationItem($cartItemId, $ingredientId, CartItem $cartItem)
+    {
+        $cartItemIngredient = CartItemIngredient::where('cart_item_id', $cartItemId)
+            ->where('ingredient_id', $ingredientId)
+            ->first();
+
+        if (!$cartItemIngredient) {
+            return response()->json(['message' => 'CartItemIngredient tidak ditemukan!'], 404);
+        }
+
+        $cartItemIngredient->delete();
+
+        $this->updateCartItemCustomization($cartItem);
+
+        // Mengembalikan respons setelah penghapusan
+        return response()->json([
+            'message' => 'Ingredient has been deleted from customization',
+            'customizations' => $cartItem->customizations,
+            'harga_item' => $cartItem->harga_item,
+            'harga_dasar' => $cartItem->customization_price,
+            'total_harga' => $cartItem->cart->harga
+        ], 200);
+    }
+
 
     private function updateCartItemCustomization(CartItem $cartItem)
     {
@@ -335,30 +371,6 @@ class CartController extends Controller
 
         return response()->json([
             'cart_item_ingredients' => $cartItemIngredients,
-        ], 200);
-    }
-
-    public function deleteCustomizationItem($cartItemIngredientId)
-    {
-        $cartItemIngredient = CartItemIngredient::find($cartItemIngredientId);
-
-        if (!$cartItemIngredient) {
-            return response()->json(['message' => 'CartItemIngredient tidak ditemukan!'], 404);
-        }
-
-        $cartItemId = $cartItemIngredient->cart_item_id;
-        $cartItem = CartItem::findOrFail($cartItemId);
-
-        $cartItemIngredient->delete();
-
-        $this->updateCartItemCustomization($cartItem);
-
-        return response()->json([
-            'message' => 'Ingredient has been deleted from customization',
-            'customizations' => $cartItem->customizations,
-            'harga_item' => $cartItem->harga_item,
-            'harga_dasar' => $cartItem->customization_price,
-            'total_harga' => $cartItem->cart->harga
         ], 200);
     }
 

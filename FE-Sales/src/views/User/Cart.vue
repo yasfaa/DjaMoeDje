@@ -175,7 +175,10 @@ export default {
       } catch (error) {
         console.error(error)
       }
-    }
+    },
+    goToCustomization(cartItemId) {
+      this.$router.push(`/customization/${cartItemId}`)
+    },
   }
 }
 </script>
@@ -211,7 +214,8 @@ export default {
                     <div class="row">
                       <div class="col detailMenu">
                         <h5>{{ order.name }}</h5>
-                        <p>Rp {{ formatPrice(order.harga_dasar) }}</p>
+                        <p class="mb-3">Rp {{ formatPrice(order.harga_dasar) }}</p>
+                        <a class="custom" @click="goToCustomization(order.id)">Kustomisasi Menu Anda Sekarang!</a>
                       </div>
                       <div class="col d-flex align-items-center justify-content-end">
                         <v-icon
@@ -291,11 +295,15 @@ export default {
   user-select: none;
 }
 
-a {
-  text-decoration: none;
-  color: unset;
+.custom {
+  text-decoration: underline;
+  color: #998748;
+  cursor: pointer;
 }
 
+.custom:hover {
+  color: #ffe279;
+}
 .large-checkbox {
   width: 1.5rem;
   height: 1.5rem;
