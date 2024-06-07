@@ -63,7 +63,7 @@
                 <button class="btn btn-primary me-4" @click.prevent="addToCart(menu.id, quantity)">
                   Add to Cart
                 </button>
-                <button class="btn btn-secondary my-2">Customize Menu</button>
+                <button class="btn btn-secondary my-2" @click.prevent="goToCustomize(menu.id)">Customize Menu</button>
               </div>
             </div>
           </div>
@@ -139,6 +139,9 @@ export default {
       if (this.quantity > 1) {
         this.quantity--
       }
+    },
+    goToCustomize(menuId) {
+      this.$router.push(`/menu/${menuId}/customize`)
     },
     async addToCart(menuId, quantity) {
       const isLoggedIn = !!localStorage.getItem('access_token') // Check if the user is logged in

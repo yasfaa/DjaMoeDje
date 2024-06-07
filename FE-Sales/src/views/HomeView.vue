@@ -141,8 +141,8 @@ export default {
                 >
                 </v-img>
                 <v-card-title class="menu-title">{{ menu.nama }}</v-card-title>
-                <v-card-actions class="menu-actions">
-                  <p class="menu-price mt-0">Rp {{ formatPrice(menu.total) }}</p>
+                <v-card-actions class="menu-actions align-item-center">
+                  <p class="menu-price m-0">Rp {{ formatPrice(menu.total) }}</p>
                   <v-spacer></v-spacer>
                   <button class="btn btn-primary" @click="goToMenu(menu.id)">View Menu</button>
                   <button class="btn btn-secondary mx-2" @click.prevent="addToCart(menu.id)">

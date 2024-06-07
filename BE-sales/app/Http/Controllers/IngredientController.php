@@ -8,13 +8,10 @@ use Illuminate\Http\Request;
 
 class IngredientController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, $menuId)
     {
-        $request->validate([
-            'menu_id' => 'required|integer|exists:menus,id',
-        ]);
+        
         try {
-            $menuId = $request->input('menu_id');
             $ingredients = Ingredient::where('menu_id', $menuId)->get();
 
             return response()->json($ingredients);

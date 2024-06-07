@@ -9,6 +9,7 @@ import detailMenu from '../views/User/DetailMenu.vue'
 import profile from '../views/User/Profile.vue'
 import cart from '../views/User/Cart.vue'
 import customization from '../views/User/CartCustomization.vue'
+import customize from '../views/User/MenuCustomization.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,6 +28,11 @@ const router = createRouter({
       path: '/customization/:id',
       name: 'customization',
       component: customization,
+    },
+    {
+      path: '/menu/:menuId/customize',
+      name: 'customize',
+      component: customize,
     },
     {
       path: '/',

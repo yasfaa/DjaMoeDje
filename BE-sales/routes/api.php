@@ -38,7 +38,7 @@ Route::prefix('/menu')->middleware(['auth:sanctum', 'role:Admin'])->group(functi
 });
 
 Route::prefix('/ingredient')->middleware(['auth:sanctum'])->group(function () {
-    Route::post('/get', [IngredientController::class, 'index']);
+    Route::get('/get/{menuId}', [IngredientController::class, 'index']);
     Route::get('/getCart/{cartItemId}', [IngredientController::class, 'indexCart']);
 
     Route::middleware('role:admin')->group(function () {

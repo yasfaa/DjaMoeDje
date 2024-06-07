@@ -172,6 +172,7 @@ class CartController extends Controller
             'quantity' => $cartItem->quantity,
             'harga_dasar' => $cartItem->customization_price,
             'harga_total_item' => $cartItem->harga_item,
+            'id' => $cartItemId,
             'total_harga' => $cart->harga
         ], 200);
     }
@@ -193,8 +194,9 @@ class CartController extends Controller
     public function addCustomizationMenu(Request $request, $menuId)
     {
         $request->validate([
-            'ingredient_id' => 'required|exists:ingredients,id',
-            'quantity' => 'required|integer|min:1'
+            'customizations' => 'required|array',
+            'customizations.*.ingredient_id' => 'required|exists:ingredients,id',
+            'customizations.*.quantity' => 'required|integer'
         ]);
 
         $menu = Menu::findOrFail($menuId);
@@ -218,15 +220,17 @@ class CartController extends Controller
 
         $cartItemId = $cartItem->id;
 
-        $cartItemIngredient = CartItemIngredient::updateOrCreate(
-            [
-                'cart_item_id' => $cartItemId,
-                'ingredient_id' => $request->ingredient_id
-            ],
-            [
-                'quantity' => $request->quantity
-            ]
-        );
+        foreach ($request->customizations as $customization) {
+            CartItemIngredient::updateOrCreate(
+                [
+                    'cart_item_id' => $cartItemId,
+                    'ingredient_id' => $customization['ingredient_id']
+                ],
+                [
+                    'quantity' => $customization['quantity']
+                ]
+            );
+        }
 
         $this->updateCartItemCustomization($cartItem);
 
@@ -235,6 +239,7 @@ class CartController extends Controller
             'customizations' => $cartItem->customizations,
             'harga_item' => $cartItem->harga_item,
             'harga_dasar' => $cartItem->customization_price,
+            'id' => $cartItemId,
             'total_harga' => $cart->harga
         ], 200);
     }
@@ -251,31 +256,31 @@ class CartController extends Controller
     public function addCustomizationCart(Request $request, $cartItemId)
     {
         $request->validate([
-            'ingredient_id' => 'required|exists:ingredients,id',
-            'quantity' => 'required|integer'
+            'customizations' => 'required|array',
+            'customizations.*.ingredient_id' => 'required|exists:ingredients,id',
+            'customizations.*.quantity' => 'required|integer'
         ]);
 
         // Ambil item cart berdasarkan ID
         $cartItem = CartItem::findOrFail($cartItemId);
 
-        if ($request->quantity == 0) {
-            // Jika quantity adalah 0, panggil metode deleteCustomizationItem
-            $this->deleteCustomizationItem($cartItemId, $request->ingredient_id, $cartItem);
-        } else {
-            // Cari atau buat entri kustomisasi di cart_item_ingredients
-            $cartItemIngredient = CartItemIngredient::updateOrCreate(
-                [
-                    'cart_item_id' => $cartItemId,
-                    'ingredient_id' => $request->ingredient_id
-                ],
-                [
-                    'quantity' => $request->quantity
-                ]
-            );
-
-            // Perbarui kustomisasi dan harga item
-            $this->updateCartItemCustomization($cartItem);
+        foreach ($request->customizations as $customization) {
+            if ($customization['quantity'] == 0) {
+                $this->deleteCustomizationItem($cartItemId, $customization['ingredient_id'], $cartItem);
+            } else {
+                $cartItemIngredient = CartItemIngredient::updateOrCreate(
+                    [
+                        'cart_item_id' => $cartItemId,
+                        'ingredient_id' => $customization['ingredient_id']
+                    ],
+                    [
+                        'quantity' => $customization['quantity']
+                    ]
+                );
+            }
         }
+        // Perbarui kustomisasi dan harga item
+        $this->updateCartItemCustomization($cartItem);
 
         return response()->json([
             'message' => 'Customization added successfully',
@@ -285,6 +290,7 @@ class CartController extends Controller
             'total_harga' => $cartItem->cart->harga
         ], 200);
     }
+
 
     private function deleteCustomizationItem($cartItemId, $ingredientId, CartItem $cartItem)
     {
