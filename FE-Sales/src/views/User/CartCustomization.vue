@@ -8,10 +8,11 @@
           <div class="d-flex py-4 align-items-center" style="height: 70px">
             <input
               type="checkbox"
+              class="checkbox"
               v-model="ingredient.selected"
               @change="toggleSelectIngredient(ingredient.id, ingredient.selected)"
             />
-            <span class="ms-2" :class="{ 'text-disabled': !ingredient.selected }">
+            <span class="ms-2 text" :class="{ 'text-disabled': !ingredient.selected }">
               {{ ingredient.nama }} - Rp {{ formatPrice(ingredient.harga) }}
             </span>
             <div
@@ -38,15 +39,16 @@
             </div>
           </div>
         </div>
-        <div class="d-flex justify-content-end">
-          <strong>Harga Menu: Rp {{ formatPrice(menuPrice) }}</strong>
-        </div>
       </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="primary" @click="navigateToCart">Simpan</v-btn>
-      </v-card-actions>
     </v-card>
+  </div>
+  <div class="row sticky-bottom justify-content-center ">
+    <div class="row footer-content mb-2">
+      <div class="d-flex justify-content-between align-items-center">
+        <strong>Harga Menu: Rp {{ formatPrice(menuPrice) }}</strong>
+        <v-btn color="primary" @click="navigateToCart">Simpan</v-btn>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -191,5 +193,35 @@ export default {
 
 .icon-btn {
   cursor: pointer;
+}
+
+.sticky-footer {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  background-color: white;
+  padding: 1rem 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+}
+
+.footer-content {
+  width: 80%;
+  border-radius: 10px;
+  padding: 1rem;
+  color: black;
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.text{
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.checkbox{
+  width: 1.3rem;
+  height: 1.3rem;
 }
 </style>
