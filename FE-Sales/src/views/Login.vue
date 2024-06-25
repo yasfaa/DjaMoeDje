@@ -213,7 +213,7 @@ export default {
   width: 400px;
   height: auto;
   background: #fff4cc;
-  border: 1px solid rgba(255, 237, 171, 0.5);
+  border: 1px solid rgba(51, 45, 24, 0.5);
   border-radius: 10px;
   display: flex;
   justify-content: center;

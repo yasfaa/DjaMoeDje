@@ -72,5 +72,6 @@ Route::get('menu/get/{id}', [MenuController::class, 'getOne']);
 
 Route::prefix('/biteship')->group(function () {
     Route::get('/areas', [AddressController::class, 'getAreas']);
+    Route::post('/kurir', [CartController::class, 'getShippingRates']);
 
 });

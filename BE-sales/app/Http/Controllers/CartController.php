@@ -3,7 +3,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\Menu;
+use App\Models\Address;
 use App\Models\CartItem;
+use App\Services\Biteship;
 use Illuminate\Http\Request;
 use App\Models\CartItemIngredient;
 use Illuminate\Support\Facades\Log;
@@ -11,6 +13,12 @@ use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
+    protected $biteship;
+
+    public function __construct(Biteship $biteship)
+    {
+        $this->biteship = $biteship;
+    }
     public function store(Request $request)
     {
         $request->validate([
@@ -408,5 +416,38 @@ class CartController extends Controller
             'harga_dasar' => $cartItem->customization_price,
             'total_harga' => $cartItem->cart->harga
         ], 200);
+    }
+
+    public function getShippingRates(Request $request)
+    {
+        $request->validate([
+            'destination_area_id' => 'required|string',
+            'items' => 'required|array',
+            'items.*.name' => 'required|string',
+            'items.*.description' => 'required|string',
+            'items.*.value' => 'required|numeric',
+            'items.*.length' => 'required|numeric',
+            'items.*.width' => 'required|numeric',
+            'items.*.height' => 'required|numeric',
+            'items.*.weight' => 'required|numeric',
+            'items.*.quantity' => 'required|integer',
+        ]);
+
+        $address = Address::where('user_id', 1)->firstOrFail();
+        $areaId = $address->kode_alamat;
+        
+        $payload = [
+            'origin_area_id' => "IDNP6IDNC150IDND882IDZ14250",
+            'destination_area_id' => $request->destination_area_id,
+            'couriers' => 'paxel',
+            'items' => $request->items,
+        ];
+
+        try {
+            $shippingRates = $this->biteship->getShippingRates($payload);
+            return response()->json(['data' => $shippingRates], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }
