@@ -19,7 +19,10 @@ class Address extends Model
         'kota',
         'provinsi',
         'kode_pos',
-        'user_id'
+        'user_id',
+        'latitude',
+        'longitude'
+
     ];
 
     public function user()

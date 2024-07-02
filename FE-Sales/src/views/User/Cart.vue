@@ -195,7 +195,7 @@ export default {
           :width="6"
         ></v-progress-circular>
       </v-overlay>
-      <div class="container">
+      <div class="container mt-2">
         <div class="row">
           <div class="col-lg-8">
             <div v-for="(order, index) in orders" :key="index" class="mb-4 card">

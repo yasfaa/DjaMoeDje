@@ -12,7 +12,6 @@ return new class extends Migration {
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
-            $table->string('kode_alamat');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('nama_penerima');
@@ -22,6 +21,8 @@ return new class extends Migration {
             $table->string('kota');
             $table->string('provinsi');
             $table->string('kode_pos');
+            $table->double('latitude');
+            $table->double('longitude');
             $table->timestamps();
         });
     }

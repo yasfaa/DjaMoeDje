@@ -267,6 +267,7 @@ export default {
 <style>
 .navbar {
   z-index: 1;
+  background-color: #fff6d6;
 }
 
 .navbar-hidden {

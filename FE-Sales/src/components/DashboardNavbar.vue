@@ -317,5 +317,6 @@ export default {
 
 .navbar {
   z-index: 999;
+  background-color: #fff6d6;
 }
 </style>

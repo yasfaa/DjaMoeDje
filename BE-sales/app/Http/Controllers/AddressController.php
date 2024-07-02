@@ -29,7 +29,6 @@ class AddressController extends Controller
     {
         $created = Address::create(
             [
-                'kode_alamat' => $request->kode_alamat,
                 'nama_penerima' => $request->nama_penerima,
                 'nomor_telepon' => $request->nomor_telepon,
                 'jalan' => $request->jalan,
@@ -37,7 +36,10 @@ class AddressController extends Controller
                 'kota' => $request->kota,
                 'provinsi' => $request->provinsi,
                 'kode_pos' => $request->kode_pos,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
                 'user_id' => $request->user()->id
+                
             ]
         );
 
