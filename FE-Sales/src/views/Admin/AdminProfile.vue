@@ -6,7 +6,10 @@ import Navbar from '@/components/DashboardNavbar.vue'
 export default {
   name: 'Profile',
   components: {
-    Navbar
+    Navbar,
+    LMap,
+    LTileLayer,
+    LMarker
   },
   data() {
     return {
@@ -23,18 +26,24 @@ export default {
       searchResults: [],
       selectedAddress: null,
       address: {
-        kode_alamat: '',
         nama_penerima: '',
         nomor_telepon: '',
         jalan: '',
         kecamatan: '',
         kota: '',
         provinsi: '',
-        kode_pos: ''
+        kode_pos: '',
+        latitude: '',
+        longitude: ''
       },
       alamat: [],
       selectedAddressId: null,
-      confirmdeletion: false
+      confirmdeletion: false,
+      mapCenter: [-6.17511, 106.865036],
+      zoom: 13,
+      markerPosition: null,
+      map: null,
+      marker: null
     }
   },
   created() {
@@ -59,16 +68,15 @@ export default {
     async searchAddress() {
       if (this.searchQuery && this.searchQuery.length > 2) {
         try {
-          const response = await axios.get(`${BASE_URL}/biteship/areas`, {
+          const response = await axios.get(`https://nominatim.openstreetmap.org/search`, {
             params: {
-              countries: 'ID',
-              input: this.searchQuery,
-              type: 'single'
+              q: this.searchQuery,
+              format: 'json'
             }
           })
-          this.searchResults = response.data.areas
+          this.searchResults = response.data
         } catch (error) {
-          console.error('Error fetching address:', error)
+          console.error('Error fetching location:', error)
           this.searchResults = []
         } finally {
           this.loadingRegist = false
@@ -78,23 +86,38 @@ export default {
       }
     },
     selectAddress(address) {
-      this.selectedAddress = address
-      this.fillAddress()
-      this.searchResults = []
-      this.searchQuery = address.name
-    },
-    fillAddress() {
-      if (this.selectedAddress) {
-        this.address.kode_alamat = this.selectedAddress.id
-        this.address.provinsi = this.selectedAddress.administrative_division_level_1_name
-        this.address.kota = this.selectedAddress.administrative_division_level_2_name
-        this.address.kecamatan = this.selectedAddress.administrative_division_level_3_name
-        this.address.kode_pos = this.selectedAddress.postal_code
+      const displayName = address.display_name
+      const parts = displayName.split(',')
+
+      let kode_pos = ''
+      let kecamatan = ''
+      let kota = ''
+      let provinsi = ''
+
+      // Mengatur variabel berdasarkan urutan dari belakang
+      if (parts.length >= 6) {
+        kecamatan = parts[parts.length - 6].trim()
+        kota = parts[parts.length - 5].trim()
+        provinsi = parts[parts.length - 4].trim()
+        kode_pos = parts[parts.length - 2].trim()
       }
+
+      this.selectedAddress = address
+      this.mapCenter = [parseFloat(address.lat), parseFloat(address.lon)]
+      this.markerPosition = [parseFloat(address.lat), parseFloat(address.lon)]
+      this.address.latitude = address.lat
+      this.address.longitude = address.lon
+      this.address.kode_pos = kode_pos
+      this.address.kecamatan = kecamatan
+      this.address.kota = kota
+      this.address.provinsi = provinsi
+
+      // Update map view and marker position
+      this.map.setView(this.mapCenter, this.zoom)
+      this.marker.setLatLng(this.markerPosition)
     },
     async saveAddress() {
       const addressData = {
-        kode_alamat: this.address.kode_alamat,
         nama_penerima: this.address.nama_penerima,
         nomor_telepon: this.address.nomor_telepon,
         jalan: this.address.jalan,
@@ -102,7 +125,9 @@ export default {
         kota: this.address.kota,
         provinsi: this.address.provinsi,
         kode_pos: this.address.kode_pos,
-        user_id: this.users.id
+        user_id: this.users.id,
+        latitude: this.address.latitude,
+        longitude: this.address.longitude
       }
 
       try {
@@ -134,7 +159,9 @@ export default {
         kecamatan: '',
         kota: '',
         provinsi: '',
-        kode_pos: ''
+        kode_pos: '',
+        latitude: '',
+        longitude: ''
       }
     },
     async fetchUserAddresses() {
@@ -178,7 +205,7 @@ export default {
         this.confirmdeletion = false
       }
     },
-    closeModal(){
+    closeModal() {
       this.resetForm()
     },
     async getUser() {
@@ -228,6 +255,38 @@ export default {
           const errorMessage = error.response.data.message
           console.log(errorMessage)
         }
+      }
+    },
+    updateMarkerPosition(event) {
+      const { lat, lng } = event.latlng
+      this.markerPosition = [lat, lng]
+      this.address.latitude = lat
+      this.address.longitude = lng
+      this.getAddressFromCoordinates(lat, lng)
+    },
+    onMarkerDragEnd(event) {
+      const { lat, lng } = event.target.getLatLng()
+      this.markerPosition = [lat, lng]
+      this.address.latitude = lat
+      this.address.longitude = lng
+      this.getAddressFromCoordinates(lat, lng)
+    },
+    async getAddressFromCoordinates(lat, lng) {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
+        )
+        const data = await response.json()
+
+        const address = data.address
+        this.address.kecamatan = address.suburb || address.village || ''
+        this.address.kota = address.city || address.town || address.county || ''
+        this.address.provinsi = address.state || address.region || ''
+        this.address.kode_pos = address.postcode || ''
+        this.address.latitude = lat
+        this.address.longitude = lng
+      } catch (error) {
+        console.error('Error fetching address from coordinates:', error)
       }
     }
   }
@@ -326,9 +385,23 @@ export default {
                     <div class="modal-content">
                       <div class="modal-header">
                         <h5 class="modal-title">Tambah Alamat</h5>
-                        <button type="button" class="btn-close" @click="dialog = false"></button>
+                        <button type="button" class="btn-close" @click="closeModal"></button>
                       </div>
                       <div class="modal-body">
+                        <!-- Leaflet Map -->
+                        <div id="mapid">
+                          <LMap
+                            :zoom="zoom"
+                            :center="mapCenter"
+                            style="height: 300px"
+                            @click="updateMarkerPosition"
+                          >
+                            <LTileLayer
+                              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            ></LTileLayer>
+                            <LMarker v-if="markerPosition" :lat-lng="markerPosition"></LMarker>
+                          </LMap>
+                        </div>
                         <div class="">
                           <label for="searchQuery" class="form-label">Cari Lokasi</label>
                           <input
@@ -339,21 +412,20 @@ export default {
                             @input="searchWithDelay"
                           />
                         </div>
-
                         <div v-if="searchResults.length" class="mb-3 mt-3">
                           <label for="addressSelect" class="form-label">Pilih Alamat</label>
                           <select
                             class="form-select"
                             id="addressSelect"
                             v-model="selectedAddress"
-                            @change="fillAddress"
+                            @change="selectAddress(selectedAddress)"
                           >
                             <option
                               v-for="result in searchResults"
-                              :key="result.id"
+                              :key="result.place_id"
                               :value="result"
                             >
-                              {{ result.name }}
+                              {{ result.display_name }}
                             </option>
                           </select>
                         </div>
@@ -364,12 +436,12 @@ export default {
                           >
                         </div>
                         <v-progress-linear v-if="loadingRegist" indeterminate></v-progress-linear>
-                        <label for="">Nama Pengirim</label>
+                        <label for="">Nama Penerima</label>
                         <input
                           type="text"
                           v-model="address.nama_penerima"
                           class="form-control mb-2"
-                          placeholder="Masukkan nama pengirim"
+                          placeholder="Masukkan nama penerima"
                         />
                         <label for="">Nomor Telepon</label>
                         <input

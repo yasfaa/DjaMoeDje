@@ -132,8 +132,6 @@ export default {
         longitude: this.address.longitude
       }
 
-      console.log(addressData);
-
       try {
         await axios.post(`${BASE_URL}/address/add`, addressData, {
           headers: {
