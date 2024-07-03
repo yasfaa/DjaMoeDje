@@ -421,7 +421,8 @@ class CartController extends Controller
     public function getShippingRates(Request $request)
     {
         $request->validate([
-            'destination_area_id' => 'required|string',
+            'latitude' => 'required',
+            'longitude' => 'required',
             'items' => 'required|array',
             'items.*.name' => 'required|string',
             'items.*.description' => 'required|string',
@@ -432,13 +433,14 @@ class CartController extends Controller
             'items.*.weight' => 'required|numeric',
             'items.*.quantity' => 'required|integer',
         ]);
-
-        $address = Address::where('user_id', 1)->firstOrFail();
-        $areaId = $address->kode_alamat;
         
+
+
         $payload = [
-            'origin_area_id' => "IDNP6IDNC150IDND882IDZ14250",
-            'destination_area_id' => $request->destination_area_id,
+            'origin_latitude' => "-7.314281747619106",
+            'origin_longitude' => "112.73592789513023",
+            'destination_latitude' => $request->latitude,
+            'destination_longitude' => $request->longitude,
             'couriers' => 'paxel',
             'items' => $request->items,
         ];

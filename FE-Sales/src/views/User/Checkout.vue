@@ -9,10 +9,10 @@ export default {
   },
   data() {
     return {
-      hideConfigButton : true,
-      showNavbar : true,
-      showSidenav : false,
-      showFooter : false,
+      hideConfigButton: true,
+      showNavbar: true,
+      showSidenav: false,
+      showFooter: false,
       overlay: false,
       orders: [],
       totalPayment: '',
@@ -50,16 +50,9 @@ export default {
     this.retrieveCart()
     this.fetchUserAddresses()
   },
-  created() {
-    this.store = this.$store
-    this.body = document.getElementsByTagName('body')[0]
-    this.setupPage()
-  },
-  beforeUnmount() {
-    this.restorePage()
-  },
   watch: {
     selectedAddressId() {
+      console.log('selectedAddressId changed:', this.selectedAddressId)
       this.fillAddress()
       this.fetchShippingRates()
     },
@@ -87,12 +80,15 @@ export default {
       return numericPrice.toLocaleString('id-ID')
     },
     updateTotalPayment() {
-      this.totalPayment = this.orders.reduce((total, order) => {
-        return order.selected ? total + order.totalPrice : total
+      const courierPrice = this.selectedCourier ? this.selectedCourier.price : 0
+      const totalHarga = this.orders.reduce((total, order) => {
+        return total + parseFloat(order.harga_total_item)
       }, 0)
+      this.totalPayment = totalHarga + courierPrice
     },
     selectCourier(rate) {
       this.selectedCourier = rate
+      this.updateTotalPayment()
     },
     searchWithDelay() {
       this.loadingRegist = true
@@ -132,31 +128,31 @@ export default {
     },
     async saveAddress() {
       const addressData = {
-        selected_address_id: this.selectedAddresses.id,
-        name: this.selectedAddresses.name,
-        provinsi: this.selectedAddresses.administrative_division_level_1_name,
-        kota: this.selectedAddresses.administrative_division_level_2_name,
-        kecamatan: this.selectedAddresses.administrative_division_level_3_name,
-        postal_code: this.selectedAddresses.postal_code,
-        penerima: this.address.penerima,
-        alamat_lengkap: this.address.alamat_lengkap,
-        no_penerima: this.address.no_penerima,
-        label: this.address.label
+        nama_penerima: this.address.nama_penerima,
+        nomor_telepon: this.address.nomor_telepon,
+        jalan: this.address.jalan,
+        kecamatan: this.address.kecamatan,
+        kota: this.address.kota,
+        provinsi: this.address.provinsi,
+        kode_pos: this.address.kode_pos,
+        user_id: this.users.id,
+        latitude: this.address.latitude,
+        longitude: this.address.longitude
       }
 
       try {
-        await axios.post(`${BASE_URL}/address/store`, addressData, {
+        await axios.post(`${BASE_URL}/address/add`, addressData, {
           headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
         })
-        ;(this.dialog = false),
-          this.$notify({
-            type: 'success',
-            title: 'Success',
-            text: 'Successfully Updated!',
-            color: 'green'
-          })
+        this.dialog = false
+        this.$notify({
+          type: 'success',
+          title: 'Success',
+          text: 'Successfully Added!',
+          color: 'green'
+        })
         this.resetForm()
         this.fetchUserAddresses()
       } catch (error) {
@@ -166,16 +162,16 @@ export default {
     resetForm() {
       this.searchQuery = ''
       this.searchResults = []
-      this.selectedAddress = null
       this.address = {
-        provinsi: '',
-        kota: '',
+        nama_penerima: '',
+        nomor_telepon: '',
+        jalan: '',
         kecamatan: '',
-        postal_code: '',
-        alamat_lengkap: '',
-        penerima: '',
-        no_penerima: '',
-        label: ''
+        kota: '',
+        provinsi: '',
+        kode_pos: '',
+        latitude: '',
+        longitude: ''
       }
     },
     async proceedToCheckout() {
@@ -218,26 +214,26 @@ export default {
     },
     async fetchShippingRates() {
       this.loadingKurir = true
-      if (!this.selectedAddressId) {
+      if (!this.selectedAddress) {
         return
       }
-
       const payload = {
-        destination_area_id: this.selectedAddressId,
+        latitude: this.selectedAddress.latitude,
+        longitude: this.selectedAddress.longitude,
         items: this.orders.map((order) => ({
-          name: order.buku.judul,
-          description: order.buku.desc,
-          value: order.buku.harga,
-          length: 30,
-          width: 2,
-          height: 20,
-          weight: 150,
+          name: order.name,
+          description: order.deskripsi,
+          value: order.harga_dasar,
+          length: 10,
+          width: 10,
+          height: 5,
+          weight: 200,
           quantity: order.quantity
         }))
       }
 
       try {
-        const response = await axios.post(`${BASE_URL}/cart/rates`, payload, {
+        const response = await axios.post(`${BASE_URL}/biteship/kurir`, payload, {
           headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token'),
             'Content-Type': 'application/json'
@@ -245,6 +241,10 @@ export default {
         })
 
         this.shippingRates = response.data.data.pricing
+        // Select the cheapest courier
+        this.selectedCourier = this.shippingRates.reduce((cheapest, current) => {
+          return !cheapest || current.price < cheapest.price ? current : cheapest
+        }, null)
       } catch (error) {
         console.error('Error fetching shipping rates:', error)
       } finally {
@@ -254,6 +254,7 @@ export default {
     fillAddress() {
       this.selectedAddress =
         this.alamat.find((address) => address.selected_address_id === this.selectedAddressId) || {}
+      console.log('Selected address:', this.selectedAddress)
     },
     async fetchUserAddresses() {
       try {
@@ -298,18 +299,23 @@ export default {
         })
 
         this.orders = response.data.items
-        this.totalPayment = response.data.total_harga
+        this.totalPayment = parseFloat(response.data.total_harga)
       } catch (error) {
         console.error(error)
-        this.$notify({
-          type: 'danger',
-          title: 'Notif',
-          text: 'Anda belum menambahkan barang',
-          color: 'green'
-        })
-      } finally {
+      }
+      finally {
         this.overlay = false
       }
+    }
+  },
+  computed: {
+    totalHarga() {
+      return this.orders.reduce((total, order) => {
+        return total + parseFloat(order.harga_total_item)
+      }, 0)
+    },
+    totalBayar() {
+      return this.totalHarga + (this.selectedCourier ? this.selectedCourier.price : 0)
     }
   }
 }
@@ -317,10 +323,15 @@ export default {
 
 <template>
   <navbar />
-  <div class="py-4 container">
+  <div class="py-3 mt-5 container">
     <div class="row mt-6">
       <v-overlay :model-value="overlay" class="d-flex align-items-center justify-content-center">
-        <v-progress-circular color="primary" size="96" indeterminate></v-progress-circular>
+        <v-progress-circular
+          color="amber"
+          indeterminate
+          :size="69"
+          :width="6"
+        ></v-progress-circular>
       </v-overlay>
       <div class="container">
         <div class="row">
@@ -341,7 +352,6 @@ export default {
                       class="form-select"
                       aria-label="Default select example"
                       v-model="selectedAddressId"
-                      @change="fillAddress"
                     >
                       <option value="" disabled>Pilih alamat</option>
                       <option
@@ -387,7 +397,13 @@ export default {
               <div class="card">
                 <div class="card-body">
                   <h5 class="card-title">Pilih Kurir</h5>
-                  <v-progress-linear v-if="loadingKurir" indeterminate></v-progress-linear>
+                  <v-progress-linear
+                    v-if="loadingKurir"
+                    color="amber"
+                    indeterminate
+                    :size="69"
+                    :width="6"
+                  ></v-progress-linear>
                   <div
                     v-else
                     v-for="(rate, index) in shippingRates"
@@ -463,7 +479,7 @@ export default {
                     <div class="col-md-3 col-4">
                       <div class="row">
                         <!-- <div class="col">
-                          <img :src="order.buku.foto" class="img-fluid" alt="Book image" />
+                          <img :src="order.foto" class="img-fluid" alt="Book image" />
                         </div> -->
                       </div>
                     </div>
@@ -472,15 +488,13 @@ export default {
                         <div class="col-12">
                           <h5 class="text-truncate">{{ order.name }}</h5>
                           <p class="d-inline">
-                            <span class="">{{ order.quantity }} porsi</span> x  Rp
+                            <span class="">{{ order.quantity }} porsi</span> x Rp
                             {{ formatPrice(order.harga_dasar) }}
                           </p>
                         </div>
                         <div class="col-12 d-flex justify-content-end align-items-center mt-2">
                           <span
-                            ><strong
-                              >Rp {{ formatPrice(order.harga_total_item) }}</strong
-                            ></span
+                            ><strong>Rp {{ formatPrice(order.harga_total_item) }}</strong></span
                           >
                         </div>
                       </div>
@@ -497,33 +511,31 @@ export default {
                   <h3 class="card-title">Rincian Belanja</h3>
                 </div>
                 <hr class="horizontal dark" />
-                <p>Ringkasan Pembayaran</p>
+
                 <div class="row ring-bayar">
                   <div class="col-7">Total Harga</div>
                   <div class="col">
-                    <p>: Rp {{ formatPrice(totalPayment) }}</p>
+                    <p>: Rp {{ formatPrice(totalHarga) }}</p>
                   </div>
                 </div>
                 <div class="row ring-bayar">
-                  <div class="col-7">Total biaya pengiriman</div>
+                  <div class="col-7">Biaya pengiriman</div>
                   <div class="col">
                     <p>: Rp. {{ formatPrice(selectedCourier ? selectedCourier.price : 0) }}</p>
                   </div>
                 </div>
                 <hr class="horizontal dark" />
                 <div class="row ring-bayar">
-                  <div class="col-7">Total Bayar</div>
+                  <div class="col-7 font-weight-bold">Total Bayar</div>
                   <div class="col">
                     <p>
                       : Rp
-                      {{
-                        formatPrice(totalPayment + (selectedCourier ? selectedCourier.price : 0))
-                      }}
+                      {{ formatPrice(totalBayar) }}
                     </p>
                   </div>
                 </div>
                 <button class="btn btn-primary w-100" @click="proceedToCheckout">
-                  Lanjut untuk Membayar
+                  Checkout Sekarang
                 </button>
               </div>
             </div>
@@ -566,7 +578,13 @@ export default {
                   dicari tidak muncul, coba ganti kata kunci atau input kode pos!</a
                 >
               </div>
-              <v-progress-linear v-if="loadingRegist" indeterminate></v-progress-linear>
+              <v-progress-linear
+                v-if="loadingRegist"
+                color="amber"
+                indeterminate
+                :size="69"
+                :width="6"
+              ></v-progress-linear>
               <form>
                 <div class="mb-3">
                   <label for="Province" class="form-label">Provinsi</label>
@@ -587,7 +605,7 @@ export default {
                     type="text"
                     class="form-control"
                     id="district"
-                    v-model="address.district"
+                    v-model="address.kecamatan"
                   />
                 </div>
                 <div class="mb-3">
@@ -596,7 +614,7 @@ export default {
                     type="text"
                     class="form-control"
                     id="district"
-                    v-model="address.postal_code"
+                    v-model="address.kode_pos"
                   />
                 </div>
                 <div class="mb-3">
@@ -605,7 +623,7 @@ export default {
                     type="text"
                     class="form-control"
                     id="district"
-                    v-model="address.alamat_lengkap"
+                    v-model="address.jalan"
                   ></textarea>
                 </div>
                 <hr class="horizontal dark" />
@@ -615,7 +633,7 @@ export default {
                     type="text"
                     class="form-control"
                     id="recipientPhone"
-                    v-model="address.penerima"
+                    v-model="address.nama_penerima"
                   />
                 </div>
                 <div class="mb-3">
@@ -625,22 +643,12 @@ export default {
                     <input
                       type="text"
                       class="form-control"
-                      v-model="address.no_penerima"
+                      v-model="address.nomor_telepon"
                       placeholder="Phone Number"
                       aria-label="phone"
                       aria-describedby="basic-addon1"
                     />
                   </div>
-                </div>
-                <div class="mb-3">
-                  <label for="addressNote" class="form-label">Label Alamat</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="addressNote"
-                    placeholder="Rumah, Kantor"
-                    v-model="address.label"
-                  />
                 </div>
               </form>
             </v-card-text>
@@ -656,6 +664,7 @@ export default {
     </div>
   </div>
 </template>
+
 <style scoped>
 .user-select-none {
   user-select: none;
