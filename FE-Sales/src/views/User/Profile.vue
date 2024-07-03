@@ -51,6 +51,9 @@ export default {
     this.store = this.$store
     this.body = document.getElementsByTagName('body')[0]
   },
+  beforeUnmount() {
+    this.restorePage()
+  },
   mounted() {
     this.getUser()
     this.fetchUserAddresses()
@@ -128,6 +131,8 @@ export default {
         latitude: this.address.latitude,
         longitude: this.address.longitude
       }
+
+      console.log(addressData);
 
       try {
         await axios.post(`${BASE_URL}/address/add`, addressData, {

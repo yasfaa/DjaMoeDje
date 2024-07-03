@@ -1,11 +1,16 @@
 <script>
 import axios from 'axios'
+import 'leaflet/dist/leaflet.css'
+import { LMap, LTileLayer, LMarker } from '@vue-leaflet/vue-leaflet'
 const BASE_URL = import.meta.env.VITE_BASE_URL_API
 import Navbar from '@/components/DashboardNavbar.vue'
 
 export default {
   components: {
-    Navbar
+    Navbar,
+    LMap,
+    LTileLayer,
+    LMarker
   },
   data() {
     return {
@@ -100,16 +105,15 @@ export default {
     async searchAddress() {
       if (this.searchQuery && this.searchQuery.length > 2) {
         try {
-          const response = await axios.get(`${BASE_URL}/loc/areas`, {
+          const response = await axios.get(`https://nominatim.openstreetmap.org/search`, {
             params: {
-              countries: 'ID',
-              input: this.searchQuery,
-              type: 'single'
+              q: this.searchQuery,
+              format: 'json'
             }
           })
-          this.searchResults = response.data.areas
+          this.searchResults = response.data
         } catch (error) {
-          console.error('Error fetching address:', error)
+          console.error('Error fetching location:', error)
           this.searchResults = []
         } finally {
           this.loadingRegist = false
@@ -118,14 +122,38 @@ export default {
         this.searchResults = []
       }
     },
-    filledAddress() {
-      if (this.selectedAddresses) {
-        this.address.provinsi = this.selectedAddresses.administrative_division_level_1_name
-        this.address.city = this.selectedAddresses.administrative_division_level_2_name
-        this.address.district = this.selectedAddresses.administrative_division_level_3_name
-        this.address.postal_code = this.selectedAddresses.postal_code
+    selectAddress(address) {
+      const displayName = address.display_name
+      const parts = displayName.split(',')
+
+      let kode_pos = ''
+      let kecamatan = ''
+      let kota = ''
+      let provinsi = ''
+
+      // Mengatur variabel berdasarkan urutan dari belakang
+      if (parts.length >= 6) {
+        kecamatan = parts[parts.length - 6].trim()
+        kota = parts[parts.length - 5].trim()
+        provinsi = parts[parts.length - 4].trim()
+        kode_pos = parts[parts.length - 2].trim()
       }
+
+      this.selectedAddress = address
+      this.mapCenter = [parseFloat(address.lat), parseFloat(address.lon)]
+      this.markerPosition = [parseFloat(address.lat), parseFloat(address.lon)]
+      this.address.latitude = address.lat
+      this.address.longitude = address.lon
+      this.address.kode_pos = kode_pos
+      this.address.kecamatan = kecamatan
+      this.address.kota = kota
+      this.address.provinsi = provinsi
+
+      // Update map view and marker position
+      this.map.setView(this.mapCenter, this.zoom)
+      this.marker.setLatLng(this.markerPosition)
     },
+
     async saveAddress() {
       const addressData = {
         nama_penerima: this.address.nama_penerima,
@@ -173,6 +201,42 @@ export default {
         latitude: '',
         longitude: ''
       }
+    },
+    updateMarkerPosition(event) {
+      const { lat, lng } = event.latlng
+      this.markerPosition = [lat, lng]
+      this.address.latitude = lat
+      this.address.longitude = lng
+      this.getAddressFromCoordinates(lat, lng)
+    },
+    onMarkerDragEnd(event) {
+      const { lat, lng } = event.target.getLatLng()
+      this.markerPosition = [lat, lng]
+      this.address.latitude = lat
+      this.address.longitude = lng
+      this.getAddressFromCoordinates(lat, lng)
+    },
+    async getAddressFromCoordinates(lat, lng) {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
+        )
+        const data = await response.json()
+
+        const address = data.address
+        this.address.kecamatan = address.suburb || address.village || ''
+        this.address.kota = address.city || address.town || address.county || ''
+        this.address.provinsi = address.state || address.region || ''
+        this.address.kode_pos = address.postcode || ''
+        this.address.latitude = lat
+        this.address.longitude = lng
+      } catch (error) {
+        console.error('Error fetching address from coordinates:', error)
+      }
+    },
+    closeModal() {
+      this.resetForm()
+      this.dialog = false
     },
     async proceedToCheckout() {
       this.overlay = true
@@ -302,8 +366,7 @@ export default {
         this.totalPayment = parseFloat(response.data.total_harga)
       } catch (error) {
         console.error(error)
-      }
-      finally {
+      } finally {
         this.overlay = false
       }
     }
@@ -341,11 +404,12 @@ export default {
                 <div class="card-body">
                   <h5 class="card-title">
                     Pilih Alamat
-                    <i
-                      class="fas fa-plus fa-md mx-4"
-                      style="color: #5e72e4; cursor: pointer"
+                    <v-icon
+                      class="icon-btn justify-content-end"
+                      icon="mdi-plus"
+                      color="blue"
                       @click="dialog = true"
-                    ></i>
+                    ></v-icon>
                   </h5>
                   <div class="row">
                     <select
@@ -526,7 +590,7 @@ export default {
                 </div>
                 <hr class="horizontal dark" />
                 <div class="row ring-bayar">
-                  <div class="col-7 font-weight-bold">Total Bayar</div>
+                  <div class="col-7 font-weight-bold">Total Pembayaran</div>
                   <div class="col">
                     <p>
                       : Rp
@@ -535,131 +599,130 @@ export default {
                   </div>
                 </div>
                 <button class="btn btn-primary w-100" @click="proceedToCheckout">
-                  Checkout Sekarang
+                  Buat Pesanan
                 </button>
               </div>
             </div>
           </div>
         </div>
-        <v-dialog v-model="dialog" persistent max-width="600px">
-          <v-card>
-            <v-card-title>
-              <span class="headline">Tambah Alamat</span>
-            </v-card-title>
-
-            <v-card-text>
-              <div class="mb-3">
-                <label for="searchQuery" class="form-label">Cari Lokasi</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="searchQuery"
-                  v-model="searchQuery"
-                  @input="searchWithDelay"
-                />
-              </div>
-
-              <div v-if="searchResults.length" class="mb-3">
-                <label for="addressSelect" class="form-label">Pilih Alamat</label>
-                <select
-                  class="form-select"
-                  id="addressSelect"
-                  v-model="selectedAddresses"
-                  @change="filledAddress"
-                >
-                  <option v-for="result in searchResults" :key="result.id" :value="result">
-                    {{ result.name }}
-                  </option>
-                </select>
-              </div>
-              <div v-else>
-                <a style="font-size: 12px; color: red"
-                  ><i class="fas fa-info-circle" style="color: #ff0000"></i>&nbsp;Jika Alamat yang
-                  dicari tidak muncul, coba ganti kata kunci atau input kode pos!</a
-                >
-              </div>
-              <v-progress-linear
-                v-if="loadingRegist"
-                color="amber"
-                indeterminate
-                :size="69"
-                :width="6"
-              ></v-progress-linear>
-              <form>
-                <div class="mb-3">
-                  <label for="Province" class="form-label">Provinsi</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="province"
-                    v-model="address.provinsi"
-                  />
+        <div v-if="dialog">
+          <div class="modal-backdrop fade show"></div>
+          <div class="modal fade show d-block" tabindex="-1" aria-modal="true" role="dialog">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Tambah Alamat</h5>
+                  <button type="button" class="btn-close" @click="closeModal"></button>
                 </div>
-                <div class="mb-3">
-                  <label for="City" class="form-label">Kota</label>
-                  <input type="text" class="form-control" id="city" v-model="address.city" />
-                </div>
-                <div class="mb-3">
-                  <label for="District" class="form-label">Kecamatan</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="district"
-                    v-model="address.kecamatan"
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="postal code" class="form-label">Kode Pos</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="district"
-                    v-model="address.kode_pos"
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="postal code" class="form-label">Alamat Lengkap</label>
-                  <textarea
-                    type="text"
-                    class="form-control"
-                    id="district"
-                    v-model="address.jalan"
-                  ></textarea>
-                </div>
-                <hr class="horizontal dark" />
-                <div class="mb-3">
-                  <label for="recepient" class="form-label">Penerima</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="recipientPhone"
-                    v-model="address.nama_penerima"
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="recipientPhone" class="form-label">Nomor Telepon Penerima</label>
-                  <div class="input-group mb-3">
-                    <span class="input-group-text" id="basic-addon1">+62</span>
+                <div class="modal-body">
+                  <!-- Leaflet Map -->
+                  <div id="mapid">
+                    <LMap
+                      :zoom="zoom"
+                      :center="mapCenter"
+                      style="height: 300px"
+                      @click="updateMarkerPosition"
+                    >
+                      <LTileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      ></LTileLayer>
+                      <LMarker v-if="markerPosition" :lat-lng="markerPosition"></LMarker>
+                    </LMap>
+                  </div>
+                  <div class="">
+                    <label for="searchQuery" class="form-label">Cari Lokasi</label>
                     <input
                       type="text"
                       class="form-control"
-                      v-model="address.nomor_telepon"
-                      placeholder="Phone Number"
-                      aria-label="phone"
-                      aria-describedby="basic-addon1"
+                      id="searchQuery"
+                      v-model="searchQuery"
+                      @input="searchWithDelay"
                     />
                   </div>
+                  <div v-if="searchResults.length" class="mb-3 mt-3">
+                    <label for="addressSelect" class="form-label">Pilih Alamat</label>
+                    <select
+                      class="form-select"
+                      id="addressSelect"
+                      v-model="selectedAddress"
+                      @change="selectAddress(selectedAddress)"
+                    >
+                      <option
+                        v-for="result in searchResults"
+                        :key="result.place_id"
+                        :value="result"
+                      >
+                        {{ result.display_name }}
+                      </option>
+                    </select>
+                  </div>
+                  <div v-else>
+                    <a style="font-size: 11px; color: red"
+                      ><i class="fas fa-info-circle" style="color: #ff0000"></i>&nbsp;Masukkan kode
+                      pos atau kelurahan atau kota anda</a
+                    >
+                  </div>
+                  <v-progress-linear v-if="loadingRegist" indeterminate></v-progress-linear>
+                  <label for="">Nama Penerima</label>
+                  <input
+                    type="text"
+                    v-model="address.nama_penerima"
+                    class="form-control mb-2"
+                    placeholder="Masukkan nama penerima"
+                  />
+                  <label for="">Nomor Telepon</label>
+                  <input
+                    type="text"
+                    v-model="address.nomor_telepon"
+                    class="form-control mb-2"
+                    placeholder="Masukkan nomor telepon"
+                  />
+                  <label for="">Jalan</label>
+                  <input
+                    type="text"
+                    v-model="address.jalan"
+                    class="form-control mb-2"
+                    placeholder="Masukkan nama jalan dan nomor jalannya"
+                  />
+                  <label for="">Kecamatan</label>
+                  <input
+                    type="text"
+                    v-model="address.kecamatan"
+                    class="form-control mb-2"
+                    placeholder="Masukkan kecamatan penerima"
+                  />
+                  <label for="">Kota</label>
+                  <input
+                    type="text"
+                    v-model="address.kota"
+                    class="form-control mb-2"
+                    placeholder="Masukkan kota penerima"
+                  />
+                  <label for="">Provinsi</label>
+                  <input
+                    type="text"
+                    v-model="address.provinsi"
+                    class="form-control mb-2"
+                    placeholder="Masukkan provinsi penerima"
+                  />
+                  <label for="">Kode Pos</label>
+                  <input
+                    type="text"
+                    v-model="address.kode_pos"
+                    class="form-control mb-2"
+                    placeholder="Masukkan kode pos penerima"
+                  />
                 </div>
-              </form>
-            </v-card-text>
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="dialog = false">Batal</v-btn>
-              <v-btn color="blue darken-1" text @click="saveAddress">Simpan</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" @click="closeModal">Close</button>
+                  <button type="button" class="btn btn-primary" @click="saveAddress">
+                    Save changes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -708,5 +771,36 @@ a {
     width: 30px;
     margin-right: 10px;
   }
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+}
+
+.modal {
+  display: block;
+  z-index: 1050;
+}
+
+.modal-header {
+  background-color: #f8f9fa;
+}
+
+.modal-footer {
+  background-color: #f8f9fa;
+}
+
+hr.horizontal {
+  border-top: 1px solid #dee2e6;
+}
+
+hr.horizontal.dark {
+  border-top: 1px solid #343a40;
 }
 </style>
