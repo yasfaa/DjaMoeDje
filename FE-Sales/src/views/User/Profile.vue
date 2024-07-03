@@ -51,9 +51,6 @@ export default {
     this.store = this.$store
     this.body = document.getElementsByTagName('body')[0]
   },
-  beforeUnmount() {
-    this.restorePage()
-  },
   mounted() {
     this.getUser()
     this.fetchUserAddresses()
