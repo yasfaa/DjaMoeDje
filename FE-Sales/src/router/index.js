@@ -10,7 +10,7 @@ import profile from '../views/User/Profile.vue'
 import cart from '../views/User/Cart.vue'
 import customization from '../views/User/CartCustomization.vue'
 import customize from '../views/User/MenuCustomization.vue'
-import order from '../views/User/Order.vue'
+import checkout from '../views/User/Checkout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -70,11 +70,11 @@ const router = createRouter({
       name: 'Admin PRofile',
       component: adminProfile,
     },
-    // {
-    //   path: '/order',
-    //   name: 'Order',
-    //   component: order,
-    // },
+    {
+      path: '/checkout',
+      name: 'Checkout',
+      component: checkout,
+    },
   ]
 })
 

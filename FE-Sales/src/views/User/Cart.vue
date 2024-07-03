@@ -1,5 +1,4 @@
 <script>
-// import { useRoute } from "vue-router";
 import axios from 'axios'
 const BASE_URL = import.meta.env.VITE_BASE_URL_API
 import Navbar from '@/components/DashboardNavbar.vue'
@@ -12,6 +11,7 @@ export default {
     return {
       overlay: false,
       orders: [],
+      currentDropdownIndex: null,
       totalPayment: 0,
       noteModal: false,
       note: '',
@@ -21,11 +21,22 @@ export default {
   mounted() {
     this.retrieveCart()
   },
-  created() {
-    this.store = this.$store
-    this.body = document.getElementsByTagName('body')[0]
-  },
   methods: {
+    toggleDropdown(index) {
+      if (this.currentDropdownIndex === index) {
+        this.currentDropdownIndex = null
+      } else {
+        this.currentDropdownIndex = index
+      }
+    },
+    parseCustomization(customization) {
+      try {
+        return JSON.parse(customization)
+      } catch (e) {
+        console.error('Error parsing customization JSON:', e)
+        return []
+      }
+    },
     formatPrice(price) {
       const numericPrice = parseFloat(price)
       return numericPrice.toLocaleString('id-ID')
@@ -49,33 +60,23 @@ export default {
         console.error(error)
       }
     },
-    // async proceedToCheckout() {
-    //   const selectedOrders = this.orders.filter((order) => order.selected)
-    //   if (selectedOrders.length > 0) {
-    //     try {
-    //       const selectedIds = selectedOrders.map((order) => order.id)
-    //       await axios.put(
-    //         `${BASE_URL}/cart/select`,
-    //         { selected_ids: selectedIds },
-    //         {
-    //           headers: {
-    //             Authorization: 'Bearer ' + localStorage.getItem('access_token')
-    //           }
-    //         }
-    //       )
-    //       this.$router.push('/checkout')
-    //     } catch (error) {
-    //       console.error('Error updating selected items:', error)
-    //     }
-    //   } else {
-    //     this.$notify({
-    //       type: 'danger',
-    //       title: 'Gagal',
-    //       text: 'Pilih salah satu item untuk checkout',
-    //       color: 'green'
-    //     })
-    //   }
-    // },
+    async proceedToCheckout() {
+      const selectedOrders = this.orders.filter((order) => order.selected)
+      if (selectedOrders.length > 0) {
+        try {
+          this.$router.push('/checkout')
+        } catch (error) {
+          console.error('Error updating selected items:', error)
+        }
+      } else {
+        this.$notify({
+          type: 'danger',
+          title: 'Gagal',
+          text: 'Pilih salah satu item untuk checkout',
+          color: 'green'
+        })
+      }
+    },
     async incrementQuantity(index) {
       const order = this.orders[index]
       const newQuantity = order.quantity + 1
@@ -123,7 +124,11 @@ export default {
           }
         })
         this.orders.splice(index, 1)
-        this.totalPayment = response.data.total_harga
+        // Periksa apakah response.data.total_harga selalu tersedia setelah menghapus item
+        this.totalPayment = this.orders.reduce(
+          (acc, order) => acc + parseFloat(order.harga_dasar),
+          0
+        )
       } catch (error) {
         console.error(error)
       }
@@ -178,7 +183,7 @@ export default {
     },
     goToCustomization(cartItemId) {
       this.$router.push(`/customization/${cartItemId}`)
-    },
+    }
   }
 }
 </script>
@@ -200,22 +205,38 @@ export default {
           <div class="col-lg-8">
             <div v-for="(order, index) in orders" :key="index" class="mb-4 card">
               <div class="card-body">
-                <div class="row d-flex align-items-center">
-                  <div class="col-md-2 d-flex align-items-center">
-                    <input
-                      type="checkbox"
-                      class="large-checkbox me-1"
-                      v-model="order.selected"
-                      @change="toggleSelect(index)"
-                    />
-                    <img :src="order.foto" class="foto img-fluid" />
-                  </div>
-                  <div class="col-md-10">
+                <div class="row d-flex align-items-center justify-content-between">
+                  <div class="col-md-12">
                     <div class="row">
+                      <div class="col-md-2 d-flex align-items-center">
+                        <input
+                          type="checkbox"
+                          class="large-checkbox me-1"
+                          v-model="order.selected"
+                          @change="toggleSelect(index)"
+                        />
+                        <img :src="order.foto" class="foto img-fluid" />
+                      </div>
                       <div class="col detailMenu">
                         <h5>{{ order.name }}</h5>
                         <p class="mb-3">Rp {{ formatPrice(order.harga_dasar) }}</p>
-                        <a class="custom" @click="goToCustomization(order.id)">Kustomisasi Menu Anda Sekarang!</a>
+                        <a class="lihat" @click="toggleDropdown(index)">
+                          {{
+                            currentDropdownIndex === index
+                              ? 'Sembunyikan Kustomisasi'
+                              : 'Lihat Kustomisasi Anda'
+                          }}
+                        </a>
+                        <div
+                          :class="{ 'hidden-dropdown': true, show: currentDropdownIndex === index }"
+                        >
+                          <p
+                            v-for="(item, idx) in parseCustomization(order.customization)"
+                            :key="idx"
+                          >
+                            {{ item.nama }}: {{ item.quantity }}
+                          </p>
+                        </div>
                       </div>
                       <div class="col d-flex align-items-center justify-content-end">
                         <v-icon
@@ -250,6 +271,11 @@ export default {
                           @click="showNoteModal(index)"
                         ></v-icon>
                       </div>
+                    </div>
+                    <div class="row">
+                      <a class="custom ms-3 mt-2" @click="goToCustomization(order.id)">
+                        Kustomisasi Menu Anda Sekarang!
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -304,12 +330,22 @@ export default {
 .custom:hover {
   color: #ffe279;
 }
+
+.lihat {
+  color: #6b6b6b;
+  cursor: pointer;
+}
+
+.lihat:hover {
+  color: #000000;
+}
+
 .large-checkbox {
   width: 1.5rem;
   height: 1.5rem;
 }
 
-.h5{
+.h5 {
   overflow: hidden;
 }
 .foto {
@@ -321,12 +357,28 @@ export default {
   cursor: pointer;
 }
 
+.hidden-dropdown {
+  display: none;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.hidden-dropdown.show {
+  display: block;
+}
+
+.hidden-dropdown p {
+  margin: 0;
+}
+
 @media (max-width: 600px) {
   .large-checkbox {
     width: 1rem;
     height: 1rem;
   }
-  .detailMenu{
+  .detailMenu {
     margin-left: 30px;
   }
 }
