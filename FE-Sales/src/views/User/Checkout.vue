@@ -1,16 +1,13 @@
 <script>
 import axios from 'axios'
 import 'leaflet/dist/leaflet.css'
-import { LMap, LTileLayer, LMarker } from '@vue-leaflet/vue-leaflet'
+import L from 'leaflet'
 const BASE_URL = import.meta.env.VITE_BASE_URL_API
 import Navbar from '@/components/DashboardNavbar.vue'
 
 export default {
   components: {
-    Navbar,
-    LMap,
-    LTileLayer,
-    LMarker
+    Navbar
   },
   data() {
     return {
@@ -43,6 +40,10 @@ export default {
         latitude: '',
         longitude: ''
       },
+      users: {
+        name: '',
+        email: ''
+      },
       selectedAddressId: '',
       selectedAddress: {},
       shippingRates: [],
@@ -54,15 +55,24 @@ export default {
   mounted() {
     this.retrieveCart()
     this.fetchUserAddresses()
+    this.initMap()
   },
   watch: {
     selectedAddressId() {
-      console.log('selectedAddressId changed:', this.selectedAddressId)
       this.fillAddress()
       this.fetchShippingRates()
     },
     selectedCourier() {
       this.updateTotalPayment()
+    },
+    searchQuery(newQuery) {
+      this.searchWithDelay()
+    },
+    selectedAddress(newAddress) {
+      if (newAddress) {
+        this.mapCenter = [parseFloat(newAddress.lat), parseFloat(newAddress.lon)]
+        this.markerPosition = [parseFloat(newAddress.lat), parseFloat(newAddress.lon)]
+      }
     }
   },
   methods: {
@@ -80,6 +90,22 @@ export default {
       this.showFooter = true
       this.body.classList.add('bg-gray-100')
     },
+    async getUser() {
+      try {
+        const response = await axios.get(`${BASE_URL}/user`, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token')
+          }
+        })
+        this.users = response.data
+      } catch (error) {
+        console.error(error)
+        if (error.response && error.response.data.message) {
+          const errorMessage = error.response.data.message
+          console.log(errorMessage)
+        }
+      }
+    },
     formatPrice(price) {
       const numericPrice = parseFloat(price)
       return numericPrice.toLocaleString('id-ID')
@@ -94,6 +120,27 @@ export default {
     selectCourier(rate) {
       this.selectedCourier = rate
       this.updateTotalPayment()
+    },
+    initMap() {
+      this.$nextTick(() => {
+        if (document.getElementById('mapid')) {
+          this.map = L.map('mapid').setView(this.mapCenter, this.zoom)
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(this.map)
+          this.map.on('click', this.updateMarkerPosition)
+
+          // Initialize marker if markerPosition is set
+          if (this.markerPosition) {
+            this.marker = L.marker(this.markerPosition, { draggable: true }).addTo(this.map)
+            this.marker.on('dragend', this.onMarkerDragEnd)
+          }
+        }
+      })
+    },
+    openModal() {
+      this.dialog = true
+      this.$nextTick(() => {
+        this.initMap()
+      })
     },
     searchWithDelay() {
       this.loadingRegist = true
@@ -131,7 +178,6 @@ export default {
       let kota = ''
       let provinsi = ''
 
-      // Mengatur variabel berdasarkan urutan dari belakang
       if (parts.length >= 6) {
         kecamatan = parts[parts.length - 6].trim()
         kota = parts[parts.length - 5].trim()
@@ -149,11 +195,15 @@ export default {
       this.address.kota = kota
       this.address.provinsi = provinsi
 
-      // Update map view and marker position
-      this.map.setView(this.mapCenter, this.zoom)
-      this.marker.setLatLng(this.markerPosition)
+      // Update map view and marker position, and set zoom to 16
+      this.map.setView(this.mapCenter, 22)
+      if (this.marker) {
+        this.marker.setLatLng(this.markerPosition)
+      } else {
+        this.marker = L.marker(this.markerPosition, { draggable: true }).addTo(this.map)
+        this.marker.on('dragend', this.onMarkerDragEnd)
+      }
     },
-
     async saveAddress() {
       const addressData = {
         nama_penerima: this.address.nama_penerima,
@@ -201,6 +251,10 @@ export default {
         latitude: '',
         longitude: ''
       }
+      if (this.marker) {
+        this.marker.remove()
+        this.marker = null
+      }
     },
     updateMarkerPosition(event) {
       const { lat, lng } = event.latlng
@@ -208,6 +262,13 @@ export default {
       this.address.latitude = lat
       this.address.longitude = lng
       this.getAddressFromCoordinates(lat, lng)
+
+      if (this.marker) {
+        this.marker.setLatLng([lat, lng])
+      } else {
+        this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map)
+        this.marker.on('dragend', this.onMarkerDragEnd)
+      }
     },
     onMarkerDragEnd(event) {
       const { lat, lng } = event.target.getLatLng()
@@ -224,14 +285,15 @@ export default {
         const data = await response.json()
 
         const address = data.address
-        this.address.kecamatan = address.suburb || address.village || ''
-        this.address.kota = address.city || address.town || address.county || ''
-        this.address.provinsi = address.state || address.region || ''
+        this.address.kecamatan = address.suburb || ''
+        this.address.kota = address.city || ''
+        this.address.provinsi = address.state || ''
+        this.address.jalan = address.road || ''
         this.address.kode_pos = address.postcode || ''
-        this.address.latitude = lat
-        this.address.longitude = lng
+
+        this.searchQuery = `${this.address.jalan}, ${this.address.kecamatan}, ${this.address.kota}, ${this.address.provinsi}`
       } catch (error) {
-        console.error('Error fetching address from coordinates:', error)
+        console.error('Error fetching address:', error)
       }
     },
     closeModal() {
@@ -244,18 +306,18 @@ export default {
         const response = await axios.post(
           `${BASE_URL}/order/checkout`,
           {
-            amount: this.totalPayment,
+            amount:this.totalHarga,
             selectedCourier: this.selectedCourier,
             address_id: this.selectedAddress.id,
             items: this.orders.map((order) => ({
-              buku_id: order.buku.id,
+              cart_item_id: order.id,
               quantity: order.quantity,
-              totalPrice: order.totalPrice
+              totalPrice: order.harga_total_item
             })),
-            first_name: 'Farrel',
+            first_name: 'Yasfa',
             last_name: '',
-            email: 'farrel@example.com',
-            phone: '815559800895'
+            email: 'udin@udin.com',
+            phone: '85155245904'
           },
           {
             headers: {
@@ -318,7 +380,6 @@ export default {
     fillAddress() {
       this.selectedAddress =
         this.alamat.find((address) => address.selected_address_id === this.selectedAddressId) || {}
-      console.log('Selected address:', this.selectedAddress)
     },
     async fetchUserAddresses() {
       try {
@@ -330,27 +391,6 @@ export default {
         this.alamat = response.data
       } catch (error) {
         console.error('Error fetching addresses:', error)
-      }
-    },
-    async updateQuantity(index, id, newQuantity) {
-      if (newQuantity < 1) return
-
-      try {
-        await axios.put(
-          `${BASE_URL}/cart/update/` + id,
-          { quantity: newQuantity },
-          {
-            headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('access_token')
-            }
-          }
-        )
-        this.orders[index].quantity = newQuantity
-        this.orders[index].totalPrice = newQuantity * this.orders[index].harga
-
-        this.retrieveCart()
-      } catch (error) {
-        console.error(error)
       }
     },
     async retrieveCart() {
@@ -408,7 +448,7 @@ export default {
                       class="icon-btn justify-content-end"
                       icon="mdi-plus"
                       color="blue"
-                      @click="dialog = true"
+                      @click="openModal"
                     ></v-icon>
                   </h5>
                   <div class="row">
@@ -487,7 +527,7 @@ export default {
                             />
                           </div>
                           <div class="col-2 d-flex align-items-center">
-                            <img
+                            <!-- <img
                               v-if="rate.company === 'jne'"
                               src="../../assets/img/jne.png"
                               alt="jne"
@@ -500,7 +540,7 @@ export default {
                               alt="sicepat"
                               class="img-fluid"
                               style="width: 50px; margin-right: 20px"
-                            />
+                            /> -->
                           </div>
                           <div class="col-3">
                             <div class="row">
@@ -571,11 +611,8 @@ export default {
           <div class="col-lg-4">
             <div class="card sticky-menu">
               <div class="card-body">
-                <div class="py-2">
-                  <h3 class="card-title">Rincian Belanja</h3>
-                </div>
+                <h3 class="card-title">Rincian Belanja</h3>
                 <hr class="horizontal dark" />
-
                 <div class="row ring-bayar">
                   <div class="col-7">Total Harga</div>
                   <div class="col">
@@ -616,19 +653,7 @@ export default {
                 </div>
                 <div class="modal-body">
                   <!-- Leaflet Map -->
-                  <div id="mapid">
-                    <LMap
-                      :zoom="zoom"
-                      :center="mapCenter"
-                      style="height: 300px"
-                      @click="updateMarkerPosition"
-                    >
-                      <LTileLayer
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      ></LTileLayer>
-                      <LMarker v-if="markerPosition" :lat-lng="markerPosition"></LMarker>
-                    </LMap>
-                  </div>
+                  <div id="mapid" style="height: 300px"></div>
                   <div class="">
                     <label for="searchQuery" class="form-label">Cari Lokasi</label>
                     <input
@@ -802,5 +827,9 @@ hr.horizontal {
 
 hr.horizontal.dark {
   border-top: 1px solid #343a40;
+}
+
+#mapid {
+  height: 300px;
 }
 </style>
