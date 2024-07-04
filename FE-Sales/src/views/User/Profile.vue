@@ -1,22 +1,17 @@
 <script>
 import axios from 'axios'
 import 'leaflet/dist/leaflet.css'
-import { LMap, LTileLayer, LMarker } from '@vue-leaflet/vue-leaflet'
+import L from 'leaflet'
 const BASE_URL = import.meta.env.VITE_BASE_URL_API
 import Navbar from '@/components/DashboardNavbar.vue'
 
 export default {
   name: 'Profile',
   components: {
-    Navbar,
-    LMap,
-    LTileLayer,
-    LMarker
+    Navbar
   },
   data() {
     return {
-      store: null,
-      body: null,
       dialog: false,
       users: {
         name: '',
@@ -47,18 +42,33 @@ export default {
       marker: null
     }
   },
-  created() {
-    this.store = this.$store
-    this.body = document.getElementsByTagName('body')[0]
-  },
-  beforeUnmount() {
-    this.restorePage()
-  },
   mounted() {
     this.getUser()
     this.fetchUserAddresses()
+    this.initMap()
   },
   methods: {
+    initMap() {
+      this.$nextTick(() => {
+        if (document.getElementById('mapid')) {
+          this.map = L.map('mapid').setView(this.mapCenter, this.zoom)
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(this.map)
+          this.map.on('click', this.updateMarkerPosition)
+
+          // Initialize marker if markerPosition is set
+          if (this.markerPosition) {
+            this.marker = L.marker(this.markerPosition, { draggable: true }).addTo(this.map)
+            this.marker.on('dragend', this.onMarkerDragEnd)
+          }
+        }
+      })
+    },
+    openModal() {
+      this.dialog = true
+      this.$nextTick(() => {
+        this.initMap()
+      })
+    },
     searchWithDelay() {
       this.loadingRegist = true
       if (this.searchTimeout) {
@@ -95,7 +105,6 @@ export default {
       let kota = ''
       let provinsi = ''
 
-      // Mengatur variabel berdasarkan urutan dari belakang
       if (parts.length >= 6) {
         kecamatan = parts[parts.length - 6].trim()
         kota = parts[parts.length - 5].trim()
@@ -113,11 +122,15 @@ export default {
       this.address.kota = kota
       this.address.provinsi = provinsi
 
-      // Update map view and marker position
-      this.map.setView(this.mapCenter, this.zoom)
-      this.marker.setLatLng(this.markerPosition)
+      // Update map view and marker position, and set zoom to 16
+      this.map.setView(this.mapCenter, 22)
+      if (this.marker) {
+        this.marker.setLatLng(this.markerPosition)
+      } else {
+        this.marker = L.marker(this.markerPosition, { draggable: true }).addTo(this.map)
+        this.marker.on('dragend', this.onMarkerDragEnd)
+      }
     },
-
     async saveAddress() {
       const addressData = {
         nama_penerima: this.address.nama_penerima,
@@ -131,8 +144,6 @@ export default {
         latitude: this.address.latitude,
         longitude: this.address.longitude
       }
-
-      console.log(addressData);
 
       try {
         await axios.post(`${BASE_URL}/address/add`, addressData, {
@@ -167,6 +178,10 @@ export default {
         latitude: '',
         longitude: ''
       }
+      if (this.marker) {
+        this.marker.remove()
+        this.marker = null
+      }
     },
     async fetchUserAddresses() {
       try {
@@ -182,7 +197,7 @@ export default {
     },
     async deleteAddress(id) {
       try {
-        const response = await axios.delete(`${BASE_URL}/address/delete/` + id, {
+        await axios.delete(`${BASE_URL}/address/delete/` + id, {
           headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
@@ -230,7 +245,7 @@ export default {
     },
     async updateUser() {
       try {
-        const response = await axios.post(`${BASE_URL}/auth/update`, this.users, {
+        await axios.post(`${BASE_URL}/auth/update`, this.users, {
           headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
@@ -257,6 +272,13 @@ export default {
       this.address.latitude = lat
       this.address.longitude = lng
       this.getAddressFromCoordinates(lat, lng)
+
+      if (this.marker) {
+        this.marker.setLatLng([lat, lng])
+      } else {
+        this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map)
+        this.marker.on('dragend', this.onMarkerDragEnd)
+      }
     },
     onMarkerDragEnd(event) {
       const { lat, lng } = event.target.getLatLng()
@@ -273,14 +295,26 @@ export default {
         const data = await response.json()
 
         const address = data.address
-        this.address.kecamatan = address.suburb || address.village || ''
-        this.address.kota = address.city || address.town || address.county || ''
-        this.address.provinsi = address.state || address.region || ''
+        this.address.kecamatan = address.suburb || ''
+        this.address.kota = address.city || ''
+        this.address.provinsi = address.state || ''
+        this.address.jalan = address.road || ''
         this.address.kode_pos = address.postcode || ''
-        this.address.latitude = lat
-        this.address.longitude = lng
+
+        this.searchQuery = `${this.address.jalan}, ${this.address.kecamatan}, ${this.address.kota}, ${this.address.provinsi}`
       } catch (error) {
-        console.error('Error fetching address from coordinates:', error)
+        console.error('Error fetching address:', error)
+      }
+    }
+  },
+  watch: {
+    searchQuery(newQuery) {
+      this.searchWithDelay()
+    },
+    selectedAddress(newAddress) {
+      if (newAddress) {
+        this.mapCenter = [parseFloat(newAddress.lat), parseFloat(newAddress.lon)]
+        this.markerPosition = [parseFloat(newAddress.lat), parseFloat(newAddress.lon)]
       }
     }
   }
@@ -292,7 +326,9 @@ export default {
   <div class="border-main">
     <div class="py-4 container-fluid">
       <div class="row">
+        <!-- Profil dan Alamat -->
         <div class="col-md-7 mt-6">
+          <!-- Profil Card -->
           <div class="card shadow-lg">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
@@ -300,6 +336,7 @@ export default {
               </div>
             </div>
             <div class="card-body">
+              <!-- Form untuk mengedit profil -->
               <p class="text-uppercase fw-bolder">Informasi Pengguna</p>
               <div class="row">
                 <div class="col-md-6">
@@ -330,6 +367,7 @@ export default {
           </div>
         </div>
         <div class="col-md-5 mt-5">
+          <!-- Alamat Card -->
           <div class="card shadow-lg mt-4">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
@@ -337,6 +375,7 @@ export default {
               </div>
             </div>
             <div class="card-body">
+              <!-- Daftar Alamat -->
               <div v-for="alamatItem in alamat" :key="alamatItem.id" class="mb-3">
                 <div class="row">
                   <p class="text-xs">Nama Penerima: {{ alamatItem.nama_penerima }}</p>
@@ -354,14 +393,14 @@ export default {
                 </button>
                 <hr class="horizontal dark" />
               </div>
-              <button class="btn btn-primary btn-sm ms-auto" @click="dialog = true">
+              <button class="btn btn-primary btn-sm ms-auto" @click="openModal">
                 Tambah Alamat
               </button>
-              <!-- Modal for adding address -->
+              <!-- Modal untuk menambah alamat -->
               <div v-if="dialog">
                 <div class="modal-backdrop fade show"></div>
                 <div class="modal fade show d-block" tabindex="-1" aria-modal="true" role="dialog">
-                  <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">
                       <div class="modal-header">
                         <h5 class="modal-title">Tambah Alamat</h5>
@@ -369,19 +408,7 @@ export default {
                       </div>
                       <div class="modal-body">
                         <!-- Leaflet Map -->
-                        <div id="mapid">
-                          <LMap
-                            :zoom="zoom"
-                            :center="mapCenter"
-                            style="height: 300px"
-                            @click="updateMarkerPosition"
-                          >
-                            <LTileLayer
-                              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            ></LTileLayer>
-                            <LMarker v-if="markerPosition" :lat-lng="markerPosition"></LMarker>
-                          </LMap>
-                        </div>
+                        <div id="mapid" style="height: 300px"></div>
                         <div class="">
                           <label for="searchQuery" class="form-label">Cari Lokasi</label>
                           <input
@@ -392,6 +419,7 @@ export default {
                             @input="searchWithDelay"
                           />
                         </div>
+                        <!-- Select untuk memilih alamat dari hasil pencarian -->
                         <div v-if="searchResults.length" class="mb-3 mt-3">
                           <label for="addressSelect" class="form-label">Pilih Alamat</label>
                           <select
@@ -416,6 +444,7 @@ export default {
                           >
                         </div>
                         <v-progress-linear v-if="loadingRegist" indeterminate></v-progress-linear>
+                        <!-- Input untuk detail alamat -->
                         <label for="">Nama Penerima</label>
                         <input
                           type="text"
@@ -478,7 +507,7 @@ export default {
                   </div>
                 </div>
               </div>
-              <!-- Modal for confirming deletion -->
+              <!-- Modal untuk konfirmasi penghapusan -->
               <div v-if="confirmdeletion">
                 <div class="modal-backdrop fade show"></div>
                 <div class="modal fade show d-block" tabindex="-1" aria-modal="true" role="dialog">
@@ -568,5 +597,9 @@ hr.horizontal {
 
 hr.horizontal.dark {
   border-top: 1px solid #343a40;
+}
+
+#mapid {
+  height: 300px;
 }
 </style>
