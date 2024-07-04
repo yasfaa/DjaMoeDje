@@ -11,6 +11,7 @@ import cart from '../views/User/Cart.vue'
 import customization from '../views/User/CartCustomization.vue'
 import customize from '../views/User/MenuCustomization.vue'
 import checkout from '../views/User/Checkout.vue'
+import order from '../views/User/Order.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -74,6 +75,11 @@ const router = createRouter({
       path: '/checkout',
       name: 'Checkout',
       component: checkout,
+    },
+    {
+      path: '/order',
+      name: 'Order',
+      component: order,
     },
   ]
 })

@@ -100,10 +100,10 @@
           Keranjang saya
         </router-link>
         <router-link
-          to="/pesanan"
+          to="/order"
           exact
           class="nav-link"
-          :class="{ 'active-link': $route.path === '/pesanan' }"
+          :class="{ 'active-link': $route.path === '/order' }"
         >
           Pesananku
         </router-link>
