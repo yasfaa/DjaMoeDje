@@ -111,13 +111,25 @@ class TransactionController extends Controller
                 'status' => $transaction->status,
                 'total' => $transaction->total,
                 'created_at' => $transaction->created_at,
-                'payment'=> $transaction->payment_link,
+                'payment' => $transaction->payment_link,
                 'menu' => $transaction->cartItems->map(function ($cartItem) {
-                    return [
+                    $formattedMenu = [
+                        'menu_id' =>$cartItem->menu->id,
                         'nama_menu' => $cartItem->menu->nama_menu,
                         'quantity' => $cartItem->quantity,
                         'harga_menu' => $cartItem->customization_price,
+                        'imagePath' => null,
                     ];
+
+                    if (!is_null($cartItem->menu->file_path)) {
+                        $paths = json_decode($cartItem->menu->file_path, true);
+                        if (!empty($paths)) {
+                            $url = asset(str_replace('public/', 'storage/', $paths[0]));
+                            $formattedMenu['imagePath'] = $url;
+                        }
+                    }
+
+                    return $formattedMenu;
                 }),
             ];
         });
