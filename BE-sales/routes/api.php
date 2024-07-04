@@ -7,6 +7,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\IngredientController;
+use App\Http\Controllers\TransactionController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -73,5 +74,8 @@ Route::get('menu/get/{id}', [MenuController::class, 'getOne']);
 Route::prefix('/biteship')->group(function () {
     Route::get('/areas', [AddressController::class, 'getAreas']);
     Route::post('/kurir', [CartController::class, 'getShippingRates']);
+});
 
+Route::prefix('/order')->middleware(['auth:sanctum', 'role:User'])->group(function () {
+    Route::post('/checkout', [TransactionController::class, 'createOrder']);
 });
