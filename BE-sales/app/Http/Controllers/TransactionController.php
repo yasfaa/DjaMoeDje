@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CartItem;
 use Exception;
 use App\Models\Cart;
+use App\Models\CartItem;
 use App\Services\Biteship;
 use App\Services\Midtrans;
 use App\Models\Transaction;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
@@ -60,7 +63,7 @@ class TransactionController extends Controller
             $snapToken = $this->midtrans->createTransaction($orderDetails);
             $paymentUrl = $snapToken->redirect_url;
 
-            $transaction->update(['link' => $paymentUrl]);
+            $transaction->update(['payment_link' => $paymentUrl]);
 
             foreach ($items as $item) {
                 $cartItem = CartItem::find($item['cart_item_id']);
@@ -73,12 +76,52 @@ class TransactionController extends Controller
             }
 
             Cart::where('user_id', auth()->id())
-                ->whereIn('buku_id', array_column($items, 'buku_id'))
                 ->delete();
 
             return response()->json(['paymentUrl' => $paymentUrl]);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    public function getUserOrders(Request $request)
+    {
+        $userId = Auth::id();
+        $statusFilter = $request->query('status');
+
+        $transactionsQuery = Transaction::with(['cartItems.menu'])
+            ->where('user_id', $userId);
+
+        if ($statusFilter) {
+            $transactionsQuery->where('status', $statusFilter);
+        }
+
+        $transactions = $transactionsQuery->get();
+
+        $transactions->each(function ($transaction) {
+            if ($transaction->status === 'pending' && Carbon::parse($transaction->created_at)->diffInHours(Carbon::now()) > 24) {
+                $transaction->update(['status' => 'expired']);
+            }
+        });
+
+        $response = $transactions->map(function ($transaction) {
+            return [
+                'id_transaksi' => $transaction->id,
+                'no_pesanan' => $transaction->transaction_id,
+                'status' => $transaction->status,
+                'total' => $transaction->total,
+                'created_at' => $transaction->created_at,
+                'payment'=> $transaction->payment_link,
+                'menu' => $transaction->cartItems->map(function ($cartItem) {
+                    return [
+                        'nama_menu' => $cartItem->menu->nama_menu,
+                        'quantity' => $cartItem->quantity,
+                        'harga_menu' => $cartItem->customization_price,
+                    ];
+                }),
+            ];
+        });
+
+        return response()->json(['order' => $response]);
     }
 }

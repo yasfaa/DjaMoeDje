@@ -78,4 +78,5 @@ Route::prefix('/biteship')->group(function () {
 
 Route::prefix('/order')->middleware(['auth:sanctum', 'role:User'])->group(function () {
     Route::post('/checkout', [TransactionController::class, 'createOrder']);
+    Route::post('/getOrder', [TransactionController::class, 'getUserOrders']);
 });
