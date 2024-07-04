@@ -18,9 +18,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
         ]);
 
-        // $this->call([
-        //     AddressSeeder::class,
-        // ]);
+        $this->call([
+            AddressSeeder::class,
+        ]);
 
         $this->call([
             MenuSeeder::class,

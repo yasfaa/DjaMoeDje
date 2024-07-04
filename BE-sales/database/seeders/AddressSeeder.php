@@ -11,14 +11,29 @@ class AddressSeeder extends Seeder
     public function run(): void
     {
         DB::table('addresses')->insert([
-            'user_id' => '2', // Use an existing user_id from the users table
-            'nama_penerima' => 'Rizky Agung Prayogi',
-            'nomor_telepon' => '08524637895',
-            'jalan' => 'Jalan Raya Wonocolo No. 49',
-            'kelurahan' => 'Sememi',
-            'kecamatan' => 'Lakarsantri',
+            'user_id' => 2, 
+            'nama_penerima' => 'Udin',
+            'nomor_telepon' => '089737485982',
+            'jalan' => 'Jalan Cempaka Putih Barat XI No, 2',
+            'kecamatan' => 'Cempaka Putih',
+            'kota' => 'Central Jakarta',
+            'provinsi' => 'Special Region of Jakarta',
+            'kode_pos' => 10570,
+            'latitude' => -6.1832899,
+            'longitude' => 106.8654067
+        ]);    
+        
+        DB::table('addresses')->insert([
+            'user_id' => 1, 
+            'nama_penerima' => 'Prijo Widodo',
+            'nomor_telepon' => '0818510687',
+            'jalan' => 'Jalan Wonocolo Gang IV',
+            'kecamatan' => 'Wonocolo',
             'kota' => 'Surabaya',
-            'kode_pos' => '637895',
-        ]);        
+            'provinsi' => 'East Java',
+            'kode_pos' => 60237,
+            'latitude' => -7.3177856624486,
+            'longitude' => 112.73695707321
+        ]);   
     }
 }
