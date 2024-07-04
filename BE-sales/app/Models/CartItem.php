@@ -19,8 +19,8 @@ class CartItem extends Model
         'harga_item',
         'customization_price',
         'select',
-        'customizations'
-
+        'customizations',
+        'order_id'
     ];
 
     public function cart()

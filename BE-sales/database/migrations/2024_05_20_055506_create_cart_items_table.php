@@ -12,13 +12,14 @@ return new class extends Migration {
     {
         Schema::create('cart_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('cart_id')->constrained()->onDelete('cascade');
+            $table->foreignId('cart_id');
             $table->foreignId('menu_id')->constrained()->onDelete('cascade');
             $table->integer('quantity');
             $table->decimal('harga_item', 8, 2);
             $table->decimal('customization_price', 8, 2)->default(0);
             $table->boolean('select')->default(0);
             $table->json('customizations')->nullable();
+            $table->bigInteger('order_id')->nullable();
             $table->timestamps();
         });
     }
