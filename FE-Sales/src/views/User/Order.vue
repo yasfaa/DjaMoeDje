@@ -34,10 +34,10 @@ export default {
       this.body.classList.remove('bg-gray-100')
     },
     restorePage() {
-      this.store.state.hideConfigButton = false
-      this.store.state.showNavbar = true
-      this.store.state.showSidenav = true
-      this.store.state.showFooter = true
+      this.hideConfigButton = false
+      this.showNavbar = true
+      this.showSidenav = true
+      this.showFooter = true
       this.body.classList.add('bg-gray-100')
     },
     formatDate(data_date) {
@@ -78,50 +78,8 @@ export default {
       this.$router.push('/orders/' + order.id_transaksi)
     },
     async payNow(order) {
-      try {
-        const response = await axios.get(`${BASE_URL}/order/status`, {
-          params: {
-            order_id: order.id_transaksi
-          },
-          headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('access_token')
-          }
-        })
-
-        const status = response.data
-
-        if (status.status_code === '200') {
-          if (status.transaction_status === 'capture') {
-            this.$notify({
-              type: 'success',
-              title: 'Payment Status',
-              text: 'Payment is captured. Order status is updated to "process".',
-              color: 'green'
-            })
-
-            this.retrieveOrders()
-          } else {
-            window.open(order.link, '_blank')
-          }
-        } else if (status.status_code === '404') {
-          window.open(order.link, '_blank')
-        } else {
-          this.$notify({
-            type: 'danger',
-            title: 'Payment Status',
-            text: `Error: ${status.status_message}`,
-            color: 'red'
-          })
-        }
-      } catch (error) {
-        console.error('Error checking order status:', error)
-        this.$notify({
-          type: 'danger',
-          title: 'Payment Status',
-          text: 'Unable to check order status. Please try again later.',
-          color: 'red'
-        })
-      }
+      const paymentUrl = order.payment
+      window.open(paymentUrl, '_blank')
     },
     getStatusBadge(status) {
       switch (status) {
@@ -211,20 +169,21 @@ export default {
             </div>
             <div class="card mb-3" v-for="order in orders" :key="order.id">
               <div
-                class="card-header p-0 px-4 d-flex justify-content-between align-items-center p-1"
+                class="card-header p-0 px-3 d-flex justify-content-between align-items-center p-1"
               >
-                <div>
-                  <span
-                    ><a style="font-size: 12px"> {{ formatDate(order.created_at) }} </a></span
-                  >
-                </div>
                 <div>
                   <span>No. Pesanan {{ order.no_pesanan }}</span>
                   <span class="mx-2" :class="['badge', getStatusBadge(order.status)]">{{
                     getStatusText(order.status)
                   }}</span>
                 </div>
+                <div>
+                  <span
+                    ><a style="font-size: 12px"> {{ formatDate(order.created_at) }} </a></span
+                  >
+                </div>
               </div>
+
               <div class="card-body px-4 py-0">
                 <div v-for="item in order.menu" :key="item.id" class="d-flex m-3">
                   <img
@@ -253,6 +212,15 @@ export default {
                   </div>
                 </div>
                 <hr />
+                <div class="d-flex justify-content-end mb-2">
+                  <button
+                    class="btn btn-sm btn-primary"
+                    @click="payNow(order)"
+                    v-if="order.status === 'pending'"
+                  >
+                    Bayar Sekarang
+                  </button>
+                </div>
               </div>
             </div>
           </div>
