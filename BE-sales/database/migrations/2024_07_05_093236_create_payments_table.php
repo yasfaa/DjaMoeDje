@@ -10,23 +10,21 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('transactions', function (Blueprint $table) {
+        Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('address_id');
-            $table->unsignedBigInteger('bsorder_id')->nullable();
-            $table->string('status');
+            $table->foreignId('transaction_id')->constrained()->onDelete('cascade');
+            $table->string('payment_uuid');
             $table->decimal('total', 15, 2);
+            $table->string('payment_link');
             $table->timestamps();
         });
     }
-
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('transactions');
+        Schema::dropIfExists('payments');
     }
 };

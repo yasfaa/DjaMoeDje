@@ -220,7 +220,11 @@ export default {
                       <div class="col detailMenu">
                         <h5>{{ order.name }}</h5>
                         <p class="mb-3">Rp {{ formatPrice(order.harga_dasar) }}</p>
-                        <a class="lihat" @click="toggleDropdown(index)">
+                        <a
+                          class="lihat"
+                          v-if="order.customization === !null"
+                          @click="toggleDropdown(index)"
+                        >
                           {{
                             currentDropdownIndex === index
                               ? 'Sembunyikan Kustomisasi'

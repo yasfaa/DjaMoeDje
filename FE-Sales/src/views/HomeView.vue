@@ -82,45 +82,9 @@ export default {
     <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
       <div class="carousel-inner">
         <div class="carousel-item active">
-          <img
-            src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-            class="d-block w-100"
-            alt="..."
-          />
-        </div>
-        <div class="carousel-item">
-          <img
-            src="https://cdn.vuetifyjs.com/images/cards/hotel.jpg"
-            class="d-block w-100"
-            alt="..."
-          />
-        </div>
-        <div class="carousel-item">
-          <img
-            src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
-            class="d-block w-100"
-            alt="..."
-          />
+          <img src="../assets/img/banner.png" style="width: 100%; max-height: 500px; object-fit: cover" />
         </div>
       </div>
-      <button
-        class="carousel-control-prev"
-        type="button"
-        data-bs-target="#carouselExampleControls"
-        data-bs-slide="prev"
-      >
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-      </button>
-      <button
-        class="carousel-control-next"
-        type="button"
-        data-bs-target="#carouselExampleControls"
-        data-bs-slide="next"
-      >
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-      </button>
     </div>
   </div>
   <div class="menu-section container">
@@ -177,18 +141,6 @@ export default {
 
 .hero-section {
   position: relative;
-}
-
-.carousel {
-  max-height: 400px;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.carousel-item img {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 21/9;
 }
 
 .menu-section {

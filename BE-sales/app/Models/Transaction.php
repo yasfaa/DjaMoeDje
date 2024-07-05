@@ -15,16 +15,9 @@ class Transaction extends Model
     protected $fillable = [
         'user_id',
         'address_id',
-        'total',
-        'shipping_cost',
-        'transaction_id',
-        'bsorder_id',
-        'waybill_id',
+        'order_uuid',
         'status',
-        'courier_details',
-        'items',
-        'payment_link'
-
+        'total'
     ];
 
     public function cartItems()
@@ -40,5 +33,15 @@ class Transaction extends Model
     public function address()
     {
         return $this->belongsTo(Address::class, 'address_id');
+    }
+
+    public function courier()
+    {
+        return $this->hasOne(courier::class);
+    }
+
+    public function payment()
+    {
+        return $this->hasOne(payment::class);
     }
 }
