@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\CartItem;
 use App\Models\Ingredient;
+use App\Models\MenuPicture;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -15,7 +16,6 @@ class Menu extends Model
         'nama_menu',
         'total',
         'deskripsi',
-        'file_path',
     ];
 
     public function cartItems()
@@ -26,5 +26,10 @@ class Menu extends Model
     public function ingredient()
     {
         return $this->hasMany(Ingredient::class);
+    }
+
+    public function menuPictures()
+    {
+        return $this->hasMany(MenuPicture::class);
     }
 }

@@ -20,9 +20,6 @@ class MenuSeeder extends Seeder
                 'nama_menu' => 'Rujak Cingur',
                 'total' => 27000,
                 'deskripsi' => 'Rujak cingur standard',
-                'file_path' => json_encode([
-                    "public/menu_images/Rujak_cingur.jpg"
-                ]),
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
@@ -31,9 +28,6 @@ class MenuSeeder extends Seeder
                 'nama_menu' => 'Lontong Kupang',
                 'total' => 15000,
                 'deskripsi' => 'Lontong kupang dengan sate kupang',
-                'file_path' => json_encode([
-                    "public/menu_images/lontong_kupang.png"
-                ]),
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
@@ -42,9 +36,27 @@ class MenuSeeder extends Seeder
                 'nama_menu' => 'Tahu Telur',
                 'total' => 10000,
                 'deskripsi' => 'Tahu telur khas surabaya dengan petis mahal',
-                'file_path' => json_encode([
-                    "public/menu_images/RKdDiJECl32up3xMVDaBOJb8OyPFJgt0F26qBc1O.jpg",
-                ]),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+        ]);
+
+        DB::table('menu_pictures')->insert([
+            [
+                'menu_id' => 1,
+                'file_path' => 'Rujak_cingur.jpg',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                'menu_id' => 2,
+                'file_path' => 'lontong_kupang.png',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                'menu_id' => 3,
+                'file_path' => 'RKdDiJECl32up3xMVDaBOJb8OyPFJgt0F26qBc1O.jpg',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],

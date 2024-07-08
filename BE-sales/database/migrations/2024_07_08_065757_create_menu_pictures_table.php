@@ -8,16 +8,14 @@ return new class extends Migration {
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('menus', function (Blueprint $table) {
+        Schema::create('menu_pictures', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_menu');
-            $table->double('total');
-            $table->string('deskripsi');
+            $table->foreignId('menu_id');
+            $table->string('file_path')->nullable();
             $table->timestamps();
         });
-        
     }
 
     /**
@@ -25,6 +23,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('menus');
+        Schema::dropIfExists('menu_pictures');
     }
 };
