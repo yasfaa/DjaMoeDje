@@ -330,7 +330,7 @@ export default {
         const { paymentUrl } = response.data
         window.open(paymentUrl, '_blank')
         setTimeout(() => {
-          this.$router.push('/orders')
+          this.$router.push('/order')
         }, 1000) // Adjust the delay as needed
       } catch (error) {
         console.error('Error proceeding to checkout:', error)
@@ -582,9 +582,9 @@ export default {
                   <div class="row">
                     <div class="col-md-3 col-4">
                       <div class="row">
-                        <!-- <div class="col">
+                        <div class="col">
                           <img :src="order.foto" class="img-fluid" alt="Book image" />
-                        </div> -->
+                        </div>
                       </div>
                     </div>
                     <div class="col-md-9 col-8">
