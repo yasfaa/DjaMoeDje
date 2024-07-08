@@ -435,10 +435,13 @@ class CartController extends Controller
         ]);
         
 
+        $admin = Address::whereHas('user', function ($query) {
+            $query->where('role', 'Admin');
+        })->first();
 
         $payload = [
-            'origin_latitude' => "-7.314281747619106",
-            'origin_longitude' => "112.73592789513023",
+            'origin_latitude' => $admin->latitude,
+            'origin_longitude' => $admin->longitude,
             'destination_latitude' => $request->latitude,
             'destination_longitude' => $request->longitude,
             'couriers' => 'paxel',
