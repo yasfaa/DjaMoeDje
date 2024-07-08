@@ -76,20 +76,6 @@ export default {
     }
   },
   methods: {
-    setupPage() {
-      this.hideConfigButton = true
-      this.showNavbar = true
-      this.showSidenav = false
-      this.showFooter = false
-      this.body.classList.remove('bg-gray-100')
-    },
-    restorePage() {
-      this.hideConfigButton = false
-      this.showNavbar = true
-      this.showSidenav = true
-      this.showFooter = true
-      this.body.classList.add('bg-gray-100')
-    },
     async getUser() {
       try {
         const response = await axios.get(`${BASE_URL}/user`, {

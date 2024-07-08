@@ -17,29 +17,7 @@ export default {
   mounted() {
     this.retrieveOrders()
   },
-  created() {
-    this.store = this.$store
-    this.body = document.getElementsByTagName('body')[0]
-    this.setupPage()
-  },
-  beforeUnmount() {
-    this.restorePage()
-  },
   methods: {
-    setupPage() {
-      this.hideConfigButton = true
-      this.showNavbar = true
-      this.showSidenav = false
-      this.showFooter = false
-      this.body.classList.remove('bg-gray-100')
-    },
-    restorePage() {
-      this.hideConfigButton = false
-      this.showNavbar = true
-      this.showSidenav = true
-      this.showFooter = true
-      this.body.classList.add('bg-gray-100')
-    },
     formatDate(data_date) {
       const date = new Date(data_date)
       const options = { year: 'numeric', month: 'long', day: '2-digit' }

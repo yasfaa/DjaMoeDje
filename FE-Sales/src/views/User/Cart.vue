@@ -220,11 +220,7 @@ export default {
                       <div class="col detailMenu">
                         <h5>{{ order.name }}</h5>
                         <p class="mb-3">Rp {{ formatPrice(order.harga_dasar) }}</p>
-                        <a
-                          class="lihat"
-                          v-if="order.customization === !null"
-                          @click="toggleDropdown(index)"
-                        >
+                        <a class="lihat" v-if="order.customization" @click="toggleDropdown(index)">
                           {{
                             currentDropdownIndex === index
                               ? 'Sembunyikan Kustomisasi'
@@ -242,6 +238,7 @@ export default {
                           </p>
                         </div>
                       </div>
+
                       <div class="col d-flex align-items-center justify-content-end">
                         <v-icon
                           icon="mdi-minus"
@@ -278,7 +275,11 @@ export default {
                     </div>
                     <div class="row">
                       <a class="custom ms-3 mt-2" @click="goToCustomization(order.id)">
-                        Kustomisasi Menu Anda Sekarang!
+                        {{
+                          order.customization
+                            ? 'Ubah Kustomisasi Anda'
+                            : 'Kustomisasi Menu Anda Sekarang!'
+                        }}
                       </a>
                     </div>
                   </div>
