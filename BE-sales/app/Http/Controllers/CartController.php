@@ -64,8 +64,11 @@ class CartController extends Controller
     public function index()
     {
         $user = Auth::user();
-        // Ambil cart dengan status 'pending' untuk user yang sedang login
-        $cart = Cart::with('items.menu')
+        $cart = Cart::with([
+            'items.menu.menuPictures' => function ($query) {
+                $query->orderBy('id', 'asc');
+            }
+        ])
             ->where('user_id', $user->id)
             ->where('status', 'pending')
             ->first();
@@ -81,9 +84,10 @@ class CartController extends Controller
             $menu = $item->menu;
             $imagePath = null;
 
-            if (!is_null($menu->file_path)) {
-                $paths = json_decode($menu->file_path, true);
-                $imagePath = asset(str_replace('public/', 'storage/', $paths[0]));
+            $firstPicture = $menu->menuPictures->first();
+            if ($firstPicture) {
+                $fileName = $firstPicture->file_path;
+                $imagePath = asset('storage/menu_images/' . $fileName);
             }
 
             return [
@@ -433,7 +437,6 @@ class CartController extends Controller
             'items.*.weight' => 'required|numeric',
             'items.*.quantity' => 'required|integer',
         ]);
-        
 
         $admin = Address::whereHas('user', function ($query) {
             $query->where('role', 'Admin');

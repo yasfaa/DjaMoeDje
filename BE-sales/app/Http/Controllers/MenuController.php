@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Menu;
+use App\Models\MenuPicture;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -23,9 +24,10 @@ class MenuController extends Controller
                     'imagePath' => null,
                 ];
 
-                if (!is_null($menu->file_path)) {
-                    $paths = json_decode($menu->file_path, true);
-                    $url = asset(str_replace('public/', 'storage/', $paths[0]));
+                if ($menu->menuPictures->isNotEmpty()) {
+                    $firstPicture = $menu->menuPictures->first();
+                    $fileName = $firstPicture->file_path;
+                    $url = asset('storage/menu_images/' . $fileName);
                     $formattedMenu['imagePath'] = $url;
                 }
 
@@ -49,15 +51,12 @@ class MenuController extends Controller
                     'nama' => $menu->nama_menu,
                     'total' => $menu->total,
                     'deskripsi' => $menu->deskripsi,
-                    'imagePaths' => [],
                 ];
 
-                if (!is_null($menu->file_path)) {
-                    $paths = json_decode($menu->file_path, true);
-                    foreach ($paths as $path) {
-                        $url = asset(str_replace('public/', 'storage/', $path));
-                        $formattedMenu['imagePaths'][] = $url;
-                    }
+                foreach ($menu->menuPictures as $picture) {
+                    $fileName = $picture->file_path;
+                    $url = asset('storage/menu_images/' . $fileName);
+                    $formattedMenu['imagePaths'][] = $url;
                 }
 
                 $formattedMenus[] = $formattedMenu;
@@ -81,16 +80,17 @@ class MenuController extends Controller
         ]);
 
         try {
-            $filePaths = [];
+            $fileNames = [];
             $imageUrls = [];
 
             if ($request->hasFile('gambar')) {
-
                 foreach ($request->file('gambar') as $gambar) {
                     $path = $gambar->store('public/menu_images');
-                    $filePaths[] = $path;
+                    $fileNameOnly = basename($path);
 
-                    $imageUrl = asset(str_replace('public/', 'storage/', $path));
+                    $fileNames[] = $fileNameOnly;
+
+                    $imageUrl = asset('storage/menu_images/' . $fileNameOnly);
                     $imageUrls[] = $imageUrl;
                 }
             }
@@ -99,8 +99,14 @@ class MenuController extends Controller
                 'nama_menu' => $request->input('nama_menu'),
                 'total' => $request->input('total'),
                 'deskripsi' => $request->input('deskripsi'),
-                'file_path' => json_encode($filePaths),
             ]);
+
+            foreach ($fileNames as $fileName) {
+                MenuPicture::create([
+                    'menu_id' => $menu->id,
+                    'file_path' => $fileName,
+                ]);
+            }
 
             return response()->json(['message' => 'Menu berhasil ditambahkan', 'menu' => $menu, 'imageUrls' => $imageUrls]);
         } catch (\Exception $e) {
@@ -111,19 +117,16 @@ class MenuController extends Controller
     public function getOne($id)
     {
         try {
-            $menu = Menu::find($id);
+            $menu = Menu::with('menuPictures')->find($id);
 
             if (!$menu) {
                 return response()->json(['status' => 'error', 'message' => 'Menu tidak ditemukan.'], 404);
             }
 
-            $filePaths = json_decode($menu->file_path, true);
-
             $fileLinks = [];
-            if ($filePaths) {
-                foreach ($filePaths as $path) {
-                    $fileLinks[] = str_replace('/public/', '/storage/', asset($path));
-                }
+
+            foreach ($menu->menuPictures as $picture) {
+                $fileLinks[] = asset('storage/menu_images/' . $picture->file_path);
             }
 
             return response()->json(['status' => 'success', 'menu' => $menu, 'fileLinks' => $fileLinks], 200);
@@ -131,8 +134,6 @@ class MenuController extends Controller
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
-
-
 
 
     public function update(Request $request, $id)
@@ -151,7 +152,6 @@ class MenuController extends Controller
             'gambar.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
         ]);
 
-
         $menu->nama_menu = $request->input('nama_menu');
         $menu->total = $request->input('total');
         $menu->deskripsi = $request->input('deskripsi');
@@ -159,21 +159,26 @@ class MenuController extends Controller
         $imageUrls = [];
 
         if ($request->hasFile('gambar')) {
-            $filePaths = [];
+            $menu->menuPictures()->delete();
+
             foreach ($request->file('gambar') as $gambar) {
                 $path = $gambar->store('public/menu_images');
-                $filePaths[] = $path;
+                $fileName = basename($path);
 
-                $imageUrl = asset(str_replace('public/', 'storage/', $path));
+                $menu->menuPictures()->create([
+                    'file_path' => $fileName,
+                ]);
+
+                $imageUrl = asset('storage/menu_images/' . $fileName);
                 $imageUrls[] = $imageUrl;
             }
-            $menu->file_path = json_encode($filePaths);
         }
 
         $menu->save();
 
         return response()->json(['message' => 'Menu berhasil diperbarui', 'menu' => $menu, 'imageUrls' => $imageUrls]);
     }
+
 
 
     public function destroy($id)

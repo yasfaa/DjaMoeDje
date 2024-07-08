@@ -105,7 +105,7 @@ class TransactionController extends Controller
         $userId = Auth::id();
         $statusFilter = $request->query('status');
 
-        $transactionsQuery = Transaction::with(['payment','cartItems.menu'])
+        $transactionsQuery = Transaction::with(['payment', 'cartItems.menu.menuPictures'])
             ->where('user_id', $userId);
 
         if ($statusFilter) {
@@ -129,23 +129,22 @@ class TransactionController extends Controller
                 'created_at' => $transaction->created_at,
                 'payment' => $transaction->payment->payment_link,
                 'menu' => $transaction->cartItems->map(function ($cartItem) {
-                    $formattedMenu = [
-                        'menu_id' => $cartItem->menu->id,
-                        'nama_menu' => $cartItem->menu->nama_menu,
-                        'quantity' => $cartItem->quantity,
-                        'harga_menu' => $cartItem->customization_price,
-                        'imagePath' => null,
-                    ];
+                    $menu = $cartItem->menu;
+                    $imagePath = null;
 
-                    if (!is_null($cartItem->menu->file_path)) {
-                        $paths = json_decode($cartItem->menu->file_path, true);
-                        if (!empty($paths)) {
-                            $url = asset(str_replace('public/', 'storage/', $paths[0]));
-                            $formattedMenu['imagePath'] = $url;
-                        }
+                    $firstPicture = $menu->menuPictures->first();
+                    if ($firstPicture) {
+                        $fileName = $firstPicture->file_path;
+                        $imagePath = asset('storage/menu_images/' . $fileName);
                     }
 
-                    return $formattedMenu;
+                    return [
+                        'menu_id' => $menu->id,
+                        'nama_menu' => $menu->nama_menu,
+                        'quantity' => $cartItem->quantity,
+                        'harga_menu' => $menu->total,
+                        'imagePath' => $imagePath, 
+                    ];
                 }),
             ];
         });
