@@ -59,7 +59,7 @@ class TransactionController extends Controller
 
             $orderDetails = [
                 'transaction_details' => [
-                    'order_id' => (string) $transactionId, 
+                    'order_id' => (string) $transactionId,
                     'gross_amount' => (int) $totalPayment,
                 ],
                 'customer_details' => [
@@ -76,7 +76,6 @@ class TransactionController extends Controller
             payment::create([
                 'transaction_id' => $transactionId,
                 'payment_uuid' => $transaction_uuid,
-                'total' => $totalPayment,
                 'payment_link' => $paymentUrl,
             ]);
 

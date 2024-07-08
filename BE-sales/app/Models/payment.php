@@ -13,7 +13,6 @@ class payment extends Model
     protected $fillable = [
         'transaction_id',
         'payment_uuid',
-        'total',
         'payment_link'
     ];
 

@@ -14,7 +14,6 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('transaction_id')->constrained()->onDelete('cascade');
             $table->string('payment_uuid');
-            $table->decimal('total', 15, 2);
             $table->string('payment_link');
             $table->timestamps();
         });
