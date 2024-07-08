@@ -29,14 +29,6 @@ export default {
         this.currentDropdownIndex = index
       }
     },
-    parseCustomization(customization) {
-      try {
-        return JSON.parse(customization)
-      } catch (e) {
-        console.error('Error parsing customization JSON:', e)
-        return []
-      }
-    },
     formatPrice(price) {
       const numericPrice = parseFloat(price)
       return numericPrice.toLocaleString('id-ID')
@@ -124,7 +116,6 @@ export default {
           }
         })
         this.orders.splice(index, 1)
-        // Periksa apakah response.data.total_harga selalu tersedia setelah menghapus item
         this.totalPayment = this.orders.reduce(
           (acc, order) => acc + parseFloat(order.harga_dasar),
           0
@@ -220,7 +211,11 @@ export default {
                       <div class="col detailMenu">
                         <h5>{{ order.name }}</h5>
                         <p class="mb-3">Rp {{ formatPrice(order.harga_dasar) }}</p>
-                        <a class="lihat" v-if="order.customization" @click="toggleDropdown(index)">
+                        <a
+                          class="lihat"
+                          v-if="order.customization && order.customization.length > 0"
+                          @click="toggleDropdown(index)"
+                        >
                           {{
                             currentDropdownIndex === index
                               ? 'Sembunyikan Kustomisasi'
@@ -230,10 +225,7 @@ export default {
                         <div
                           :class="{ 'hidden-dropdown': true, show: currentDropdownIndex === index }"
                         >
-                          <p
-                            v-for="(item, idx) in parseCustomization(order.customization)"
-                            :key="idx"
-                          >
+                          <p v-for="(item, idx) in order.customization" :key="idx">
                             {{ item.nama }}: {{ item.quantity }}
                           </p>
                         </div>
@@ -276,7 +268,7 @@ export default {
                     <div class="row">
                       <a class="custom ms-3 mt-2" @click="goToCustomization(order.id)">
                         {{
-                          order.customization
+                          order.customization && order.customization.length > 0
                             ? 'Ubah Kustomisasi Anda'
                             : 'Kustomisasi Menu Anda Sekarang!'
                         }}
@@ -287,7 +279,6 @@ export default {
               </div>
             </div>
           </div>
-
           <div class="col-lg-4">
             <div class="card">
               <div class="card-body">

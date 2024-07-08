@@ -67,7 +67,8 @@ class CartController extends Controller
         $cart = Cart::with([
             'items.menu.menuPictures' => function ($query) {
                 $query->orderBy('id', 'asc');
-            }
+            },
+            'items.ingredients.ingredient'
         ])
             ->where('user_id', $user->id)
             ->where('status', 'pending')
@@ -79,7 +80,6 @@ class CartController extends Controller
 
         $totalHarga = $cart->harga;
 
-        // Mapping data cart items untuk response JSON
         $cartContents = $cart->items->map(function ($item) {
             $menu = $item->menu;
             $imagePath = null;
@@ -90,6 +90,13 @@ class CartController extends Controller
                 $imagePath = asset('storage/menu_images/' . $fileName);
             }
 
+            $customizations = $item->ingredients->map(function ($ingredient) {
+                return [
+                    'nama' => $ingredient->ingredient->nama,
+                    'quantity' => $ingredient->quantity
+                ];
+            });
+
             return [
                 'id' => $item->id,
                 'name' => $item->menu->nama_menu,
@@ -99,7 +106,7 @@ class CartController extends Controller
                 'harga_total_item' => $item->harga_item,
                 'harga_dasar' => $item->customization_price,
                 'select' => $item->select,
-                'customization' => $item->customizations,
+                'customization' => $customizations,
                 'foto' => $imagePath,
             ];
         });
@@ -166,15 +173,12 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1'
         ]);
 
-        // Ambil item cart berdasarkan ID
         $cartItem = CartItem::findOrFail($cartItemId);
 
-        // Perbarui kuantitas dan harga item
         $cartItem->quantity = $request->quantity;
         $cartItem->harga_item = $cartItem->customization_price * $request->quantity;
         $cartItem->save();
 
-        // Perbarui total harga cart
         $cart = $cartItem->cart;
         $cart->harga = $cart->items()->where('select', '1')->sum('harga_item');
         $cart->save();
@@ -195,12 +199,12 @@ class CartController extends Controller
         $cartItem = CartItem::find($cartItemId);
 
         if (!$cartItem) {
-            return response()->json(['error' => 'Ingredient not found.'], 404);
+            return response()->json(['error' => 'Cart Item not found.'], 404);
         }
 
         $cartItem->delete();
 
-        return response()->json(['message' => 'Ingredient deleted successfully']);
+        return response()->json(['message' => 'Cart Item deleted successfully']);
     }
 
     public function addCustomizationMenu(Request $request, $menuId)
@@ -246,9 +250,14 @@ class CartController extends Controller
 
         $this->updateCartItemCustomization($cartItem);
 
+        $customizations = CartItemIngredient::where('cart_item_id', $cartItemId)
+            ->join('ingredients', 'cart_item_ingredients.ingredient_id', '=', 'ingredients.id')
+            ->get(['ingredients.nama', 'cart_item_ingredients.quantity'])
+            ->toArray();
+
         return response()->json([
             'message' => 'Item added to cart with customizations successfully',
-            'customizations' => $cartItem->customizations,
+            'customizations' => $customizations,
             'harga_item' => $cartItem->harga_item,
             'harga_dasar' => $cartItem->customization_price,
             'id' => $cartItemId,
@@ -318,10 +327,15 @@ class CartController extends Controller
 
         $this->updateCartItemCustomization($cartItem);
 
+        $customizations = CartItemIngredient::where('cart_item_id', $cartItemId)
+            ->join('ingredients', 'cart_item_ingredients.ingredient_id', '=', 'ingredients.id')
+            ->get(['ingredients.nama', 'cart_item_ingredients.quantity'])
+            ->toArray();
+
         // Mengembalikan respons setelah penghapusan
         return response()->json([
             'message' => 'Ingredient has been deleted from customization',
-            'customizations' => $cartItem->customizations,
+            'customizations' => $customizations,
             'harga_item' => $cartItem->harga_item,
             'harga_dasar' => $cartItem->customization_price,
             'total_harga' => $cartItem->cart->harga
@@ -333,7 +347,6 @@ class CartController extends Controller
     {
         // Ambil semua kustomisasi dari item cart
         $ingredients = $cartItem->ingredients ?? collect();
-        // print_r($ingredients);
         $customizationDetails = [];
 
         // Ambil harga menu
@@ -359,15 +372,9 @@ class CartController extends Controller
             if ($ingredient->quantity > 1) {
                 $totalCustomPrice += $ingredientModel->harga * ($ingredient->quantity - 1);
             }
-
-            $customizationDetails[] = [
-                'nama' => $ingredientModel->nama,
-                'quantity' => $ingredient->quantity
-            ];
         }
 
         // Simpan detail kustomisasi dan harga item yang baru
-        $cartItem->customizations = json_encode($customizationDetails);
         $cartItem->customization_price = $totalCustomPrice;  // Total price including customizations
         $cartItem->harga_item = $totalCustomPrice * $cartItem->quantity;  // Custom price multiplied by quantity
         $cartItem->save();
@@ -413,9 +420,14 @@ class CartController extends Controller
         $cart->harga = $cart->items()->where('select', 1)->sum('harga_item');
         $cart->save();
 
+        $customizations = CartItemIngredient::where('cart_item_id', $cartItemId)
+            ->join('ingredients', 'cart_item_ingredients.ingredient_id', '=', 'ingredients.id')
+            ->get(['ingredients.nama', 'cart_item_ingredients.quantity'])
+            ->toArray();
+
         return response()->json([
             'message' => 'Ingredient has been deleted from customization',
-            'customizations' => $cartItem->customizations,
+            'customizations' => $customizations,
             'harga_item' => $cartItem->harga_item,
             'harga_dasar' => $cartItem->customization_price,
             'total_harga' => $cartItem->cart->harga

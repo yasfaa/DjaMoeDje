@@ -203,8 +203,8 @@ export default {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
         })
-        this.cartItemId = null // Reset cartItemId setelah penghapusan berhasil
-        this.$router.push(`/menu/${this.menuId}`) // Arahkan pengguna ke halaman menu setelah penghapusan
+        this.cartItemId = null 
+        this.$router.push(`/menu/${this.menuId}`) 
       } catch (error) {
         console.error(error)
       }

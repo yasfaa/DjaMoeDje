@@ -18,7 +18,6 @@ return new class extends Migration {
             $table->decimal('harga_item', 8, 2);
             $table->decimal('customization_price', 8, 2)->default(0);
             $table->boolean('select')->default(0);
-            $table->json('customizations')->nullable();
             $table->bigInteger('order_id')->nullable();
             $table->timestamps();
         });
