@@ -143,7 +143,7 @@ class TransactionController extends Controller
                         'nama_menu' => $menu->nama_menu,
                         'quantity' => $cartItem->quantity,
                         'harga_menu' => $menu->total,
-                        'imagePath' => $imagePath, 
+                        'imagePath' => $imagePath,
                     ];
                 }),
             ];
@@ -155,54 +155,55 @@ class TransactionController extends Controller
 
     public function detailOrder($orderId)
     {
+        $transaction = Transaction::with(['cartItems.menu.menuPictures', 'address', 'payment', 'courier'])
+            ->where('id', $orderId)
+            ->first();
 
-        $transactionsQuery = Transaction::with(['cartItems.menu', 'address'])
-            ->where('id', $orderId);
+        if (!$transaction) {
+            return response()->json(['message' => 'Transaksi tidak ditemukan.'], 404);
+        }
 
-        $transactions = $transactionsQuery->get();
+        $address = $transaction->address;
+        $fullAddress = $address
+            ? "{$address->jalan}, {$address->kota}, {$address->provinsi}, {$address->kode_pos}"
+            : 'Alamat tidak tersedia';
 
-        $response = $transactions->map(function ($transaction) {
-            $address = $transaction->address;
-            $fullAddress = $address
-                ? "{$address->jalan}, {$address->kota}, {$address->provinsi}, {$address->kode_pos}"
-                : 'Alamat tidak tersedia';
+        $response = [
+            'id_transaksi' => $transaction->id,
+            'no_pesanan' => $transaction->payment->payment_uuid,
+            'status' => $transaction->status,
+            'total' => $transaction->total,
+            'biaya_kirim' => $transaction->courier->shipping_cost,
+            'created_at' => $transaction->created_at,
+            'payment' => $transaction->payment->payment_link,
+            'alamat' => $fullAddress,
+            'no_resi' => $transaction->courier->waybill_id,
+            'detail_kurir' => $transaction->courier_details,
+            'menu' => $transaction->cartItems->map(function ($cartItem) {
+                $menu = $cartItem->menu;
+                $formattedMenu = [
+                    'menu_id' => $menu->id,
+                    'nama_menu' => $menu->nama_menu,
+                    'quantity' => $cartItem->quantity,
+                    'harga_menu' => $cartItem->customization_price,
+                    'total_menu' => $cartItem->harga_item,
+                    'imagePath' => null,
+                ];
 
-            return [
-                'id_transaksi' => $transaction->id,
-                'no_pesanan' => $transaction->transaction_id,
-                'status' => $transaction->status,
-                'total' => $transaction->total,
-                'biaya_kirim' => $transaction->shipping_cost,
-                'created_at' => $transaction->created_at,
-                'payment' => $transaction->payment_link,
-                'alamat' => $fullAddress,
-                'no_resi' => $transaction->waybill_id,
-                'detail_kurir' => $transaction->courier_details,
-                'menu' => $transaction->cartItems->map(function ($cartItem) {
-                    $formattedMenu = [
-                        'menu_id' => $cartItem->menu->id,
-                        'nama_menu' => $cartItem->menu->nama_menu,
-                        'quantity' => $cartItem->quantity,
-                        'harga_menu' => $cartItem->customization_price,
-                        'total_menu' => $cartItem->harga_item,
-                        'imagePath' => null,
-                    ];
+                $firstPicture = $menu->menuPictures->first();
+                if ($firstPicture) {
+                    $fileName = $firstPicture->file_path;
+                    $url = asset('storage/menu_images/' . $fileName);
+                    $formattedMenu['imagePath'] = $url;
+                }
 
-                    if (!is_null($cartItem->menu->file_path)) {
-                        $paths = json_decode($cartItem->menu->file_path, true);
-                        if (!empty($paths)) {
-                            $url = asset(str_replace('public/', 'storage/', $paths[0]));
-                            $formattedMenu['imagePath'] = $url;
-                        }
-                    }
-
-                    return $formattedMenu;
-                }),
-            ];
-        });
+                return $formattedMenu;
+            }),
+        ];
 
         return response()->json(['order' => $response]);
     }
+
 
     public function getOrderStatus(Request $request)
     {
