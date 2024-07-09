@@ -55,7 +55,7 @@ export default {
     lihatDetail(order) {
       this.$router.push('/orders/' + order.id_transaksi)
     },
-    async payNow(order) {
+    payNow(order) {
       const paymentUrl = order.payment
       window.open(paymentUrl, '_blank')
     },
@@ -63,12 +63,10 @@ export default {
       switch (status) {
         case 'pending':
           return 'text-bg-danger'
-        case 'paid':
-          return 'text-bg-success'
         case 'process':
-          return 'text-bg-light'
+          return 'text-bg-success'
         case 'packing':
-          return 'text-bg-light'
+          return 'text-bg-warning'
         case 'delivery':
           return 'text-bg-warning'
         case 'delivered':

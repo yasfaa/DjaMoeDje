@@ -65,7 +65,7 @@ class TransactionController extends Controller
 
             $orderDetails = [
                 'transaction_details' => [
-                    'order_id' => (string) $transactionId,
+                    'order_id' => (string) $transaction_uuid,
                     'gross_amount' => (int) $totalPayment,
                 ],
                 'customer_details' => [
@@ -119,6 +119,10 @@ class TransactionController extends Controller
         }
 
         $transactions = $transactionsQuery->get();
+
+        $transactions->each(function ($transaction) {
+            $this->updatePaymentStatus($transaction);
+        });
 
         $transactions->each(function ($transaction) {
             if ($transaction->status === 'pending' && Carbon::parse($transaction->created_at)->diffInHours(Carbon::now()) > 24) {
@@ -211,17 +215,12 @@ class TransactionController extends Controller
     }
 
 
-    public function getOrderStatus(Request $request)
+    private function updatePaymentStatus($transaction)
     {
-        $orderId = $request->query('order_id');
-        if (!$orderId) {
-            return response()->json(['error' => 'Order ID is required'], 400);
-        }
-
-        $client = new Client();
-        $url = "https://api.sandbox.midtrans.com/v2/{$orderId}/status";
-
         try {
+            $client = new Client();
+            $orderId = $transaction->payment->payment_uuid;
+            $url = "https://api.sandbox.midtrans.com/v2/{$orderId}/status";
             $response = $client->request('GET', $url, [
                 'headers' => [
                     'Accept' => 'application/json',
@@ -231,18 +230,11 @@ class TransactionController extends Controller
 
             $status = json_decode($response->getBody()->getContents(), true);
 
-            if ($status['status_code'] === "200" && $status['transaction_status'] === "capture") {
-                $transaction = Transaction::where('transaction_id', $status['order_id'])->first();
-                if ($transaction) {
-                    $transaction->status = 'process';
-                    $transaction->save();
-                }
+            if ($status['status_code'] === "200" && $status['transaction_status'] === "settlement") {
+                $transaction->update(['status' => 'process']);
             }
-
-            return response()->json($status);
         } catch (Exception $e) {
             Log::error('Error retrieving Midtrans order status: ' . $e->getMessage());
-            return response()->json(['error' => 'Unable to retrieve order status'], 500);
         }
     }
 }
