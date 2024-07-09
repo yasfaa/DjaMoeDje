@@ -12,6 +12,7 @@ import customization from '../views/User/CartCustomization.vue'
 import customize from '../views/User/MenuCustomization.vue'
 import checkout from '../views/User/Checkout.vue'
 import order from '../views/User/Order.vue'
+import adminOrder from '../views/Admin/AdminOrder.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -68,8 +69,13 @@ const router = createRouter({
     },
     {
       path: '/admin/profile',
-      name: 'Admin PRofile',
+      name: 'Admin Profile',
       component: adminProfile,
+    },
+    {
+      path: '/admin/order',
+      name: 'Admin Order',
+      component: adminOrder,
     },
     {
       path: '/checkout',
