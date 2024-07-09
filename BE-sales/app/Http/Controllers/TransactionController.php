@@ -163,6 +163,59 @@ class TransactionController extends Controller
     }
 
 
+    public function getAdminOrders(Request $request)
+    {
+        $statusFilter = $request->query('status');
+
+        $transactionsQuery = Transaction::with(['payment', 'cartItems.menu.menuPictures']);
+
+        if ($statusFilter) {
+            $transactionsQuery->where('status', $statusFilter);
+        }
+
+        $transactions = $transactionsQuery->get();
+
+        $transactions->each(function ($transaction) {
+            $this->updatePaymentStatus($transaction);
+        });
+
+        $transactions->each(function ($transaction) {
+            if ($transaction->status === 'pending' && Carbon::parse($transaction->created_at)->diffInHours(Carbon::now()) > 24) {
+                $transaction->update(['status' => 'expired']);
+            }
+        });
+
+        $response = $transactions->map(function ($transaction) {
+            return [
+                'id_transaksi' => $transaction->id,
+                'no_pesanan' => $transaction->payment->payment_uuid,
+                'status' => $transaction->status,
+                'total' => $transaction->total,
+                'created_at' => $transaction->created_at,
+                'menu' => $transaction->cartItems->map(function ($cartItem) {
+                    $menu = $cartItem->menu;
+                    $imagePath = null;
+
+                    $firstPicture = $menu->menuPictures->first();
+                    if ($firstPicture) {
+                        $fileName = $firstPicture->file_path;
+                        $imagePath = asset('storage/menu_images/' . $fileName);
+                    }
+
+                    return [
+                        'menu_id' => $menu->id,
+                        'nama_menu' => $menu->nama_menu,
+                        'quantity' => $cartItem->quantity,
+                        'harga_menu' => $menu->total,
+                        'imagePath' => $imagePath,
+                    ];
+                }),
+            ];
+        });
+
+        return response()->json(['order' => $response]);
+    }
+
     public function detailOrder($orderId)
     {
         $transaction = Transaction::with(['cartItems.menu.menuPictures', 'address', 'payment', 'courier'])
@@ -233,6 +286,8 @@ class TransactionController extends Controller
             if ($status['status_code'] === "200" && $status['transaction_status'] === "settlement") {
                 $transaction->update(['status' => 'process']);
             }
+            $transaction->payment->update(['payment_link' => null]);
+
         } catch (Exception $e) {
             Log::error('Error retrieving Midtrans order status: ' . $e->getMessage());
         }
