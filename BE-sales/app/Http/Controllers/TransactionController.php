@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\courier;
 use Exception;
 use App\Models\Cart;
 use GuzzleHttp\Client;
+use App\Models\Address;
+use App\Models\courier;
 use App\Models\payment;
 use App\Models\CartItem;
 use App\Services\Biteship;
@@ -32,6 +33,9 @@ class TransactionController extends Controller
 
     public function createOrder(Request $request)
     {
+
+        $user = Auth::user();
+
         DB::beginTransaction();
 
         try {
@@ -40,7 +44,7 @@ class TransactionController extends Controller
             $items = $request->input('items');
 
             $transaction = Transaction::create([
-                'user_id' => auth()->id(),
+                'user_id' => $user->id,
                 'total' => $totalPayment,
                 'address_id' => $request->input('address_id'),
                 'status' => 'pending',
@@ -57,16 +61,18 @@ class TransactionController extends Controller
                 'shipping_cost' => $request->input('selectedCourier.price'),
             ]);
 
+            $addresses = Address::find($request->input('address_id'));
+
             $orderDetails = [
                 'transaction_details' => [
                     'order_id' => (string) $transactionId,
                     'gross_amount' => (int) $totalPayment,
                 ],
                 'customer_details' => [
-                    'first_name' => $request->input('first_name'),
-                    'last_name' => $request->input('last_name'),
-                    'email' => $request->input('email'),
-                    'phone' => $request->input('phone'),
+                    'first_name' => $addresses->nama_penerima,
+                    'last_name' => '',
+                    'email' => $user->email,
+                    'phone' => $addresses->nomor_telepon,
                 ],
             ];
 
@@ -88,7 +94,7 @@ class TransactionController extends Controller
                     ]);
                 }
             }
-            Cart::where('user_id', auth()->id())->delete();
+            Cart::where('user_id', $user->id)->delete();
             DB::commit();
 
             return response()->json(['paymentUrl' => $paymentUrl]);

@@ -44,8 +44,8 @@ export default {
         name: '',
         email: ''
       },
-      selectedAddressId: '',
-      selectedAddress: {},
+      selectedAddressId: null,
+      selectedAddress: null,
       shippingRates: [],
       dialog: false,
       selectedCourier: null
@@ -58,7 +58,7 @@ export default {
     this.initMap()
   },
   watch: {
-    selectedAddressId() {
+    selectedAddressId(newVal) {
       this.fillAddress()
       this.fetchShippingRates()
     },
@@ -292,18 +292,14 @@ export default {
         const response = await axios.post(
           `${BASE_URL}/order/checkout`,
           {
-            amount:this.totalHarga,
+            amount: this.totalHarga,
             selectedCourier: this.selectedCourier,
             address_id: this.selectedAddress.id,
             items: this.orders.map((order) => ({
               cart_item_id: order.id,
               quantity: order.quantity,
               totalPrice: order.harga_total_item
-            })),
-            first_name: 'Yasfa',
-            last_name: '',
-            email: 'udin@udin.com',
-            phone: '85155245904'
+            }))
           },
           {
             headers: {
@@ -453,14 +449,14 @@ export default {
                       </option>
                     </select>
                   </div>
-                  <div v-if="selectedAddressId">
+                  <div v-if="selectedAddress">
                     <hr class="horizontal dark" />
                     <div class="row">
                       <div class="row">
                         <div class="col">Nama Penerima</div>
-                        <div class="col">: {{ selectedAddress.penerima }}</div>
+                        <div class="col">: {{ selectedAddress.nama_penerima }}</div>
                         <div class="col">Nomor Penerima</div>
-                        <div class="col">: {{ selectedAddress.no_penerima }}</div>
+                        <div class="col">: {{ selectedAddress.nomor_telepon }}</div>
                       </div>
                     </div>
                     <div class="row">
@@ -476,85 +472,7 @@ export default {
                         <div class="col">Kecamatan</div>
                         <div class="col">: {{ selectedAddress.kecamatan }}</div>
                         <div class="col">Kode Pos</div>
-                        <div class="col">: {{ selectedAddress.postal_code }}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row mb-2" v-if="selectedAddressId">
-              <div class="card">
-                <div class="card-body">
-                  <h5 class="card-title">Pilih Kurir</h5>
-                  <v-progress-linear
-                    v-if="loadingKurir"
-                    color="amber"
-                    indeterminate
-                    :size="69"
-                    :width="6"
-                  ></v-progress-linear>
-                  <div
-                    v-else
-                    v-for="(rate, index) in shippingRates"
-                    :key="index"
-                    class="row border mb-3"
-                    style="border-radius: 10px"
-                  >
-                    <div class="col-sm-12">
-                      <div class="p-2">
-                        <div class="row align-items-center py-2">
-                          <div class="col-1 d-flex align-items-center">
-                            <input
-                              type="checkbox"
-                              class="large-checkbox"
-                              :checked="selectedCourier === rate"
-                              @change="selectCourier(rate)"
-                            />
-                          </div>
-                          <div class="col-2 d-flex align-items-center">
-                            <!-- <img
-                              v-if="rate.company === 'jne'"
-                              src="../../assets/img/jne.png"
-                              alt="jne"
-                              class="img-fluid"
-                              style="width: 50px; margin-right: 20px"
-                            />
-                            <img
-                              v-if="rate.company === 'sicepat'"
-                              src="../../assets/img/sicepat.png"
-                              alt="sicepat"
-                              class="img-fluid"
-                              style="width: 50px; margin-right: 20px"
-                            /> -->
-                          </div>
-                          <div class="col-3">
-                            <div class="row">
-                              <strong class="d-block d-sm-inline">Jenis Layanan</strong>
-                            </div>
-                            <div class="row">
-                              <a class="d-block d-sm-inline"
-                                >{{ rate.courier_name }} {{ rate.courier_service_name }}</a
-                              >
-                            </div>
-                          </div>
-                          <div class="col-4">
-                            <div class="row">
-                              <strong class="d-block d-sm-inline">Estimasi Pengiriman</strong>
-                            </div>
-                            <div class="row">
-                              <a class="d-block d-sm-inline">{{ rate.duration }}</a>
-                            </div>
-                          </div>
-                          <div class="col-2">
-                            <div class="row">
-                              <strong class="d-block d-sm-inline">Tarif</strong>
-                            </div>
-                            <div class="row">
-                              <a class="d-block d-sm-inline">Rp. {{ formatPrice(rate.price) }}</a>
-                            </div>
-                          </div>
-                        </div>
+                        <div class="col">: {{ selectedAddress.kode_pos }}</div>
                       </div>
                     </div>
                   </div>
