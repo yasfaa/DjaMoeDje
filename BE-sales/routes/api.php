@@ -76,8 +76,16 @@ Route::prefix('/biteship')->group(function () {
     Route::post('/kurir', [CartController::class, 'getShippingRates']);
 });
 
-Route::prefix('/order')->middleware(['auth:sanctum', 'role:User'])->group(function () {
-    Route::post('/checkout', [TransactionController::class, 'createOrder']);
-    Route::get('/getOrder', [TransactionController::class, 'getUserOrders']);
+Route::prefix('/order')->middleware(['auth:sanctum'])->group(function () {
+
     Route::get('/detail/{orderId}', [TransactionController::class, 'detailOrder']);
+
+    Route::middleware('role:User')->group(function () {
+        Route::post('/checkout', [TransactionController::class, 'createOrder']);
+        Route::get('/getOrder', [TransactionController::class, 'getUserOrders']);
+    });
+
+    Route::middleware('role:Admin')->group(function () {
+        Route::get('/adminOrder', [TransactionController::class, 'getAdminOrders']);
+    });
 });
