@@ -11,7 +11,8 @@ export default {
     return {
       overlay: false,
       orders: [],
-      selectedFilter: ''
+      selectedFilter: '',
+      currentDropdownIndex: null
     }
   },
   mounted() {
@@ -26,6 +27,14 @@ export default {
     formatPrice(price) {
       const numericPrice = parseFloat(price)
       return numericPrice.toLocaleString('id-ID')
+    },
+    toggleDropdown(index) {
+      console.log('Toggle Dropdown called with index:', index)
+      if (this.currentDropdownIndex === index) {
+        this.currentDropdownIndex = null
+      } else {
+        this.currentDropdownIndex = index
+      }
     },
     async retrieveOrders() {
       this.overlay = true
@@ -171,6 +180,24 @@ export default {
                   <div>
                     <h6 class="mt-4">{{ item.nama_menu }}</h6>
                     <p>{{ item.quantity }} Barang x Rp {{ formatPrice(item.harga_menu) }}</p>
+                    <a
+                      class="lihat"
+                      v-if="item.customization && item.customization.length > 0"
+                      @click="toggleDropdown(orderIndex + '-' + index)"
+                    >
+                      {{
+                        currentDropdownIndex === orderIndex + '-' + index
+                          ? 'Sembunyikan Kustomisasi'
+                          : 'Lihat Kustomisasi Anda'
+                      }}
+                    </a>
+                    <div class="show" v-if="currentDropdownIndex === orderIndex + '-' + index">
+                      <ul>
+                        <li v-for="custom in item.customization" :key="custom.nama">
+                          {{ custom.nama }}: {{ custom.quantity }}
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
                 <hr />

@@ -30,7 +30,7 @@
           Kelola Menu
         </router-link>
         <router-link
-          to="/admin/menu"
+          to="/admin/order"
           exact
           class="nav-link"
           :class="{ 'active-link': $route.path === '/admin/order' }"

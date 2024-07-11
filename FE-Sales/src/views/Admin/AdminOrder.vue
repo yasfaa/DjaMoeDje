@@ -12,7 +12,8 @@ export default {
       overlay: false,
       orders: [],
       selectedFilter: '',
-      orderDetails: ''
+      orderDetails: '',
+      currentDropdownIndex: null
     }
   },
   mounted() {
@@ -54,7 +55,14 @@ export default {
         this.overlay = false
       }
     },
-
+    toggleDropdown(index) {
+      console.log('Toggle Dropdown called with index:', index)
+      if (this.currentDropdownIndex === index) {
+        this.currentDropdownIndex = null
+      } else {
+        this.currentDropdownIndex = index
+      }
+    },
     lihatDetail(order) {
       this.$router.push('/admin/orders/' + order.id_transaksi)
     },
@@ -170,7 +178,7 @@ export default {
                 </select>
               </div>
             </div>
-            <div class="card mb-3" v-for="order in orders" :key="order.id">
+            <div class="card mb-3" v-for="(order, orderIndex) in orders" :key="order.id_transaksi">
               <div
                 class="card-header p-0 px-3 d-flex justify-content-between align-items-center p-1"
               >
@@ -188,7 +196,7 @@ export default {
               </div>
 
               <div class="card-body px-4 py-0">
-                <div v-for="item in order.menu" :key="item.id" class="d-flex m-3">
+                <div v-for="(item, index) in order.menu" :key="item.menu_id" class="d-flex m-3">
                   <img
                     :src="item.imagePath ? item.imagePath : `https://picsum.photos/200`"
                     alt="Product Image"
@@ -198,6 +206,24 @@ export default {
                   <div>
                     <h6 class="mt-4">{{ item.nama_menu }}</h6>
                     <p>{{ item.quantity }} Barang x Rp {{ formatPrice(item.harga_menu) }}</p>
+                    <a
+                      class="lihat"
+                      v-if="item.customization && item.customization.length > 0"
+                      @click="toggleDropdown(orderIndex + '-' + index)"
+                    >
+                      {{
+                        currentDropdownIndex === orderIndex + '-' + index
+                          ? 'Sembunyikan Kustomisasi'
+                          : 'Lihat Kustomisasi Pelanggan'
+                      }}
+                    </a>
+                    <div class="show" v-if="currentDropdownIndex === orderIndex + '-' + index">
+                      <ul>
+                        <li v-for="custom in item.customization" :key="custom.nama">
+                          {{ custom.nama }}: {{ custom.quantity }}
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
                 <hr />
@@ -236,6 +262,15 @@ export default {
 <style>
 .user-select-none {
   user-select: none;
+}
+
+.lihat {
+  color: #6b6b6b;
+  cursor: pointer;
+}
+
+.lihat:hover {
+  color: #000000;
 }
 
 a {

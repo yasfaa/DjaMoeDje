@@ -152,11 +152,19 @@ class TransactionController extends Controller
                         $imagePath = asset('storage/menu_images/' . $fileName);
                     }
 
+                    $customizations = $cartItem->ingredients->map(function ($ingredient) {
+                        return [
+                            'nama' => $ingredient->ingredient->nama,
+                            'quantity' => $ingredient->quantity
+                        ];
+                    });
+
                     return [
                         'menu_id' => $menu->id,
                         'nama_menu' => $menu->nama_menu,
                         'quantity' => $cartItem->quantity,
                         'harga_menu' => $menu->total,
+                        'customization' => $customizations,
                         'imagePath' => $imagePath,
                     ];
                 }),
@@ -208,11 +216,19 @@ class TransactionController extends Controller
                         $imagePath = asset('storage/menu_images/' . $fileName);
                     }
 
+                    $customizations = $cartItem->ingredients->map(function ($ingredient) {
+                        return [
+                            'nama' => $ingredient->ingredient->nama,
+                            'quantity' => $ingredient->quantity
+                        ];
+                    });
+
                     return [
                         'menu_id' => $menu->id,
                         'nama_menu' => $menu->nama_menu,
                         'quantity' => $cartItem->quantity,
                         'harga_menu' => $menu->total,
+                        'customization' => $customizations,
                         'imagePath' => $imagePath,
                     ];
                 }),
