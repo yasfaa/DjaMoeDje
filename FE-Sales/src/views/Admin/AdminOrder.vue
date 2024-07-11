@@ -56,7 +56,35 @@ export default {
     },
 
     lihatDetail(order) {
-      this.$router.push('/admin/orders/' + order.transaction_id)
+      this.$router.push('/admin/orders/' + order.id_transaksi)
+    },
+    async createOrder(order) {
+      this.overlay = true
+
+      try {
+        const response = await axios.get(`${BASE_URL}/order/create/` + order.id_transaksi, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token')
+          }
+        })
+        console.log('Order created:', response.data)
+        this.$notify({
+          type: 'success',
+          title: 'Success',
+          text: 'Order successfully created!',
+          color: 'green'
+        })
+      } catch (error) {
+        console.error('Error creating order:', error)
+        this.$notify({
+          type: 'error',
+          title: 'Error',
+          text: 'Failed to create order!',
+          color: 'red'
+        })
+      } finally {
+        this.overlay = false
+      }
     },
     getStatusBadge(status) {
       switch (status) {
@@ -187,6 +215,15 @@ export default {
                   </div>
                 </div>
                 <hr />
+                <div class="d-flex justify-content-end mb-2">
+                  <button
+                    class="btn btn-sm btn-primary"
+                    @click="createOrder(order)"
+                    v-if="order.status === 'process'"
+                  >
+                    Kirim Sekarang
+                  </button>
+                </div>
                 <div class="d-flex justify-content-end mb-2"></div>
               </div>
             </div>
