@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class TransactionController extends Controller
 {
@@ -59,6 +60,7 @@ class TransactionController extends Controller
             courier::create([
                 'transaction_id' => $transactionId,
                 'shipping_cost' => $request->input('selectedCourier.price'),
+                'courier_type' => $request->input('selectedCourier.courier_service_code')
             ]);
 
             $addresses = Address::find($request->input('address_id'));
@@ -121,7 +123,9 @@ class TransactionController extends Controller
         $transactions = $transactionsQuery->get();
 
         $transactions->each(function ($transaction) {
-            $this->updatePaymentStatus($transaction);
+            if ($transaction->status === 'pending') {
+                $this->updatePaymentStatus($transaction);
+            }
         });
 
         $transactions->each(function ($transaction) {
@@ -176,7 +180,9 @@ class TransactionController extends Controller
         $transactions = $transactionsQuery->get();
 
         $transactions->each(function ($transaction) {
-            $this->updatePaymentStatus($transaction);
+            if ($transaction->status === 'pending') {
+                $this->updatePaymentStatus($transaction);
+            }
         });
 
         $transactions->each(function ($transaction) {
@@ -290,6 +296,131 @@ class TransactionController extends Controller
 
         } catch (Exception $e) {
             Log::error('Error retrieving Midtrans order status: ' . $e->getMessage());
+        }
+    }
+
+    public function adminCreateOrder($orderId)
+    {
+        DB::beginTransaction();
+
+        try {
+            $transaction = Transaction::with(['cartItems.menu', 'user', 'address', 'courier'])->findOrFail($orderId);
+
+
+            $user = $transaction->user;
+            $address = $transaction->address;
+            $admin = Address::with('user')->whereHas('user', function ($query) {
+                $query->where('role', 'Admin');
+            })->first();
+
+            $origin_address = implode(', ', array_filter([
+                $admin->jalan,
+                $admin->kecamatan,
+                $admin->kota,
+                $admin->provinsi,
+                $admin->kode_pos
+            ]));
+
+            $destination_address = implode(', ', array_filter([
+                $address->jalan,
+                $address->kecamatan,
+                $address->kota,
+                $address->provinsi,
+                $address->kode_pos
+            ]));
+
+            $dataForBiteship = [
+                'shipper_contact_name' => $admin->nama_penerima,
+                'shipper_contact_phone' => $admin->nomor_telepon,
+                'shipper_contact_email' => $admin->user->email,
+                'shipper_organization' => 'DjaMoeDje',
+                'origin_contact_name' => $admin->nama_penerima,
+                'origin_contact_phone' => $admin->nomor_telepon,
+                'origin_address' => $origin_address,
+                'origin_coordinate' => [
+                    'latitude' => $admin->latitude,
+                    'longitude' => $admin->longitude
+                ],
+                'destination_contact_name' => $address->nama_penerima,
+                'destination_contact_phone' => $address->nomor_telepon,
+                'destination_contact_email' => $user->email,
+                'destination_address' => $destination_address,
+                'destination_coordinate' => [
+                    'latitude' => $address->latitude,
+                    'longitude' => $address->longitude
+                ],
+                'courier_company' => 'paxel',
+                'courier_type' => 'paxel_big',
+                'delivery_type' => 'now',
+                // 'order_note' => $transaction->order_note,
+                // 'metadata' => (array) $transaction->metadata,
+                'items' => $transaction->cartItems->map(function ($cartItem) {
+                    return [
+                        'name' => $cartItem->menu->nama_menu,
+                        'description' => $cartItem->menu->description,
+                        'value' => $cartItem->customization_price,
+                        'quantity' => $cartItem->quantity,
+                        'height' => 10,
+                        'length' => 10,
+                        'weight' => 5,
+                        'width' => 200
+                    ];
+                })->toArray()
+            ];
+
+            // echo json_encode($dataForBiteship, JSON_PRETTY_PRINT);
+            $response = $this->biteship->createOrder($dataForBiteship);
+
+            if (isset($response['id'])) {
+                $transaction = Transaction::findOrFail($orderId);
+                $transaction->status = 'packing';
+                $transaction->save();
+
+                $transaction = Transaction::updateOrCreate(
+                    ['id' => $transaction->id],
+                    [
+                        'bsorder_id' => $response['id'],
+                    ]
+                );
+
+                $courier = courier::updateOrCreate(
+                    ['transaction_id' => $transaction->id],
+                    [
+                        'waybill_id' => $response['courier']['waybill_id'],
+                        'tracking_id' => $response['courier']['tracking_id']
+                    ]
+                );
+
+                DB::commit();
+                return response()->json(['transaction' => $transaction, 'courier' => $courier, 'response' => $response], 201);
+            } else {
+                throw new Exception('Invalid response from Biteship');
+            }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function retrieveTracking($orderId)
+    {
+        try {
+            $courier = courier::where('transaction_id', $orderId)->first();
+
+            if (!$courier) {
+                return response()->json(['status' => 'error', 'message' => 'Courier not found.'], 404);
+            }
+
+            $tracking = $courier->tracking_id;
+            $trackingData = $this->biteship->retrieveTrackingData($tracking);
+
+            if (!$trackingData) {
+                return response()->json(['status' => 'error', 'message' => 'Tracking data not found.'], 404);
+            }
+
+            return response()->json(['status' => 'success', 'tracking' => $trackingData], 200);
+        } catch (Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
 }

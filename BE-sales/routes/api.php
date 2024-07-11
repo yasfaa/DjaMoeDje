@@ -79,6 +79,7 @@ Route::prefix('/biteship')->group(function () {
 Route::prefix('/order')->middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/detail/{orderId}', [TransactionController::class, 'detailOrder']);
+    Route::get('/tracking/{orderId}', [TransactionController::class, 'retrieveTracking']);
 
     Route::middleware('role:User')->group(function () {
         Route::post('/checkout', [TransactionController::class, 'createOrder']);
@@ -87,5 +88,6 @@ Route::prefix('/order')->middleware(['auth:sanctum'])->group(function () {
 
     Route::middleware('role:Admin')->group(function () {
         Route::get('/adminOrder', [TransactionController::class, 'getAdminOrders']);
+        Route::get('/create/{orderId}', [TransactionController::class, 'adminCreateOrder']);
     });
 });

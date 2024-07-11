@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('transaction_id')->constrained()->onDelete('cascade');
             $table->decimal('shipping_cost', 15, 2);
-            $table->unsignedBigInteger('waybill_id')->nullable();
+            $table->string('waybill_id')->nullable();
+            $table->string('tracking_id')->nullable();
+            $table->string('courier_type');
             $table->timestamps();
         });
     }

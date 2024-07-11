@@ -13,7 +13,9 @@ class courier extends Model
     protected $fillable = [
         'transaction_id',
         'shipping_cost',
-        'waybill_id'
+        'waybill_id',
+        'courier_type',
+        'tracking_id'
     ];
 
     public function transaction()
