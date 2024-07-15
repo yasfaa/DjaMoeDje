@@ -126,13 +126,20 @@ class TransactionController extends Controller
             if ($transaction->status === 'pending') {
                 $this->updatePaymentStatus($transaction);
             }
-        });
-
-        $transactions->each(function ($transaction) {
             if ($transaction->status === 'pending' && Carbon::parse($transaction->created_at)->diffInHours(Carbon::now()) > 24) {
                 $transaction->update(['status' => 'expired']);
             }
         });
+
+        $transactions = Transaction::with(['payment', 'cartItems.menu.menuPictures'])
+            ->where('user_id', $userId)
+            ->get();
+
+        if ($statusFilter) {
+            $transactions = $transactions->filter(function ($transaction) use ($statusFilter) {
+                return $transaction->status === $statusFilter;
+            });
+        }
 
         $response = $transactions->map(function ($transaction) {
             return [
@@ -173,7 +180,6 @@ class TransactionController extends Controller
 
         return response()->json(['order' => $response]);
     }
-
 
     public function getAdminOrders(Request $request)
     {
@@ -263,7 +269,7 @@ class TransactionController extends Controller
             'payment' => $transaction->payment->payment_link,
             'alamat' => $fullAddress,
             'no_resi' => $transaction->courier->waybill_id,
-            'detail_kurir' => $transaction->courier_details,
+            'tracking_id' => $transaction->courier->tracking_id,
             'menu' => $transaction->cartItems->map(function ($cartItem) {
                 $menu = $cartItem->menu;
                 $formattedMenu = [
