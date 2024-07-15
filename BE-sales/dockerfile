@@ -1,4 +1,4 @@
-FROM php:8.3.9RC1-fpm-alpine
+FROM php:8.1-fpm-alpine
 
 LABEL author="Yasfa Ainun Abdullah"
 
