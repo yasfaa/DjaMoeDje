@@ -4,6 +4,14 @@ import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 const BASE_URL = import.meta.env.VITE_BASE_URL_API
 import Navbar from '@/components/DashboardNavbar.vue'
+import markerIconUrl from '@/assets/img/marker.png';
+
+const  defaultIcon = L.icon({
+    iconUrl: markerIconUrl,
+    iconSize:     [38, 45],
+    iconAnchor:   [12, 94],
+    popupAnchor:  [-1, -76]
+});
 
 export default {
   name: 'Profile',
@@ -57,7 +65,10 @@ export default {
 
           // Initialize marker if markerPosition is set
           if (this.markerPosition) {
-            this.marker = L.marker(this.markerPosition, { draggable: true }).addTo(this.map)
+            this.marker = L.marker(this.markerPosition, {
+              draggable: true,
+              icon: defaultIcon
+            }).addTo(this.map)
             this.marker.on('dragend', this.onMarkerDragEnd)
           }
         }
@@ -124,10 +135,13 @@ export default {
 
       // Update map view and marker position, and set zoom to 16
       this.map.setView(this.mapCenter, 22)
+
       if (this.marker) {
         this.marker.setLatLng(this.markerPosition)
       } else {
-        this.marker = L.marker(this.markerPosition, { draggable: true }).addTo(this.map)
+        this.marker = L.marker(this.markerPosition, { draggable: true, icon: defaultIcon }).addTo(
+          this.map
+        )
         this.marker.on('dragend', this.onMarkerDragEnd)
       }
     },
@@ -276,7 +290,7 @@ export default {
       if (this.marker) {
         this.marker.setLatLng([lat, lng])
       } else {
-        this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map)
+        this.marker = L.marker([lat, lng], { draggable: true, icon: defaultIcon }).addTo(this.map)
         this.marker.on('dragend', this.onMarkerDragEnd)
       }
     },
