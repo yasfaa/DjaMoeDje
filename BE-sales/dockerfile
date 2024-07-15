@@ -1,22 +1,30 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.3.9RC1-fpm-alpine
+
+LABEL author="Yasfa Ainun Abdullah"
 
 WORKDIR /var/www/app
 
 RUN apk update && apk add \
-    curl \
-    libpng-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    nano
+    nano \
+    unzip
 
-RUN docker-php-ext-install pdo pdo_mysql \
-    && apk --no-cache add nodejs npm
+RUN docker-php-ext-install pdo pdo_mysql
 
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
-USER root
+# Salin file composer.json dan composer.lock
+COPY composer.* .
 
-RUN chmod -R 777 /var/www/app
+# Jalankan composer install
+RUN composer install --no-scripts --no-autoloader
 
-CMD ["php-fpm"]
+# Salin seluruh kode aplikasi ke dalam image
+COPY . .
+
+# Jalankan autoloader
+RUN composer dump-autoload --optimize
+
+# Ubah hak akses direktori (opsional)
+RUN chown -R www-data:www-data /var/www/app/storage
+
+USER www-data

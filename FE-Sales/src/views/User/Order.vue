@@ -95,7 +95,7 @@ export default {
         case 'process':
           return 'Pesanan Diproses'
         case 'packing':
-          return 'Pesanan Dikemas'
+          return 'Menunggu Kurir'
         case 'delivery':
           return 'Sedang Dikirim'
         case 'delivered':

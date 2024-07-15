@@ -15,7 +15,7 @@
               >
                 <img
                   :src="link || 'https://via.placeholder.com/150'"
-                  class="d-block w-100"
+                  class="d-block"
                   alt="Menu Image"
                 />
               </div>
