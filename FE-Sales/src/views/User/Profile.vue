@@ -9,8 +9,8 @@ import markerIconUrl from '@/assets/img/marker.png';
 const  defaultIcon = L.icon({
     iconUrl: markerIconUrl,
     iconSize:     [38, 45],
-    iconAnchor:   [12, 94],
-    popupAnchor:  [-1, -76]
+    iconAnchor:   [20, 50],
+    popupAnchor:  [-1, -1]
 });
 
 export default {
