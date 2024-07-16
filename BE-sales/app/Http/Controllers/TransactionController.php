@@ -129,7 +129,7 @@ class TransactionController extends Controller
             }
         });
 
-        $transactions = Transaction::with(['payment', 'cartItems.menu.menuPictures'])
+        $transactions = Transaction::with(['payment', 'cartItems.menu.menuPictures', 'courier'])
             ->where('user_id', $userId)
             ->get();
 
@@ -262,6 +262,7 @@ class TransactionController extends Controller
             'payment' => $transaction->payment->payment_link,
             'alamat' => $fullAddress,
             'no_resi' => $transaction->courier->waybill_id,
+            'courier_type' => $transaction->courier->courier_type,
             'tracking_id' => $transaction->courier->tracking_id,
             'menu' => $transaction->cartItems->map(function ($cartItem) {
                 $menu = $cartItem->menu;
@@ -272,6 +273,7 @@ class TransactionController extends Controller
                     'harga_menu' => $cartItem->customization_price,
                     'total_menu' => $cartItem->harga_item,
                     'imagePath' => null,
+                    'customization' => null
                 ];
 
                 $firstPicture = $menu->menuPictures->first();
@@ -281,13 +283,21 @@ class TransactionController extends Controller
                     $formattedMenu['imagePath'] = $url;
                 }
 
+                $customizations = $cartItem->ingredients->map(function ($ingredient) {
+                    return [
+                        'nama' => $ingredient->ingredient->nama,
+                        'quantity' => $ingredient->quantity
+                    ];
+                });
+    
+                $formattedMenu['customization'] = $customizations;
+    
                 return $formattedMenu;
             }),
         ];
 
         return response()->json(['order' => $response]);
     }
-
 
     private function updatePaymentStatus($transaction)
     {
