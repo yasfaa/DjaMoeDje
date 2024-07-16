@@ -212,7 +212,7 @@ class TransactionController extends Controller
                     $firstPicture = $menu->menuPictures->first();
                     if ($firstPicture) {
                         $fileName = $firstPicture->file_path;
-                        $imagePath = asset('storage/menu_images/' . $fileName);
+                        $imagePath = asset('storage/public/menu_images/' . $fileName);
                     }
 
                     $customizations = $cartItem->ingredients->map(function ($ingredient) {
@@ -249,7 +249,7 @@ class TransactionController extends Controller
 
         $address = $transaction->address;
         $fullAddress = $address
-            ? "{$address->jalan}, {$address->kota}, {$address->provinsi}, {$address->kode_pos}"
+            ? "{$address->nama_penerima},{$address->nomor_telepon},{$address->jalan}, {$address->kota}, {$address->provinsi}, {$address->kode_pos}"
             : 'Alamat tidak tersedia';
 
         $response = [
