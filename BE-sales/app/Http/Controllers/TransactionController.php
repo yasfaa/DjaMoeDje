@@ -321,8 +321,8 @@ class TransactionController extends Controller
     {
         try {
             $client = new Client();
-            $courier_type = $transaction->courier->courier_type;
-            $url = "https://api.biteship.com/v1/trackings/{$courier_type}";
+            $tracking_id = $transaction->courier->tracking_id;
+            $url = "https://api.biteship.com/v1/trackings/{$tracking_id}";
             $response = $client->request('GET', $url, [
                 'headers' => [
                     'Accept' => 'application/json',
