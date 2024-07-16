@@ -249,7 +249,7 @@ class TransactionController extends Controller
 
         $address = $transaction->address;
         $fullAddress = $address
-            ? "{$address->nama_penerima},{$address->nomor_telepon},{$address->jalan}, {$address->kota}, {$address->provinsi}, {$address->kode_pos}"
+            ? "{$address->nama_penerima},{$address->nomor_telepon},{$address->jalan}, {$address->kecamatan},{$address->kota}, {$address->provinsi}, {$address->kode_pos}"
             : 'Alamat tidak tersedia';
 
         $response = [

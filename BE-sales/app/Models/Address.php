@@ -15,7 +15,6 @@ class Address extends Model
         'nomor_telepon',
         'jalan',
         'kecamatan',
-        'kecamatan',
         'kota',
         'provinsi',
         'kode_pos',
