@@ -464,11 +464,37 @@ class TransactionController extends Controller
                 return response()->json(['status' => 'error', 'message' => 'Tracking data not found.'], 404);
             }
 
-            return response()->json(['status' => 'success', 'tracking' => $trackingData], 200);
+            // Ambil hanya bagian yang dibutuhkan dari data pelacakan
+            $filteredData = [
+                'courier' => [
+                    'company' => $trackingData['courier']['company'],
+                    'name' => $trackingData['courier']['name'],
+                    'phone' => $trackingData['courier']['phone'],
+                    'driver_name' => $trackingData['courier']['driver_name'],
+                    'driver_phone' => $trackingData['courier']['driver_phone'],
+                ],
+                'destination' => [
+                    'contact_name' => $trackingData['destination']['contact_name'],
+                    'address' => $trackingData['destination']['address'],
+                ],
+                'history' => [],
+                'status' => $trackingData['status'],
+            ];
+
+            // Ambil data dari history
+            foreach ($trackingData['history'] as $historyItem) {
+                $filteredData['history'][] = [
+                    'status' => $historyItem['status'],
+                    'updated_at' => $historyItem['updated_at'],
+                ];
+            }
+
+            return response()->json(['status' => 'success', 'tracking' => $filteredData], 200);
         } catch (Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
+
 
     public function biteshipWebhook(Request $request)
     {

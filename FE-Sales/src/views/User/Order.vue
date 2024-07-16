@@ -73,17 +73,23 @@ export default {
         case 'pending':
           return 'text-bg-danger'
         case 'process':
-          return 'text-bg-success'
-        case 'packing':
-          return 'text-bg-warning'
-        case 'delivery':
-          return 'text-bg-warning'
+        case 'confirmed':
+          return 'text-bg-success' 
+        case 'allocated':
+        case 'pickingUp':
+        case 'picked':
+        case 'droppingOff':
+        case 'returnInTransit':
+          return 'text-bg-warning' 
         case 'delivered':
           return 'text-bg-info'
-        case 'finished':
-          return 'text-bg-success'
-        case 'expired':
-          return 'text-bg-secondary'
+        case 'rejected':
+        case 'courierNotFound':
+        case 'returned':
+        case 'cancelled':
+        case 'disposed':
+        case 'onHold':
+          return 'text-bg-danger'
         default:
           return 'text-bg-secondary'
       }
@@ -94,20 +100,32 @@ export default {
           return 'Menunggu Pembayaran'
         case 'process':
           return 'Pesanan Diproses'
-        case 'packing':
-          return 'Menunggu Kurir'
-        case 'delivery':
-          return 'Sedang Dikirim'
+        case 'confirmed':
+          return 'Pesanan Dikonfirmasi'
+        case 'allocated':
+          return 'Kurir Telah Dialokasikan'
+        case 'pickingUp':
+          return 'Kurir Sedang Menuju Titik Jemput'
+        case 'picked':
+          return 'Barang Telah Diambil'
+        case 'droppingOff':
+          return 'Barang Sedang Dikirim'
+        case 'returnInTransit':
+          return 'Pengembalian Sedang Dalam Perjalanan'
         case 'delivered':
           return 'Telah Terkirim'
-        case 'finished':
-          return 'Pesanan Selesai'
-        case 'expired':
-          return 'Expired'
-        case 'onsite':
-          return 'On Site'
-        case 'failed':
-          return 'Pembayaran Gagal'
+        case 'rejected':
+          return 'Pesanan Ditolak'
+        case 'courierNotFound':
+          return 'Kurir Tidak Tersedia'
+        case 'returned':
+          return 'Pesanan Dikembalikan'
+        case 'cancelled':
+          return 'Pesanan Dibatalkan' // Pesanan telah dibatalkan
+        case 'disposed':
+          return 'Pesanan Dibuang' // Pesanan telah dibuang
+        case 'onHold':
+          return 'Pesanan Dalam Tunggu' // Pesanan sedang ditahan
         default:
           return 'Tidak Diketahui'
       }
