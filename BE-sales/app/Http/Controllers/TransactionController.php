@@ -469,12 +469,11 @@ class TransactionController extends Controller
                 return response()->json(['message' => 'Webhook processed successfully', 'data' => $transaction], 200);
             } else {
                 Log::error('Invalid payload received', ['payload' => $payload]);
-                return response()->json(['message' => 'Invalid payload'], 200);
+                return response()->json(['message' => 'Invalid payload', 'payload' => $payload], 200);
             }
         } catch (Exception $e) {
             Log::error('Error processing webhook', ['error' => $e->getMessage(), 'payload' => $payload]);
             return response()->json(['message' => 'Error processing webhook', 'error' => $e->getMessage()], 200);
         }
     }
-
 }
