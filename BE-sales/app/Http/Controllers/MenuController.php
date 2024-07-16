@@ -27,7 +27,7 @@ class MenuController extends Controller
                 if ($menu->menuPictures->isNotEmpty()) {
                     $firstPicture = $menu->menuPictures->first();
                     $fileName = $firstPicture->file_path;
-                    $url = asset('storage/menu_images/' . $fileName);
+                    $url = asset('storage/public/menu_images/' . $fileName);
                     $formattedMenu['imagePath'] = $url;
                 }
 
