@@ -87,7 +87,7 @@ class CartController extends Controller
             $firstPicture = $menu->menuPictures->first();
             if ($firstPicture) {
                 $fileName = $firstPicture->file_path;
-                $imagePath = asset('storage/menu_images/' . $fileName);
+                $imagePath = asset('storage/public/menu_images/' . $fileName);
             }
 
             $customizations = $item->ingredients->map(function ($ingredient) {

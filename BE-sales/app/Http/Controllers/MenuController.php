@@ -27,7 +27,7 @@ class MenuController extends Controller
                 if ($menu->menuPictures->isNotEmpty()) {
                     $firstPicture = $menu->menuPictures->first();
                     $fileName = $firstPicture->file_path;
-                    $url = asset('storage/public/menu_images/' . $fileName);
+                    $url = asset('storage/menu_images/' . $fileName);
                     $formattedMenu['imagePath'] = $url;
                 }
 
@@ -55,7 +55,7 @@ class MenuController extends Controller
 
                 foreach ($menu->menuPictures as $picture) {
                     $fileName = $picture->file_path;
-                    $url = asset('storage/menu_images/' . $fileName);
+                    $url = asset('storage/public/menu_images/' . $fileName);
                     $formattedMenu['imagePaths'][] = $url;
                 }
 
@@ -90,7 +90,7 @@ class MenuController extends Controller
 
                     $fileNames[] = $fileNameOnly;
 
-                    $imageUrl = asset('storage/menu_images/' . $fileNameOnly);
+                    $imageUrl = asset('storage/public/menu_images/' . $fileNameOnly);
                     $imageUrls[] = $imageUrl;
                 }
             }
@@ -126,7 +126,7 @@ class MenuController extends Controller
             $fileLinks = [];
 
             foreach ($menu->menuPictures as $picture) {
-                $fileLinks[] = asset('storage/menu_images/' . $picture->file_path);
+                $fileLinks[] = asset('storage/public/menu_images/' . $picture->file_path);
             }
 
             return response()->json(['status' => 'success', 'menu' => $menu, 'fileLinks' => $fileLinks], 200);
@@ -169,7 +169,7 @@ class MenuController extends Controller
                     'file_path' => $fileName,
                 ]);
 
-                $imageUrl = asset('storage/menu_images/' . $fileName);
+                $imageUrl = asset('storage/public/menu_images/' . $fileName);
                 $imageUrls[] = $imageUrl;
             }
         }
