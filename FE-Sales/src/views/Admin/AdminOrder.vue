@@ -102,6 +102,8 @@ export default {
           return 'text-bg-success'
         case 'packing':
           return 'text-bg-warning'
+          case 'picked':
+          return 'text-bg-success'
         case 'delivery':
           return 'text-bg-warning'
         case 'delivered':
@@ -121,6 +123,8 @@ export default {
         case 'process':
           return 'Pesanan Diproses'
         case 'packing':
+          return 'Menunggu Kurir'
+          case 'picked':
           return 'Menunggu Kurir'
         case 'delivery':
           return 'Sedang Dikirim'

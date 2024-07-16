@@ -436,10 +436,10 @@ export default {
                   <div class="row">
                     <select
                       class="form-select"
-                      aria-label="Default select example"
+                      id="addressSelect"
                       v-model="selectedAddressId"
+                      @change="fillAddress()"
                     >
-                      <option value="" disabled>Pilih alamat</option>
                       <option
                         v-for="item in alamat"
                         :key="item.selected_address_id"
