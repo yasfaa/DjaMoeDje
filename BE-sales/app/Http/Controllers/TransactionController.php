@@ -154,7 +154,7 @@ class TransactionController extends Controller
                     $firstPicture = $menu->menuPictures->first();
                     if ($firstPicture) {
                         $fileName = $firstPicture->file_path;
-                        $imagePath = asset('storage/menu_images/' . $fileName);
+                        $imagePath = asset('storage/public/menu_images/' . $fileName);
                     }
 
                     $customizations = $cartItem->ingredients->map(function ($ingredient) {
@@ -277,7 +277,7 @@ class TransactionController extends Controller
                 $firstPicture = $menu->menuPictures->first();
                 if ($firstPicture) {
                     $fileName = $firstPicture->file_path;
-                    $url = asset('storage/menu_images/' . $fileName);
+                    $url = asset('storage/public/menu_images/' . $fileName);
                     $formattedMenu['imagePath'] = $url;
                 }
 
