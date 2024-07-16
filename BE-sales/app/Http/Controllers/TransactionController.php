@@ -113,7 +113,7 @@ class TransactionController extends Controller
         $userId = Auth::id();
         $statusFilter = $request->query('status');
 
-        $transactionsQuery = Transaction::with(['payment', 'cartItems.menu.menuPictures'])
+        $transactionsQuery = Transaction::with(['payment', 'cartItems.menu.menuPictures', 'courier'])
             ->where('user_id', $userId);
 
         if ($statusFilter) {
@@ -183,7 +183,7 @@ class TransactionController extends Controller
     {
         $statusFilter = $request->query('status');
 
-        $transactionsQuery = Transaction::with(['payment', 'cartItems.menu.menuPictures']);
+        $transactionsQuery = Transaction::with(['payment', 'cartItems.menu.menuPictures', 'courier']);
 
         if ($statusFilter) {
             $transactionsQuery->where('status', $statusFilter);
@@ -317,7 +317,7 @@ class TransactionController extends Controller
         }
     }
 
-    private function updateOrderStatus($transaction)
+    public function updateOrderStatus($transaction)
     {
         try {
             $client = new Client();
@@ -326,18 +326,23 @@ class TransactionController extends Controller
             $response = $client->request('GET', $url, [
                 'headers' => [
                     'Accept' => 'application/json',
-                    'Authorization' => 'Basic ' . base64_encode(env('BITESHIP_API_KEY') . ':'),
+                    'Authorization' => 'Bearer ' . env('BITESHIP_API_KEY')
                 ]
             ]);
 
-            $data = json_decode($response->getBody(), true); 
+            $data = json_decode($response->getBody(), true);
             $status = isset($data['status']) ? $data['status'] : null;
 
-            $transaction->update(['status' => $status]);
-
+            if ($status !== null) {
+                $transaction->status = $status;
+                $transaction->save();
+            } else {
+                Log::warning('Unable to retrieve valid status from Biteship API response.');
+            }
         } catch (Exception $e) {
             Log::error('Error retrieving Biteship order status: ' . $e->getMessage());
         }
+
     }
 
     public function adminCreateOrder($orderId)
