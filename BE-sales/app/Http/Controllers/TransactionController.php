@@ -457,8 +457,8 @@ class TransactionController extends Controller
             // Verifikasi webhook, jika Biteship menyediakan mekanisme verifikasi
             // Contoh: HMAC verification, shared secret, dll.
 
-            if (isset($payload['tracking_id']) && isset($payload['status'])) {
-                $courier = Courier::where('tracking_id', $payload['tracking_id'])->firstOrFail();
+            if (isset($payload['courier_tracking_id']) && isset($payload['status'])) {
+                $courier = Courier::where('tracking_id', $payload['courier_tracking_id'])->firstOrFail();
 
                 $transaction = Transaction::findOrFail($courier->transaction_id);
                 $transaction->status = $payload['status'];
