@@ -450,20 +450,31 @@ class TransactionController extends Controller
     {
         $payload = $request->all();
 
-        // Verifikasi webhook, jika Biteship menyediakan mekanisme verifikasi
-        // Contoh: HMAC verification, shared secret, dll.
+        // Log incoming request for debugging
+        Log::info('Incoming webhook request', ['payload' => $payload]);
 
-        if (isset($payload['tracking_id']) && isset($payload['status'])) {
+        try {
+            // Verifikasi webhook, jika Biteship menyediakan mekanisme verifikasi
+            // Contoh: HMAC verification, shared secret, dll.
 
-            $courier = Courier::where('tracking_id', $payload['tracking_id'])->firstOrFail();
+            if (isset($payload['tracking_id']) && isset($payload['status'])) {
+                $courier = Courier::where('tracking_id', $payload['tracking_id'])->firstOrFail();
 
-            $transaction = Transaction::findOrFail($courier->transaction_id);
-            $transaction->status = $payload['status'];
-            $transaction->save();
+                $transaction = Transaction::findOrFail($courier->transaction_id);
+                $transaction->status = $payload['status'];
+                $transaction->save();
 
-            Log::info('Webhook received and processed', ['payload' => $payload]);
+                Log::info('Webhook received and processed', ['payload' => $payload, 'transaction' => $transaction]);
 
-            return response()->json(['message' => 'Webhook processed successfully'], 200);
+                return response()->json(['message' => 'Webhook processed successfully', 'data' => $transaction], 200);
+            } else {
+                Log::error('Invalid payload received', ['payload' => $payload]);
+                return response()->json(['message' => 'Invalid payload'], 200);
+            }
+        } catch (Exception $e) {
+            Log::error('Error processing webhook', ['error' => $e->getMessage(), 'payload' => $payload]);
+            return response()->json(['message' => 'Error processing webhook', 'error' => $e->getMessage()], 200);
         }
     }
+
 }
