@@ -71,9 +71,11 @@ Route::prefix('/customize')->middleware(['auth:sanctum', 'role:User'])->group(fu
 Route::get('/getMenu', [MenuController::class, 'index']);
 Route::get('menu/get/{id}', [MenuController::class, 'getOne']);
 
+
 Route::prefix('/biteship')->group(function () {
     Route::get('/areas', [AddressController::class, 'getAreas']);
     Route::post('/kurir', [CartController::class, 'getShippingRates']);
+    Route::post('/webhook', [TransactionController::class, 'biteshipWebhook']);
 });
 
 Route::prefix('/order')->middleware(['auth:sanctum'])->group(function () {

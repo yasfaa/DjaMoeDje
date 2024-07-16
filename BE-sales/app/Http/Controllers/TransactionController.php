@@ -445,4 +445,31 @@ class TransactionController extends Controller
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function biteshipWebhook(Request $request)
+    {
+        $payload = $request->all();
+
+        // Verifikasi webhook, jika Biteship menyediakan mekanisme verifikasi
+        // Contoh: HMAC verification, shared secret, dll.
+
+        if (isset($payload['tracking_id']) && isset($payload['status'])) {
+            try {
+                $courier = Courier::where('tracking_id', $payload['tracking_id'])->firstOrFail();
+
+                $transaction = Transaction::findOrFail($courier->transaction_id);
+                $transaction->status = $payload['status'];
+                $transaction->save();
+
+                Log::info('Webhook received and processed', ['payload' => $payload]);
+
+                return response()->json(['message' => 'Webhook processed successfully'], 200);
+            } catch (Exception $e) {
+                Log::error('Error processing webhook', ['error' => $e->getMessage()]);
+                return response()->json(['error' => 'Error processing webhook'], 500);
+            }
+        }
+
+        return response()->json(['error' => 'Invalid payload'], 400);
+    }
 }
