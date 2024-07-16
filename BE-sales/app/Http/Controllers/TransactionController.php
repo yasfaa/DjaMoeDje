@@ -372,7 +372,7 @@ class TransactionController extends Controller
                     'longitude' => $address->longitude
                 ],
                 'courier_company' => 'paxel',
-                'courier_type' => 'paxel_big',
+                'courier_type' => $transaction->courier->courier_type,
                 'delivery_type' => 'now',
                 // 'order_note' => $transaction->order_note,
                 // 'metadata' => (array) $transaction->metadata,
@@ -384,8 +384,8 @@ class TransactionController extends Controller
                         'quantity' => $cartItem->quantity,
                         'height' => 10,
                         'length' => 10,
-                        'weight' => 5,
-                        'width' => 200
+                        'weight' => 200,
+                        'width' => 5
                     ];
                 })->toArray()
             ];
