@@ -1,149 +1,406 @@
 <script>
-import { ref, onMounted, watch } from 'vue'
-import { useStore } from 'vuex'
-import { useRouter } from 'vue-router'
 import axios from 'axios'
-import Navbar from '@/components/Navbar.vue'
-import { formatPrice } from '@/utils/formatPrice'
-import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import L from 'leaflet'
+const BASE_URL = import.meta.env.VITE_BASE_URL_API
+import Navbar from '@/components/DashboardNavbar.vue'
 
 export default {
   components: {
     Navbar
   },
-  setup() {
-    const store = useStore()
-    const router = useRouter()
-
-    const alamat = ref([])
-    const selectedAddress = ref(null)
-    const selectedAddressId = ref('')
-
-    const totalHarga = ref(0)
-    const totalBayar = ref(0)
-    const orders = ref([])
-    const selectedCourier = ref(null)
-    const overlay = ref(false)
-    const dialog = ref(false)
-
-    const searchQuery = ref('')
-    const searchResults = ref([])
-    const loadingRegist = ref(false)
-
-    const address = ref({
-      nama_penerima: '',
-      nomor_telepon: '',
-      jalan: '',
-      kecamatan: '',
-      kota: '',
-      provinsi: '',
-      kode_pos: '',
-      latitude: '',
-      longitude: ''
-    })
-
-    const formatPrice = (value) => {
-      return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR'
-      }).format(value)
-    }
-
-    const openModal = () => {
-      dialog.value = true
-    }
-
-    const closeModal = () => {
-      dialog.value = false
-    }
-
-    const saveAddress = async () => {
-      try {
-        loadingRegist.value = true
-        await axios.post('/api/address', address.value)
-        loadingRegist.value = false
-        dialog.value = false
-        loadAddresses()
-      } catch (error) {
-        console.error(error)
-        loadingRegist.value = false
-      }
-    }
-
-    const loadAddresses = async () => {
-      try {
-        const response = await axios.get('/api/addresses')
-        alamat.value = response.data
-        if (alamat.value.length) {
-          selectedAddressId.value = alamat.value[0].id
-        }
-      } catch (error) {
-        console.error(error)
-      }
-    }
-
-    const updateLocation = (location) => {
-      address.value.latitude = location.lat
-      address.value.longitude = location.lng
-    }
-
-    const searchWithDelay = () => {
-      if (searchQuery.value.length > 3) {
-        setTimeout(async () => {
-          const response = await axios.get(
-            `https://nominatim.openstreetmap.org/search?q=${searchQuery.value}&format=json&addressdetails=1`
-          )
-          searchResults.value = response.data
-        }, 1000) 
-      }
-    }
-
-    const selectAddress = (address) => {
-      searchResults.value = []
-      searchQuery.value = address.display_name
-      address.value.latitude = address.lat
-      address.value.longitude = address.lon
-    }
-
-    const proceedToCheckout = () => {
-      router.push('/checkout')
-    }
-
-    watch(selectedAddressId, (newVal) => {
-      selectedAddress.value = alamat.value.find((address) => address.id === newVal)
-    })
-
-    onMounted(() => {
-      loadAddresses()
-      totalHarga.value = store.getters.getTotalHarga
-      totalBayar.value = store.getters.getTotalBayar
-      orders.value = store.getters.getOrders
-      selectedCourier.value = store.getters.getSelectedCourier
-    })
-
+  data() {
     return {
-      formatPrice,
-      alamat,
-      selectedAddress,
-      selectedAddressId,
-      totalHarga,
-      totalBayar,
-      orders,
-      selectedCourier,
-      overlay,
-      dialog,
-      searchQuery,
-      searchResults,
-      loadingRegist,
-      address,
-      openModal,
-      closeModal,
-      saveAddress,
-      updateLocation,
-      searchWithDelay,
-      selectAddress,
-      proceedToCheckout
+      hideConfigButton: true,
+      showNavbar: true,
+      showSidenav: false,
+      showFooter: false,
+      overlay: false,
+      orders: [],
+      totalPayment: '',
+      alamat: [],
+      mapCenter: [-6.17511, 106.865036],
+      zoom: 13,
+      markerPosition: null,
+      map: null,
+      marker: null,
+      loadingRegist: false,
+      loadingKurir: false,
+      searchQuery: '',
+      searchResults: [],
+      selectedAddresses: null,
+      address: {
+        nama_penerima: '',
+        nomor_telepon: '',
+        jalan: '',
+        kecamatan: '',
+        kota: '',
+        provinsi: '',
+        kode_pos: '',
+        latitude: '',
+        longitude: ''
+      },
+      users: {
+        name: '',
+        email: ''
+      },
+      selectedAddressId: null,
+      selectedAddress: null,
+      shippingRates: [],
+      dialog: false,
+      selectedCourier: null
+    }
+  },
+
+  mounted() {
+    this.retrieveCart()
+    this.fetchUserAddresses()
+    this.initMap()
+  },
+  watch: {
+    selectedAddressId(newVal) {
+      this.fillAddress()
+      this.fetchShippingRates()
+    },
+    selectedCourier() {
+      this.updateTotalPayment()
+    },
+    searchQuery(newQuery) {
+      this.searchWithDelay()
+    },
+    selectedAddress(newAddress) {
+      if (newAddress) {
+        this.mapCenter = [parseFloat(newAddress.lat), parseFloat(newAddress.lon)]
+        this.markerPosition = [parseFloat(newAddress.lat), parseFloat(newAddress.lon)]
+      }
+    }
+  },
+  methods: {
+    async getUser() {
+      try {
+        const response = await axios.get(`${BASE_URL}/user`, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token')
+          }
+        })
+        this.users = response.data
+      } catch (error) {
+        console.error(error)
+        if (error.response && error.response.data.message) {
+          const errorMessage = error.response.data.message
+          console.log(errorMessage)
+        }
+      }
+    },
+    formatPrice(price) {
+      const numericPrice = parseFloat(price)
+      return numericPrice.toLocaleString('id-ID')
+    },
+    updateTotalPayment() {
+      const courierPrice = this.selectedCourier ? this.selectedCourier.price : 0
+      const totalHarga = this.orders.reduce((total, order) => {
+        return total + parseFloat(order.harga_total_item)
+      }, 0)
+      this.totalPayment = totalHarga + courierPrice
+    },
+    selectCourier(rate) {
+      this.selectedCourier = rate
+      this.updateTotalPayment()
+    },
+    initMap() {
+      this.$nextTick(() => {
+        if (document.getElementById('mapid')) {
+          this.map = L.map('mapid').setView(this.mapCenter, this.zoom)
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(this.map)
+          this.map.on('click', this.updateMarkerPosition)
+
+          // Initialize marker if markerPosition is set
+          if (this.markerPosition) {
+            this.marker = L.marker(this.markerPosition, { draggable: true }).addTo(this.map)
+            this.marker.on('dragend', this.onMarkerDragEnd)
+          }
+        }
+      })
+    },
+    openModal() {
+      this.dialog = true
+      this.$nextTick(() => {
+        this.initMap()
+      })
+    },
+    searchWithDelay() {
+      this.loadingRegist = true
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout)
+      }
+      this.searchTimeout = setTimeout(this.searchAddress, 2000)
+    },
+    async searchAddress() {
+      if (this.searchQuery && this.searchQuery.length > 2) {
+        try {
+          const response = await axios.get(`https://nominatim.openstreetmap.org/search`, {
+            params: {
+              q: this.searchQuery,
+              format: 'json'
+            }
+          })
+          this.searchResults = response.data
+        } catch (error) {
+          console.error('Error fetching location:', error)
+          this.searchResults = []
+        } finally {
+          this.loadingRegist = false
+        }
+      } else {
+        this.searchResults = []
+      }
+    },
+    selectAddress(address) {
+      const displayName = address.display_name
+      const parts = displayName.split(',')
+
+      let kode_pos = ''
+      let kecamatan = ''
+      let kota = ''
+      let provinsi = ''
+
+      if (parts.length >= 6) {
+        kecamatan = parts[parts.length - 6].trim()
+        kota = parts[parts.length - 5].trim()
+        provinsi = parts[parts.length - 4].trim()
+        kode_pos = parts[parts.length - 2].trim()
+      }
+
+      this.selectedAddress = address
+      this.mapCenter = [parseFloat(address.lat), parseFloat(address.lon)]
+      this.markerPosition = [parseFloat(address.lat), parseFloat(address.lon)]
+      this.address.latitude = address.lat
+      this.address.longitude = address.lon
+      this.address.kode_pos = kode_pos
+      this.address.kecamatan = kecamatan
+      this.address.kota = kota
+      this.address.provinsi = provinsi
+
+      // Update map view and marker position, and set zoom to 16
+      this.map.setView(this.mapCenter, 22)
+      if (this.marker) {
+        this.marker.setLatLng(this.markerPosition)
+      } else {
+        this.marker = L.marker(this.markerPosition, { draggable: true }).addTo(this.map)
+        this.marker.on('dragend', this.onMarkerDragEnd)
+      }
+    },
+    async saveAddress() {
+      const addressData = {
+        nama_penerima: this.address.nama_penerima,
+        nomor_telepon: this.address.nomor_telepon,
+        jalan: this.address.jalan,
+        kecamatan: this.address.kecamatan,
+        kota: this.address.kota,
+        provinsi: this.address.provinsi,
+        kode_pos: this.address.kode_pos,
+        user_id: this.users.id,
+        latitude: this.address.latitude,
+        longitude: this.address.longitude
+      }
+
+      try {
+        await axios.post(`${BASE_URL}/address/add`, addressData, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token')
+          }
+        })
+        this.dialog = false
+        this.$notify({
+          type: 'success',
+          title: 'Success',
+          text: 'Successfully Added!',
+          color: 'green'
+        })
+        this.resetForm()
+        this.fetchUserAddresses()
+      } catch (error) {
+        console.error('Error saving address:', error)
+      }
+    },
+    resetForm() {
+      this.searchQuery = ''
+      this.searchResults = []
+      this.address = {
+        nama_penerima: '',
+        nomor_telepon: '',
+        jalan: '',
+        kecamatan: '',
+        kota: '',
+        provinsi: '',
+        kode_pos: '',
+        latitude: '',
+        longitude: ''
+      }
+      if (this.marker) {
+        this.marker.remove()
+        this.marker = null
+      }
+    },
+    updateMarkerPosition(event) {
+      const { lat, lng } = event.latlng
+      this.markerPosition = [lat, lng]
+      this.address.latitude = lat
+      this.address.longitude = lng
+      this.getAddressFromCoordinates(lat, lng)
+
+      if (this.marker) {
+        this.marker.setLatLng([lat, lng])
+      } else {
+        this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map)
+        this.marker.on('dragend', this.onMarkerDragEnd)
+      }
+    },
+    onMarkerDragEnd(event) {
+      const { lat, lng } = event.target.getLatLng()
+      this.markerPosition = [lat, lng]
+      this.address.latitude = lat
+      this.address.longitude = lng
+      this.getAddressFromCoordinates(lat, lng)
+    },
+    async getAddressFromCoordinates(lat, lng) {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
+        )
+        const data = await response.json()
+
+        const address = data.address
+        this.address.kecamatan = address.suburb || ''
+        this.address.kota = address.city || ''
+        this.address.provinsi = address.state || ''
+        this.address.jalan = address.road || ''
+        this.address.kode_pos = address.postcode || ''
+
+        this.searchQuery = `${this.address.jalan}, ${this.address.kecamatan}, ${this.address.kota}, ${this.address.provinsi}`
+      } catch (error) {
+        console.error('Error fetching address:', error)
+      }
+    },
+    closeModal() {
+      this.resetForm()
+      this.dialog = false
+    },
+    async proceedToCheckout() {
+      this.overlay = true
+      try {
+        const response = await axios.post(
+          `${BASE_URL}/order/checkout`,
+          {
+            amount: this.totalHarga,
+            selectedCourier: this.selectedCourier,
+            address_id: this.selectedAddress.id,
+            items: this.orders.map((order) => ({
+              cart_item_id: order.id,
+              quantity: order.quantity,
+              totalPrice: order.harga_total_item
+            }))
+          },
+          {
+            headers: {
+              Authorization: 'Bearer ' + localStorage.getItem('access_token'),
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+
+        const { paymentUrl } = response.data
+        window.open(paymentUrl, '_blank')
+        setTimeout(() => {
+          this.$router.push('/order')
+        }, 1000) // Adjust the delay as needed
+      } catch (error) {
+        console.error('Error proceeding to checkout:', error)
+      } finally {
+        this.overlay = false
+      }
+    },
+    async fetchShippingRates() {
+      this.loadingKurir = true
+      if (!this.selectedAddress) {
+        return
+      }
+      const payload = {
+        latitude: this.selectedAddress.latitude,
+        longitude: this.selectedAddress.longitude,
+        items: this.orders.map((order) => ({
+          name: order.name,
+          description: order.deskripsi,
+          value: order.harga_dasar,
+          length: 10,
+          width: 10,
+          height: 5,
+          weight: 200,
+          quantity: order.quantity
+        }))
+      }
+
+      try {
+        const response = await axios.post(`${BASE_URL}/biteship/kurir`, payload, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token'),
+            'Content-Type': 'application/json'
+          }
+        })
+
+        this.shippingRates = response.data.data.pricing
+        // Select the cheapest courier
+        this.selectedCourier = this.shippingRates.reduce((cheapest, current) => {
+          return !cheapest || current.price < cheapest.price ? current : cheapest
+        }, null)
+      } catch (error) {
+        console.error('Error fetching shipping rates:', error)
+      } finally {
+        this.loadingKurir = false
+      }
+    },
+    fillAddress() {
+      this.selectedAddress =
+        this.alamat.find((address) => address.selected_address_id === this.selectedAddressId) || {}
+    },
+    async fetchUserAddresses() {
+      try {
+        const response = await axios.get(`${BASE_URL}/address/get`, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token')
+          }
+        })
+        this.alamat = response.data
+      } catch (error) {
+        console.error('Error fetching addresses:', error)
+      }
+    },
+    async retrieveCart() {
+      this.overlay = true
+      try {
+        const response = await axios.get(`${BASE_URL}/cart/get`, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token')
+          }
+        })
+
+        this.orders = response.data.items
+        this.totalPayment = parseFloat(response.data.total_harga)
+      } catch (error) {
+        console.error(error)
+      } finally {
+        this.overlay = false
+      }
+    }
+  },
+  computed: {
+    totalHarga() {
+      return this.orders.reduce((total, order) => {
+        return total + parseFloat(order.harga_total_item)
+      }, 0)
+    },
+    totalBayar() {
+      return this.totalHarga + (this.selectedCourier ? this.selectedCourier.price : 0)
     }
   }
 }
@@ -185,8 +442,8 @@ export default {
                       <option value="" disabled>Pilih alamat</option>
                       <option
                         v-for="item in alamat"
-                        :key="item.id"  <!-- Use a unique key here -->
-                        :value="item.id"  <!-- Use the actual address ID -->
+                        :key="item.AddressId"
+                        :value="item.AddressId"
                       >
                         {{ item.nama_penerima }} | {{ item.kecamatan }}, {{ item.kota }}
                       </option>
@@ -384,38 +641,17 @@ export default {
                     class="form-control mb-2"
                     placeholder="Masukkan kode pos penerima"
                   />
-                  <label for="">Latitude</label>
-                  <input
-                    type="text"
-                    v-model="address.latitude"
-                    class="form-control mb-2"
-                    readonly
-                  />
-                  <label for="">Longitude</label>
-                  <input
-                    type="text"
-                    v-model="address.longitude"
-                    class="form-control mb-2"
-                    readonly
-                  />
                 </div>
                 <div class="modal-footer">
-                  <button
-                    type="button"
-                    class="btn btn-secondary"
-                    @click="closeModal"
-                  >
-                    Batal
-                  </button>
+                  <button type="button" class="btn btn-secondary" @click="closeModal">Close</button>
                   <button type="button" class="btn btn-primary" @click="saveAddress">
-                    Simpan Alamat
+                    Save changes
                   </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <leaflet-map @locationSelected="updateLocation"></leaflet-map>
       </div>
     </div>
   </div>

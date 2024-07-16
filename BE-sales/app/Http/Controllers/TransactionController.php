@@ -123,11 +123,9 @@ class TransactionController extends Controller
         $transactions = $transactionsQuery->get();
 
         $transactions->each(function ($transaction) {
+            $this->updateOrderStatus($transaction);
             if ($transaction->status === 'pending') {
                 $this->updatePaymentStatus($transaction);
-            }
-            if ($transaction->status === 'pending' && Carbon::parse($transaction->created_at)->diffInHours(Carbon::now()) > 24) {
-                $transaction->update(['status' => 'expired']);
             }
         });
 
@@ -194,14 +192,9 @@ class TransactionController extends Controller
         $transactions = $transactionsQuery->get();
 
         $transactions->each(function ($transaction) {
+            $this->updateOrderStatus($transaction);
             if ($transaction->status === 'pending') {
                 $this->updatePaymentStatus($transaction);
-            }
-        });
-
-        $transactions->each(function ($transaction) {
-            if ($transaction->status === 'pending' && Carbon::parse($transaction->created_at)->diffInHours(Carbon::now()) > 24) {
-                $transaction->update(['status' => 'expired']);
             }
         });
 
@@ -314,10 +307,36 @@ class TransactionController extends Controller
             if ($status['status_code'] === "200" && $status['transaction_status'] === "settlement") {
                 $transaction->update(['status' => 'process']);
             }
+            if ($status['status_code'] === "200" && $status['transaction_status'] === "expire") {
+                $transaction->update(['status' => 'expired']);
+            }
             $transaction->payment->update(['payment_link' => null]);
 
         } catch (Exception $e) {
             Log::error('Error retrieving Midtrans order status: ' . $e->getMessage());
+        }
+    }
+
+    private function updateOrderStatus($transaction)
+    {
+        try {
+            $client = new Client();
+            $courier_type = $transaction->courier->courier_type;
+            $url = "https://api.biteship.com/v1/trackings/{$courier_type}";
+            $response = $client->request('GET', $url, [
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Basic ' . base64_encode(env('BITESHIP_API_KEY') . ':'),
+                ]
+            ]);
+
+            $data = json_decode($response->getBody(), true); 
+            $status = isset($data['status']) ? $data['status'] : null;
+
+            $transaction->update(['status' => $status]);
+
+        } catch (Exception $e) {
+            Log::error('Error retrieving Biteship order status: ' . $e->getMessage());
         }
     }
 
