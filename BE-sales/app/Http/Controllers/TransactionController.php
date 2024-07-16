@@ -454,22 +454,16 @@ class TransactionController extends Controller
         // Contoh: HMAC verification, shared secret, dll.
 
         if (isset($payload['tracking_id']) && isset($payload['status'])) {
-            try {
-                $courier = Courier::where('tracking_id', $payload['tracking_id'])->firstOrFail();
 
-                $transaction = Transaction::findOrFail($courier->transaction_id);
-                $transaction->status = $payload['status'];
-                $transaction->save();
+            $courier = Courier::where('tracking_id', $payload['tracking_id'])->firstOrFail();
 
-                Log::info('Webhook received and processed', ['payload' => $payload]);
+            $transaction = Transaction::findOrFail($courier->transaction_id);
+            $transaction->status = $payload['status'];
+            $transaction->save();
 
-                return response()->json(['message' => 'Webhook processed successfully'], 200);
-            } catch (Exception $e) {
-                Log::error('Error processing webhook', ['error' => $e->getMessage()]);
-                return response()->json(['error' => 'Error processing webhook'], 500);
-            }
+            Log::info('Webhook received and processed', ['payload' => $payload]);
+
+            return response()->json(['message' => 'Webhook processed successfully'], 200);
         }
-
-        return response()->json(['error' => 'Invalid payload'], 400);
     }
 }
