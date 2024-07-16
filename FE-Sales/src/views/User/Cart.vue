@@ -194,7 +194,7 @@ export default {
       <div class="container mt-2">
         <div class="row">
           <div class="col-lg-8">
-            <div v-for="(order, index) in orders" :key="index" class="mb-4 card">
+            <v-card v-for="(order, index) in orders" :key="index" class="mb-4 card">
               <div class="card-body">
                 <div class="row d-flex align-items-center justify-content-between">
                   <div class="col-md-12">
@@ -277,39 +277,22 @@ export default {
                   </div>
                 </div>
               </div>
-            </div>
+            </v-card>
           </div>
           <div class="col-lg-4">
-            <div class="card">
+            <v-card class="card">
               <div class="card-body">
                 <h5 class="card-title">Rincian Belanja</h5>
                 <p>Total biaya belanja</p>
                 <p>Rp {{ formatPrice(totalPayment) }}</p>
                 <button class="btn btn-primary w-100" @click="proceedToCheckout">Checkout</button>
               </div>
-            </div>
+            </v-card>
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- Note Modal -->
-  <v-dialog v-model="noteModal" max-width="500px">
-    <v-card>
-      <v-card-title>
-        <span class="headline">Tambah Catatan</span>
-      </v-card-title>
-      <v-card-text>
-        <v-textarea v-model="note" label="Catatan" rows="3"></v-textarea>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="closeNoteModal">Batal</v-btn>
-        <v-btn color="blue darken-1" text @click="saveNote">Simpan</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
 </template>
 
 <style>

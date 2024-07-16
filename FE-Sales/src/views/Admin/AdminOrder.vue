@@ -82,6 +82,7 @@ export default {
           text: 'Order successfully created!',
           color: 'green'
         })
+        await this.retrieveOrders()
       } catch (error) {
         console.error('Error creating order:', error)
         this.$notify({
@@ -99,19 +100,23 @@ export default {
         case 'pending':
           return 'text-bg-danger'
         case 'process':
+        case 'confirmed':
           return 'text-bg-success'
-        case 'packing':
-          return 'text-bg-warning'
-          case 'picked':
-          return 'text-bg-success'
-        case 'delivery':
+        case 'allocated':
+        case 'picking_up':
+        case 'picked':
+        case 'dropping_off':
+        case 'return_in_transit':
           return 'text-bg-warning'
         case 'delivered':
           return 'text-bg-info'
-        case 'finished':
-          return 'text-bg-success'
-        case 'expired':
-          return 'text-bg-secondary'
+        case 'rejected':
+        case 'courierNotFound':
+        case 'returned':
+        case 'cancelled':
+        case 'disposed':
+        case 'on_hold':
+          return 'text-bg-danger'
         default:
           return 'text-bg-secondary'
       }
@@ -122,22 +127,32 @@ export default {
           return 'Menunggu Pembayaran'
         case 'process':
           return 'Pesanan Diproses'
-        case 'packing':
-          return 'Menunggu Kurir'
-          case 'picked':
-          return 'Menunggu Kurir'
-        case 'delivery':
-          return 'Sedang Dikirim'
+        case 'confirmed':
+          return 'Pesanan Dikonfirmasi'
+        case 'allocated':
+          return 'Kurir Telah Dialokasikan'
+        case 'picking_up':
+          return 'Kurir Sedang Menuju Titik Jemput'
+        case 'picked':
+          return 'Barang Telah Diambil'
+        case 'dropping_off':
+          return 'Barang Sedang Dikirim'
+        case 'return_in_transit':
+          return 'Pengembalian Sedang Dalam Perjalanan'
         case 'delivered':
           return 'Telah Terkirim'
-        case 'finished':
-          return 'Pesanan Selesai'
-        case 'expired':
-          return 'Expired'
-        case 'onsite':
-          return 'On Site'
-        case 'failed':
-          return 'Pembayaran Gagal'
+        case 'rejected':
+          return 'Pesanan Ditolak'
+        case 'courier_not_found':
+          return 'Kurir Tidak Tersedia'
+        case 'returned':
+          return 'Pesanan Dikembalikan'
+        case 'cancelled':
+          return 'Pesanan Dibatalkan' 
+        case 'disposed':
+          return 'Pesanan Dibuang' 
+        case 'on_hold':
+          return 'Pesanan Dalam Tunggu' 
         default:
           return 'Tidak Diketahui'
       }

@@ -76,10 +76,10 @@ export default {
         case 'confirmed':
           return 'text-bg-success' 
         case 'allocated':
-        case 'pickingUp':
+        case 'picking_up':
         case 'picked':
-        case 'droppingOff':
-        case 'returnInTransit':
+        case 'dropping_off':
+        case 'return_in_transit':
           return 'text-bg-warning' 
         case 'delivered':
           return 'text-bg-info'
@@ -88,7 +88,7 @@ export default {
         case 'returned':
         case 'cancelled':
         case 'disposed':
-        case 'onHold':
+        case 'on_hold':
           return 'text-bg-danger'
         default:
           return 'text-bg-secondary'
@@ -104,28 +104,28 @@ export default {
           return 'Pesanan Dikonfirmasi'
         case 'allocated':
           return 'Kurir Telah Dialokasikan'
-        case 'pickingUp':
+        case 'picking_up':
           return 'Kurir Sedang Menuju Titik Jemput'
         case 'picked':
           return 'Barang Telah Diambil'
-        case 'droppingOff':
+        case 'dropping_off':
           return 'Barang Sedang Dikirim'
-        case 'returnInTransit':
+        case 'return_in_transit':
           return 'Pengembalian Sedang Dalam Perjalanan'
         case 'delivered':
           return 'Telah Terkirim'
         case 'rejected':
           return 'Pesanan Ditolak'
-        case 'courierNotFound':
+        case 'courier_not_found':
           return 'Kurir Tidak Tersedia'
         case 'returned':
           return 'Pesanan Dikembalikan'
         case 'cancelled':
-          return 'Pesanan Dibatalkan' // Pesanan telah dibatalkan
+          return 'Pesanan Dibatalkan'
         case 'disposed':
-          return 'Pesanan Dibuang' // Pesanan telah dibuang
-        case 'onHold':
-          return 'Pesanan Dalam Tunggu' // Pesanan sedang ditahan
+          return 'Pesanan Dibuang' 
+        case 'on_hold':
+          return 'Pesanan Dalam Tunggu'
         default:
           return 'Tidak Diketahui'
       }
@@ -170,7 +170,7 @@ export default {
                 </select>
               </div>
             </div>
-            <div class="card mb-3" v-for="order in orders" :key="order.id">
+            <v-card class="card mb-3" v-for="order in orders" :key="order.id">
               <div
                 class="card-header p-0 px-3 d-flex justify-content-between align-items-center p-1"
               >
@@ -243,7 +243,7 @@ export default {
                   </button>
                 </div>
               </div>
-            </div>
+            </v-card>
           </div>
         </div>
       </div>
@@ -260,19 +260,16 @@ a {
   color: unset;
 }
 
-.transaction-card {
-  max-width: 100%;
-  margin: auto;
+.card {
+  border-radius: 15px;
+  box-shadow: 1px 1px 15px #cccccc40;
+  transition: 0.5s ease-in;
+  background-color: white;
+  margin: 1rem;
 }
-.card-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
-}
-.card-header .badge {
-  margin-left: 10px;
-}
-.card-body {
-  background-color: #fff;
+
+.card:hover {
+  box-shadow: 1px 1px 28.5px -7px #d6d6d6;
 }
 .list-group-item.active {
   background-color: #007bff;
