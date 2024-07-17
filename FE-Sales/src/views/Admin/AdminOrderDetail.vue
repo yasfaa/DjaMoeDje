@@ -14,7 +14,8 @@ export default {
       items: [],
       address: '',
       showDetail: false,
-      riwayat: []
+      riwayat: [],
+      currentDropdownIndex: null
     }
   },
 
@@ -44,6 +45,14 @@ export default {
     getAddressPart(index) {
       const addressParts = this.address.split(',')
       return addressParts[index] || ''
+    },
+    toggleDropdown(index) {
+      console.log('Toggle Dropdown called with index:', index)
+      if (this.currentDropdownIndex === index) {
+        this.currentDropdownIndex = null
+      } else {
+        this.currentDropdownIndex = index
+      }
     },
     async retrieveDetail() {
       this.overlay = true
@@ -159,6 +168,7 @@ export default {
         case 'cancelled':
         case 'disposed':
         case 'on_hold':
+        case 'expired':
           return 'text-bg-danger'
         default:
           return 'text-bg-secondary'
@@ -173,6 +183,7 @@ export default {
         case 'cancelled':
         case 'disposed':
         case 'on_hold':
+        case 'expired':
           return 'mdi-close-circle'
         case 'process':
         case 'confirmed':
@@ -220,6 +231,8 @@ export default {
           return 'Pesanan Dibuang'
         case 'on_hold':
           return 'Pesanan Dalam Tunggu'
+        case 'expired':
+          return 'Expired'
         default:
           return 'Tidak Diketahui'
       }
@@ -252,6 +265,8 @@ export default {
           return 'Pesanan dibatalkan.'
         case 'disposed':
           return 'Pesanan berhasil dibuang.'
+        case 'expired':
+          return 'Expired'
         default:
           return 'Status tidak dikenal.'
       }
@@ -298,7 +313,7 @@ export default {
                       :key="index"
                       :color="getStatusBadge(item.status)"
                       :icon="getStatusIcon(item.status)"
-                      dot-color="yellow"
+                      dot-color="pink"
                       size="small"
                     >
                       <div>{{ formatDate(item.updated_at) }}</div>
@@ -327,6 +342,24 @@ export default {
                         >Rp{{ formatPrice(item.harga_menu) }} x {{ item.quantity }}</small
                       >
                     </div>
+                  </div>
+                  <a
+                    class="lihat"
+                    v-if="item.customization && item.customization.length > 0"
+                    @click="toggleDropdown(orderIndex + '-' + index)"
+                  >
+                    {{
+                      currentDropdownIndex === orderIndex + '-' + index
+                        ? 'Sembunyikan Kustomisasi'
+                        : 'Lihat Kustomisasi Pelanggan'
+                    }}
+                  </a>
+                  <div class="show" v-if="currentDropdownIndex === orderIndex + '-' + index">
+                    <ul>
+                      <li v-for="custom in item.customization" :key="custom.nama">
+                        {{ custom.nama }}: {{ custom.quantity }}
+                      </li>
+                    </ul>
                   </div>
                   <span>Rp{{ formatPrice(item.total_menu) }}</span>
                 </li>
@@ -432,6 +465,15 @@ a {
 
 .mb-4 {
   margin-bottom: 1.5rem !important;
+}
+
+.lihat {
+  color: #6b6b6b;
+  cursor: pointer;
+}
+
+.lihat:hover {
+  color: #000000;
 }
 
 @media (max-width: 576px) {

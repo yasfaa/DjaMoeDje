@@ -65,6 +65,7 @@ class CartController extends Controller
     {
         $user = Auth::user();
         $cart = Cart::with([
+            'items.menu.ingredient',
             'items.menu.menuPictures' => function ($query) {
                 $query->orderBy('id', 'asc');
             },
@@ -97,6 +98,8 @@ class CartController extends Controller
                 ];
             });
 
+            $ingredients = $menu->ingredient->isNotEmpty() ? 'ada' : null;
+
             return [
                 'id' => $item->id,
                 'name' => $item->menu->nama_menu,
@@ -107,6 +110,7 @@ class CartController extends Controller
                 'harga_dasar' => $item->customization_price,
                 'select' => $item->select,
                 'customization' => $customizations,
+                'ingredient' => $ingredients,
                 'foto' => $imagePath,
             ];
         });

@@ -63,7 +63,7 @@
                 <button class="btn btn-primary me-4" @click.prevent="addToCart(menu.id, quantity)">
                   Add to Cart
                 </button>
-                <button class="btn btn-secondary my-2" @click.prevent="goToCustomize(menu.id)">Customize Menu</button>
+                <button class="btn btn-secondary my-2" v-if="menu.ingredient && menu.ingredient.length > 0" @click.prevent="goToCustomize(menu.id)">Customize Menu</button>
               </div>
             </div>
           </div>

@@ -18,7 +18,6 @@ export default {
   },
   mounted() {
     this.retrieveOrders()
-    // this.retrieveBsOrder();
   },
   methods: {
     formatDate(data_date) {
@@ -116,6 +115,7 @@ export default {
         case 'cancelled':
         case 'disposed':
         case 'on_hold':
+        case 'expired':
           return 'text-bg-danger'
         default:
           return 'text-bg-secondary'
@@ -125,6 +125,8 @@ export default {
       switch (status) {
         case 'pending':
           return 'Menunggu Pembayaran'
+        case 'expired':
+          return 'Expired'
         case 'process':
           return 'Pesanan Diproses'
         case 'confirmed':
@@ -148,11 +150,11 @@ export default {
         case 'returned':
           return 'Pesanan Dikembalikan'
         case 'cancelled':
-          return 'Pesanan Dibatalkan' 
+          return 'Pesanan Dibatalkan'
         case 'disposed':
-          return 'Pesanan Dibuang' 
+          return 'Pesanan Dibuang'
         case 'on_hold':
-          return 'Pesanan Dalam Tunggu' 
+          return 'Pesanan Dalam Tunggu'
         default:
           return 'Tidak Diketahui'
       }

@@ -117,7 +117,7 @@ class MenuController extends Controller
     public function getOne($id)
     {
         try {
-            $menu = Menu::with('menuPictures')->find($id);
+            $menu = Menu::with('menuPictures', 'ingredient')->find($id);
 
             if (!$menu) {
                 return response()->json(['status' => 'error', 'message' => 'Menu tidak ditemukan.'], 404);

@@ -266,7 +266,7 @@ export default {
                       </div>
                     </div>
                     <div class="row">
-                      <a class="custom ms-3 mt-2" @click="goToCustomization(order.id)">
+                      <a class="custom ms-3 mt-2" v-if="order.ingredient === 'ada'" @click="goToCustomization(order.id)">
                         {{
                           order.customization && order.customization.length > 0
                             ? 'Ubah Kustomisasi Anda'

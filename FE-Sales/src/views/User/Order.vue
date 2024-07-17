@@ -89,6 +89,7 @@ export default {
         case 'cancelled':
         case 'disposed':
         case 'on_hold':
+        case 'expired':
           return 'text-bg-danger'
         default:
           return 'text-bg-secondary'
@@ -100,6 +101,8 @@ export default {
           return 'Menunggu Pembayaran'
         case 'process':
           return 'Pesanan Diproses'
+          case 'expired':
+          return 'Expired'
         case 'confirmed':
           return 'Pesanan Dikonfirmasi'
         case 'allocated':

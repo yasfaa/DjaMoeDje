@@ -14,7 +14,8 @@ export default {
       items: [],
       address: '',
       showDetail: false,
-      riwayat: []
+      riwayat: [],
+      currentDropdownIndex: null
     }
   },
 
@@ -44,6 +45,14 @@ export default {
     getAddressPart(index) {
       const addressParts = this.address.split(',')
       return addressParts[index] || ''
+    },
+    toggleDropdown(index) {
+      console.log('Toggle Dropdown called with index:', index)
+      if (this.currentDropdownIndex === index) {
+        this.currentDropdownIndex = null
+      } else {
+        this.currentDropdownIndex = index
+      }
     },
     async retrieveDetail() {
       this.overlay = true
@@ -132,6 +141,7 @@ export default {
         case 'courierNotFound':
         case 'returned':
         case 'cancelled':
+        case 'expired':
         case 'disposed':
         case 'on_hold':
           return 'text-bg-danger'
@@ -147,6 +157,7 @@ export default {
         case 'returned':
         case 'cancelled':
         case 'disposed':
+        case 'expired':
         case 'on_hold':
           return 'mdi-close-circle'
         case 'process':
@@ -167,6 +178,8 @@ export default {
       switch (status) {
         case 'pending':
           return 'Menunggu Pembayaran'
+        case 'expired':
+          return 'Expired'
         case 'process':
           return 'Pesanan Diproses'
         case 'confirmed':
@@ -303,6 +316,24 @@ export default {
                       >
                     </div>
                   </div>
+                  <a
+                    class="lihat"
+                    v-if="item.customization && item.customization.length > 0"
+                    @click="toggleDropdown(orderIndex + '-' + index)"
+                  >
+                    {{
+                      currentDropdownIndex === orderIndex + '-' + index
+                        ? 'Sembunyikan Kustomisasi'
+                        : 'Lihat Kustomisasi Pelanggan'
+                    }}
+                  </a>
+                  <div class="show" v-if="currentDropdownIndex === orderIndex + '-' + index">
+                    <ul>
+                      <li v-for="custom in item.customization" :key="custom.nama">
+                        {{ custom.nama }}: {{ custom.quantity }}
+                      </li>
+                    </ul>
+                  </div>
                   <span>Rp{{ formatPrice(item.total_menu) }}</span>
                 </li>
               </ul>
@@ -354,12 +385,12 @@ export default {
               </div>
               <div class="row justify-content-end">
                 <button
-                class="btn btn-sm btn-primary"
-                @click="payNow(orders)"
-                v-if="orders.status === 'pending'"
-              >
-                Bayar Sekarang
-              </button>
+                  class="btn btn-sm btn-primary"
+                  @click="payNow(orders)"
+                  v-if="orders.status === 'pending'"
+                >
+                  Bayar Sekarang
+                </button>
               </div>
             </div>
           </v-card>
@@ -408,7 +439,6 @@ a {
 .mb-4 {
   margin-bottom: 1.5rem !important;
 }
-
 
 @media (max-width: 576px) {
   .row .col-1,
