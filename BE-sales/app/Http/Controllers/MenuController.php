@@ -179,8 +179,6 @@ class MenuController extends Controller
         return response()->json(['message' => 'Menu berhasil diperbarui', 'menu' => $menu, 'imageUrls' => $imageUrls]);
     }
 
-
-
     public function destroy($id)
     {
         $menu = Menu::find($id);

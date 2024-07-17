@@ -5,67 +5,90 @@
   <div class="py-4 container-fluid gradient-container">
     <div class="container">
       <div class="row mt-5">
-        <div class="card border-2 pt-3" v-if="menu.id">
-          <div id="menuCarousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
-              <div
-                v-for="(link, index) in fileLinks"
-                :key="index"
-                :class="['carousel-item', { active: index === 0 }]"
-              >
-                <img
-                  :src="link || 'https://via.placeholder.com/150'"
-                  class="d-block"
-                  alt="Menu Image"
-                />
+        <div class="col-lg-8 col-md-12">
+          <div class="card border-2 pt-3" v-if="menu.id">
+            <div class="row">
+              <!-- Column 1: Image Carousel -->
+              <div class="col-md-6 order-1 order-md-1">
+                <div id="menuCarousel" class="carousel slide p-3" data-bs-ride="carousel">
+                  <div class="carousel-inner">
+                    <div
+                      v-for="(link, index) in fileLinks"
+                      :key="index"
+                      :class="['carousel-item', { active: index === 0 }]"
+                    >
+                      <div class="carousel-image-container">
+                        <img
+                          :src="link || 'https://via.placeholder.com/150'"
+                          class="d-block w-100 carousel-image"
+                          alt="Menu Image"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    class="carousel-control-prev"
+                    type="button"
+                    data-bs-target="#menuCarousel"
+                    data-bs-slide="prev"
+                  >
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                  </button>
+                  <button
+                    class="carousel-control-next"
+                    type="button"
+                    data-bs-target="#menuCarousel"
+                    data-bs-slide="next"
+                  >
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                  </button>
+                </div>
+              </div>
+              <div class="col-md-6 order-2 order-md-2">
+                <div class="d-flex flex-column mx-5">
+                  <h2 class="menu-title mt-2">{{ menu.nama_menu }}</h2>
+                  <div class="menu-price">Rp. {{ formatPrice(menu.total) }}</div>
+                  <div class="theme-text subtitle">Deskripsi:</div>
+                  <div class="brief-description">{{ menu.deskripsi }}</div>
+                </div>
               </div>
             </div>
-            <button
-              class="carousel-control-prev"
-              type="button"
-              data-bs-target="#menuCarousel"
-              data-bs-slide="prev"
-            >
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Previous</span>
-            </button>
-            <button
-              class="carousel-control-next"
-              type="button"
-              data-bs-target="#menuCarousel"
-              data-bs-slide="next"
-            >
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Next</span>
-            </button>
           </div>
-          <div class="row p-2 pt-2">
-            <div class="d-flex flex-column">
-              <div class="d-flex justify-content-between align-items-center">
-                <h2 class="menu-title">{{ menu.nama_menu }}</h2>
-              </div>
-              <div class="menu-price">Rp. {{ formatPrice(menu.total) }}</div>
-              <div class="theme-text subtitle">Deskripsi:</div>
-              <div class="brief-description">{{ menu.deskripsi }}</div>
-              <div class="quantity-control my-3">
-                <v-icon icon="mdi-minus" class="icon-btn" @click="decreaseQuantity"></v-icon>
-                <input
-                  type="number"
-                  min="1"
-                  v-model="quantity"
-                  @change="updateQuantity(index, order.id, order.quantity)"
-                  class="form-control text-center quantity-input mx-2"
-                  style="width: 55px"
-                />
-                <v-icon icon="mdi-plus" class="icon-btn" @click="increaseQuantity"></v-icon>
-              </div>
-              <div class="justify-content-end">
-                <button class="btn btn-primary me-4" @click.prevent="addToCart(menu.id, quantity)">
-                  Add to Cart
-                </button>
-                <button class="btn btn-secondary my-2" v-if="menu.ingredient && menu.ingredient.length > 0" @click.prevent="goToCustomize(menu.id)">Customize Menu</button>
-              </div>
+        </div>
+        <div class="col-lg-4 col-md-12 order-3">
+          <div class="card p-3 order-controls">
+            <h3 class="control-title mt-2">Atur Jumlah</h3>
+            <div class="quantity-control my-3">
+              <v-icon icon="mdi-minus" class="icon-btn" @click="decreaseQuantity"></v-icon>
+              <input
+                type="number"
+                min="1"
+                v-model="quantity"
+                @change="updateQuantity(index, order.id, order.quantity)"
+                class="form-control text-center quantity-input mx-2"
+                style="width: 55px"
+              />
+              <v-icon icon="mdi-plus" class="icon-btn" @click="increaseQuantity"></v-icon>
             </div>
+            <div class="subtotal">
+              <span>Subtotal:</span>
+              <span class="menu-price">Rp. {{ formatPrice(menu.total * quantity) }}</span>
+            </div>
+            <button
+              class="btn btn-primary w-100 my-2"
+              @click.prevent="addToCart(menu.id, quantity)"
+            >
+              + Keranjang
+            </button>
+            <button
+              class="btn btn-secondary w-100"
+              v-if="menu.ingredient && menu.ingredient.length > 0"
+              @click.prevent="goToCustomize(menu.id)"
+            >
+              Customize Menu
+            </button>
           </div>
         </div>
       </div>
@@ -199,8 +222,32 @@ export default {
   border-radius: 10px;
 }
 
+.carousel-image-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%; /* This creates the 1:1 aspect ratio container */
+  background-color: white; /* White background for the empty space */
+}
+
+.carousel-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Ensure the image fits within the container without stretching */
+  transform: translate(-50%, -50%);
+}
+
 .menu-title {
   font-size: 2rem;
+  font-weight: bold;
+  color: #19160c;
+  margin-bottom: 0.5rem;
+}
+
+.control-title {
+  font-size: 1.5rem;
   font-weight: bold;
   color: #19160c;
   margin-bottom: 0.5rem;
@@ -263,11 +310,35 @@ export default {
   margin: 0 10px;
 }
 
+.subtotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.order-controls {
+  border-radius: 10px;
+  box-shadow: 1px 1px 15px #cccccc40;
+}
+
 @media (max-width: 600px) {
   .carousel {
-    max-height: 200px;
-    overflow: hidden;
+    max-height: 400px;
     border-radius: 10px;
+  }
+
+  .order-1 {
+    order: 1 !important;
+  }
+
+  .order-2 {
+    order: 2 !important;
+  }
+
+  .order-3 {
+    order: 3 !important;
   }
 }
 </style>
