@@ -287,6 +287,14 @@ export default {
       this.dialog = false
     },
     async proceedToCheckout() {
+      if (!this.selectedCourier) {
+        this.$notify({
+          type: 'error',
+          title: 'Error',
+          text: 'Pilih alamat pengiriman terlebih dahulu',
+        })
+        return
+      }
       this.overlay = true
       try {
         const response = await axios.post(
@@ -440,11 +448,7 @@ export default {
                       v-model="selectedAddressId"
                     >
                       <option value="" disabled>Pilih alamat</option>
-                      <option
-                        v-for="item in alamat"
-                        :key="item.AddressId"
-                        :value="item.AddressId"
-                      >
+                      <option v-for="item in alamat" :key="item.AddressId" :value="item.AddressId">
                         {{ item.nama_penerima }} | {{ item.kecamatan }}, {{ item.kota }}
                       </option>
                     </select>
