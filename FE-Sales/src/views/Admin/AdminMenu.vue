@@ -115,30 +115,6 @@ export default {
         this.overlay = false
       }
     },
-    async addToCart(menuId) {
-      const isLoggedIn = !!localStorage.getItem('access_token') // Check if the user is logged in
-
-      if (!isLoggedIn) {
-        this.$router.push('/login') // Redirect to login if not logged in
-        return
-      }
-
-      try {
-        const formData = new FormData()
-        formData.append('menu_id', menuId)
-        formData.append('quantity', '1')
-
-        await axios.post(BASE_URL + '/cart/add', formData, {
-          headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('access_token'),
-            'Content-Type': 'multipart/form-data'
-          }
-        })
-        this.showSuccessDialog = true
-      } catch (error) {
-        console.error('Error adding menu to cart:', error)
-      }
-    }
   }
 }
 </script>

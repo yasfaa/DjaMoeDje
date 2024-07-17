@@ -80,14 +80,15 @@
               v-model="ingredient.price"
             />
             <a style="font-size: 11px; color: red"
-              ><i class="fas fa-info-circle" style="color: #ff0000"></i>&nbsp;Masukkan harga jika mempengaruhi harga menu</a
+              ><i class="fas fa-info-circle" style="color: #ff0000"></i>&nbsp;Masukkan harga jika
+              mempengaruhi harga menu</a
             >
           </div>
           <button type="button" class="btn btn-primary mb-5" @click="addOrUpdateIngredient">
             Tambah Bahan Lainnya
           </button>
           <div class="modal-footer">
-            <button class="btn btn-primary me-4 justify-content-start" @click="closeAddDialog">
+            <button class="btn btn-primary me-4 justify-content-start" type="button" @click="closeAddDialog">
               Batal
             </button>
             <button class="btn btn-primary" type="submit">Simpan</button>
@@ -112,7 +113,8 @@
               v-model="ingredient.price"
             />
             <a style="font-size: 11px; color: red"
-              ><i class="fas fa-info-circle" style="color: #ff0000"></i>&nbsp;Masukkan harga jika mempengaruhi harga menu</a
+              ><i class="fas fa-info-circle" style="color: #ff0000"></i>&nbsp;Masukkan harga jika
+              mempengaruhi harga menu</a
             >
           </div>
           <div class="modal-footer">
@@ -174,11 +176,8 @@ export default {
       this.dialogEdit = false
     },
     async retrieveBahans() {
-      const formData = new FormData()
-      formData.append('menu_id', this.menuId)
-
       try {
-        const response = await axios.post(this.BASE_URL + '/ingredient/get', formData, {
+        const response = await axios.get(`${this.BASE_URL}/ingredient/get/${this.menuId}`, {
           headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
@@ -223,6 +222,15 @@ export default {
       }
     },
     addOrUpdateIngredient() {
+      if (!this.ingredient.name) {
+        this.$notify({
+          type: 'error',
+          title: 'Error',
+          text: 'Nama bahan harus terisi',
+          color: 'red'
+        })
+        return
+      }
       if (this.selectedIngredientIndex !== null) {
         this.ingredients.splice(this.selectedIngredientIndex, 1, { ...this.ingredient })
       } else {
@@ -300,7 +308,7 @@ export default {
       formData.append('menu_id', this.menuId)
 
       try {
-        await axios.put(`${this.BASE_URL}/ingredient/update/${ingredientToUpdate.id}`, formData, {
+        await axios.post(`${this.BASE_URL}/ingredient/update/${ingredientToUpdate.id}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${localStorage.getItem('access_token')}`

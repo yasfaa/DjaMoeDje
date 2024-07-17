@@ -74,13 +74,13 @@ export default {
           return 'text-bg-danger'
         case 'process':
         case 'confirmed':
-          return 'text-bg-success' 
+          return 'text-bg-success'
         case 'allocated':
         case 'picking_up':
         case 'picked':
         case 'dropping_off':
         case 'return_in_transit':
-          return 'text-bg-warning' 
+          return 'text-bg-warning'
         case 'delivered':
           return 'text-bg-info'
         case 'rejected':
@@ -101,7 +101,7 @@ export default {
           return 'Menunggu Pembayaran'
         case 'process':
           return 'Pesanan Diproses'
-          case 'expired':
+        case 'expired':
           return 'Expired'
         case 'confirmed':
           return 'Pesanan Dikonfirmasi'
@@ -126,7 +126,7 @@ export default {
         case 'cancelled':
           return 'Pesanan Dibatalkan'
         case 'disposed':
-          return 'Pesanan Dibuang' 
+          return 'Pesanan Dibuang'
         case 'on_hold':
           return 'Pesanan Dalam Tunggu'
         default:
@@ -162,14 +162,20 @@ export default {
                   @change="retrieveOrders"
                 >
                   <option value="" selected>Semua</option>
-                  <option value="pending">Pending</option>
-                  <option value="process">Process</option>
+                  <option value="pending">Menunggu Pembayaran</option>
+                  <option value="process">Pesanan Diproses</option>
                   <option value="packing">Dikemas</option>
+                  <option value="confirmed">Pesanan Dikonfirmasi</option>
+                  <option value="allocated">Kurir Telah Dialokasikan</option>
+                  <option value="picking_up">Kurir Sedang Menuju Titik Jemput</option>
+                  <option value="picked">Barang Telah Diambil</option>
+                  <option value="dropping_off">Barang Sedang Dikirim</option>
                   <option value="delivery">Sedang Dikirim</option>
-                  <option value="delivered">Terkirim</option>
+                  <option value="delivered">Telah Terkirim</option>
                   <option value="finished">Selesai</option>
-                  <option value="onsite">OnSite</option>
                   <option value="expired">Expired</option>
+                  <option value="cancelled">Pesanan Dibatalkan</option>
+                  <option value="rejected">Pesanan Ditolak</option>
                 </select>
               </div>
             </div>

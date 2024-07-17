@@ -192,6 +192,7 @@ export default {
     },
     async saveAddress() {
       const addressData = {
+        id: this.selectedAddresses.id,
         nama_penerima: this.address.nama_penerima,
         nomor_telepon: this.address.nomor_telepon,
         jalan: this.address.jalan,
@@ -291,7 +292,7 @@ export default {
         this.$notify({
           type: 'error',
           title: 'Error',
-          text: 'Pilih alamat pengiriman terlebih dahulu',
+          text: 'Pilih alamat pengiriman terlebih dahulu'
         })
         return
       }
@@ -369,7 +370,7 @@ export default {
     },
     fillAddress() {
       this.selectedAddress =
-        this.alamat.find((address) => address.selected_address_id === this.selectedAddressId) || {}
+        this.alamat.find((address) => address.id === this.selectedAddressId) || {}
     },
     async fetchUserAddresses() {
       try {
@@ -446,10 +447,15 @@ export default {
                       class="form-select"
                       aria-label="Default select example"
                       v-model="selectedAddressId"
+                      @change="fillAddress"
                     >
                       <option value="" disabled>Pilih alamat</option>
-                      <option v-for="item in alamat" :key="item.AddressId" :value="item.AddressId">
-                        {{ item.nama_penerima }} | {{ item.kecamatan }}, {{ item.kota }}
+                      <option
+                        v-for="item in alamat"
+                        :key="item.id"
+                        :value="item.id"
+                      >
+                      {{ item.nama_penerima }} | {{ item.kecamatan }}, {{ item.kota }}
                       </option>
                     </select>
                   </div>

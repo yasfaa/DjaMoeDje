@@ -42,7 +42,7 @@ Route::prefix('/ingredient')->middleware(['auth:sanctum'])->group(function () {
     Route::get('/get/{menuId}', [IngredientController::class, 'index']);
     Route::get('/getCart/{cartItemId}', [IngredientController::class, 'indexCart']);
 
-    Route::middleware('role:admin')->group(function () {
+    Route::middleware('role:Admin')->group(function () {
         Route::post('/add', [IngredientController::class, 'store']);
         Route::post('/update/{id}', [IngredientController::class, 'update']);
         Route::delete('/delete/{id}', [IngredientController::class, 'destroy']);

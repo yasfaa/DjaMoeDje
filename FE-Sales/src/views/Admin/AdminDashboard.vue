@@ -91,7 +91,7 @@
               Tambah Bahan Lainnya
             </button>
             <div class="modal-footer">
-              <button class="btn btn-primary me-4 justify-content-start" @click="closeDialog">
+              <button class="btn btn-primary me-4 justify-content-start" type="button" @click="closeDialog">
                 Batal
               </button>
               <button class="btn btn-primary" type="submit">Simpan</button>
@@ -216,7 +216,7 @@ export default {
         this.$notify({
           type: 'error',
           title: 'Error',
-          text: 'Both ingredient name and price are required',
+          text: 'Nama bahan harus terisi',
           color: 'red'
         })
         return

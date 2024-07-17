@@ -188,18 +188,28 @@ export default {
                   @change="retrieveOrders"
                 >
                   <option value="" selected>Semua</option>
-                  <option value="pending">Pending</option>
-                  <option value="process">Process</option>
+                  <option value="pending">Menunggu Pembayaran</option>
+                  <option value="process">Pesanan Diproses</option>
                   <option value="packing">Dikemas</option>
+                  <option value="confirmed">Pesanan Dikonfirmasi</option>
+                  <option value="allocated">Kurir Telah Dialokasikan</option>
+                  <option value="picking_up">Kurir Sedang Menuju Titik Jemput</option>
+                  <option value="picked">Barang Telah Diambil</option>
+                  <option value="dropping_off">Barang Sedang Dikirim</option>
                   <option value="delivery">Sedang Dikirim</option>
-                  <option value="delivered">Terkirim</option>
+                  <option value="delivered">Telah Terkirim</option>
                   <option value="finished">Selesai</option>
-                  <option value="onsite">OnSite</option>
                   <option value="expired">Expired</option>
+                  <option value="cancelled">Pesanan Dibatalkan</option>
+                  <option value="rejected">Pesanan Ditolak</option>
                 </select>
               </div>
             </div>
-            <div class="card mb-3" v-for="(order, orderIndex) in orders" :key="order.id_transaksi">
+            <v-card
+              class="card mb-3"
+              v-for="(order, orderIndex) in orders"
+              :key="order.id_transaksi"
+            >
               <div
                 class="card-header p-0 px-3 d-flex justify-content-between align-items-center p-1"
               >
@@ -273,7 +283,7 @@ export default {
                 </div>
                 <div class="d-flex justify-content-end mb-2"></div>
               </div>
-            </div>
+            </v-card>
           </div>
         </div>
       </div>
