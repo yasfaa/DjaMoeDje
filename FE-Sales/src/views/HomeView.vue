@@ -82,7 +82,10 @@ export default {
     <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
       <div class="carousel-inner">
         <div class="carousel-item active">
-          <img src="../assets/img/banner.png" style="width: 100%; max-height: 500px; object-fit: cover" />
+          <img
+            src="../assets/img/banner.png"
+            style="width: 100%; max-height: 500px; object-fit: cover"
+          />
         </div>
       </div>
     </div>
@@ -97,20 +100,16 @@ export default {
           <v-row>
             <v-col v-for="menu in menus" :key="menu.id" cols="12" sm="6" md="4">
               <v-card class="menu-card">
-                <v-img
-                  :src="getMenuImage(menu.id)"
-                  height="225"
-                  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-                  cover
-                >
-                </v-img>
+                <div class="menu-image-container">
+                  <v-img :src="getMenuImage(menu.id)" class="menu-image"></v-img>
+                </div>
                 <v-card-title class="menu-title">{{ menu.nama }}</v-card-title>
                 <v-card-actions class="menu-actions align-item-center">
                   <p class="menu-price m-0">Rp {{ formatPrice(menu.total) }}</p>
                   <v-spacer></v-spacer>
-                  <button class="btn btn-primary" @click="goToMenu(menu.id)">View Menu</button>
+                  <button class="btn btn-primary" @click="goToMenu(menu.id)">Lihat Menu</button>
                   <button class="btn btn-secondary mx-2" @click.prevent="addToCart(menu.id)">
-                    Add to Cart
+                    + Keranjang
                   </button>
                 </v-card-actions>
               </v-card>
@@ -217,6 +216,22 @@ export default {
 
 .btn-secondary:hover {
   background-color: #5a6268;
+}
+
+.menu-image-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%; 
+  background-color: rgba(255, 255, 255, 0.212);
+}
+
+.menu-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 @media (max-width: 600px) {

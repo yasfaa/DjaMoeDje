@@ -84,7 +84,7 @@
               mempengaruhi harga menu</a
             >
           </div>
-          <button type="button" class="btn btn-primary mb-5" @click="addOrUpdateIngredient">
+          <button type="button" class="btn btn-primary mb-5 w-100" @click="addOrUpdateIngredient">
             Tambah Bahan Lainnya
           </button>
           <div class="modal-footer">
@@ -361,7 +361,7 @@ export default {
 
 .form-box {
   position: relative;
-  width: 450px;
+  width: 350px;
   height: auto;
   background: #fffcf1;
   display: flex;

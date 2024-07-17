@@ -5,48 +5,54 @@
   <div class="py-4 container-fluid gradient-container">
     <div class="container">
       <div class="row mt-5">
-        <div class="card border-2 pt-3" v-if="menu.id">
-          <div id="menuCarousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
-              <div
-                v-for="(link, index) in fileLinks"
-                :key="index"
-                :class="['carousel-item', { active: index === 0 }]"
-              >
-                <img
-                  :src="link || 'https://via.placeholder.com/150'"
-                  class="d-block w-100"
-                  alt="Menu Image"
-                />
+        <div class="col-lg-12 col-md-12">
+          <div class="card border-2 pt-3" v-if="menu.id">
+            <div class="row">
+              <div class="col-md-4 order-1 order-md-1">
+                <div id="menuCarousel" class="carousel slide p-3" data-bs-ride="carousel">
+                  <div class="carousel-inner">
+                    <div
+                      v-for="(link, index) in fileLinks"
+                      :key="index"
+                      :class="['carousel-item', { active: index === 0 }]"
+                    >
+                      <div class="carousel-image-container">
+                        <img
+                          :src="link || 'https://via.placeholder.com/150'"
+                          class="d-block w-100 carousel-image"
+                          alt="Menu Image"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    class="carousel-control-prev"
+                    type="button"
+                    data-bs-target="#menuCarousel"
+                    data-bs-slide="prev"
+                  >
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                  </button>
+                  <button
+                    class="carousel-control-next"
+                    type="button"
+                    data-bs-target="#menuCarousel"
+                    data-bs-slide="next"
+                  >
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                  </button>
+                </div>
               </div>
-            </div>
-            <button
-              class="carousel-control-prev"
-              type="button"
-              data-bs-target="#menuCarousel"
-              data-bs-slide="prev"
-            >
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Previous</span>
-            </button>
-            <button
-              class="carousel-control-next"
-              type="button"
-              data-bs-target="#menuCarousel"
-              data-bs-slide="next"
-            >
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Next</span>
-            </button>
-          </div>
-          <div class="row p-2 pt-2">
-            <div class="d-flex flex-column">
-              <div class="d-flex justify-content-between align-items-center">
-                <h2 class="menu-title">{{ menu.nama_menu }}</h2>
+              <div class="col-md-6 order-2 order-md-2">
+                <div class="d-flex flex-column mx-5">
+                  <h2 class="menu-title mt-2">{{ menu.nama_menu }}</h2>
+                  <div class="menu-price">Rp. {{ formatPrice(menu.total) }}</div>
+                  <div class="theme-text subtitle">Deskripsi:</div>
+                  <div class="brief-description">{{ menu.deskripsi }}</div>
+                </div>
               </div>
-              <div class="menu-price">Rp. {{ formatPrice(menu.total) }}</div>
-              <div class="theme-text subtitle">Deskripsi:</div>
-              <div class="brief-description">{{ menu.deskripsi }}</div>
             </div>
             <Datatables />
           </div>
@@ -114,7 +120,7 @@ export default {
       } finally {
         this.overlay = false
       }
-    },
+    }
   }
 }
 </script>
@@ -128,9 +134,27 @@ export default {
 }
 
 .carousel {
-  max-height: 550px;
-  overflow: hidden;
+  max-height: 400px;
+  max-width: 400px;
   border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.carousel-image-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%; /* This creates the 1:1 aspect ratio container */
+  background-color: white; /* White background for the empty space */
+}
+
+.carousel-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Ensure the image fits within the container without stretching */
+  transform: translate(-50%, -50%);
 }
 
 .menu-title {
@@ -188,9 +212,16 @@ export default {
 
 @media (max-width: 600px) {
   .carousel {
-    max-height: 200px;
-    overflow: hidden;
+    max-height: 350px;
     border-radius: 10px;
+  }
+
+  .order-1 {
+    order: 1 !important;
+  }
+
+  .order-2 {
+    order: 2 !important;
   }
 }
 </style>

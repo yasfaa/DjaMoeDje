@@ -4,7 +4,7 @@
       <div id="mySidenav" class="sidenav shadow" :class="{ openNavClass: isActive }">
         <a class="closebtn" @click="isActive = !isActive" style="cursor: pointer">&times;</a>
         <router-link to="/" exact class="nav-link" :class="{ 'active-link': $route.path === '/#' }">
-          Home
+          <v-icon>mdi-home</v-icon> Home
         </router-link>
         <router-link
           to="/admin/dashboard"
@@ -12,7 +12,7 @@
           class="nav-link"
           :class="{ 'active-link': $route.path === '/admin/dashboard' }"
         >
-          Kelola Menu
+          <v-icon>mdi-view-dashboard</v-icon> Kelola Menu
         </router-link>
         <router-link
           to="/admin/order"
@@ -20,7 +20,7 @@
           class="nav-link"
           :class="{ 'active-link': $route.path === '/admin/order' }"
         >
-          Daftar Pesanan
+          <v-icon>mdi-file-document</v-icon> Daftar Pesanan
         </router-link>
       </div>
       <div class="content">
@@ -44,40 +44,40 @@
                 aria-controls="navbarSupportedContent"
                 aria-expanded="false"
                 aria-label="Toggle navigation"
-              ></button>
+              >
+                <span class="navbar-toggler-icon"></span>
+              </button>
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <div class="div">
-                  <ul class="navbar-nav mb-2 mb-lg-0">
-                    <li class="nav-item dropdown">
-                      <button
-                        class="btn dropdown-toggle"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        <v-icon> mdi-account </v-icon>
-                        {{ user.name }}
-                      </button>
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <a
-                            class="dropdown-item text-center"
-                            @click="AdminProfile()"
-                            style="cursor: pointer"
-                            >Profile</a
-                          >
-                        </li>
-                        <li>
-                          <a
-                            class="dropdown-item text-center"
-                            @click="onLogout()"
-                            style="cursor: pointer"
-                            >Logout</a
-                          >
-                        </li>
-                      </ul>
-                    </li>
-                  </ul>
-                </div>
+                <ul class="navbar-nav mb-2 mb-lg-0 ms-auto">
+                  <li class="nav-item dropdown">
+                    <button
+                      class="btn dropdown-toggle"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      <v-icon> mdi-account </v-icon>
+                      {{ user.name }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      <li>
+                        <a
+                          class="dropdown-item text-center"
+                          @click="AdminProfile()"
+                          style="cursor: pointer"
+                          >Profile</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          class="dropdown-item text-center"
+                          @click="onLogout()"
+                          style="cursor: pointer"
+                          >Logout</a
+                        >
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
               </div>
             </div>
           </nav>
@@ -89,7 +89,7 @@
       <div id="mySidenav" class="sidenav shadow" :class="{ openNavClass: isActive }">
         <a class="closebtn" @click="isActive = !isActive" style="cursor: pointer">&times;</a>
         <router-link to="/" exact class="nav-link" :class="{ 'active-link': $route.path === '/' }">
-          Home
+          <v-icon>mdi-home</v-icon> Home
         </router-link>
         <router-link
           to="/cart"
@@ -97,7 +97,7 @@
           class="nav-link"
           :class="{ 'active-link': $route.path === '/cart' }"
         >
-          Keranjang saya
+          <v-icon>mdi-cart</v-icon> Keranjang saya
         </router-link>
         <router-link
           to="/order"
@@ -105,7 +105,7 @@
           class="nav-link"
           :class="{ 'active-link': $route.path === '/order' }"
         >
-          Pesananku
+          <v-icon>mdi-file-document</v-icon> Pesananku
         </router-link>
       </div>
       <div class="content">
@@ -129,40 +129,40 @@
                 aria-controls="navbarSupportedContent"
                 aria-expanded="false"
                 aria-label="Toggle navigation"
-              ></button>
+              >
+                <span class="navbar-toggler-icon"></span>
+              </button>
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <div class="div">
-                  <ul class="navbar-nav mb-2 mb-lg-0">
-                    <li class="nav-item dropdown">
-                      <button
-                        class="btn dropdown-toggle"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        <v-icon> mdi-account </v-icon>
-                        {{ user.name }}
-                      </button>
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <a
-                            class="dropdown-item text-center"
-                            @click="profile()"
-                            style="cursor: pointer"
-                            >Profile</a
-                          >
-                        </li>
-                        <li>
-                          <a
-                            class="dropdown-item text-center"
-                            @click="onLogout()"
-                            style="cursor: pointer"
-                            >Logout</a
-                          >
-                        </li>
-                      </ul>
-                    </li>
-                  </ul>
-                </div>
+                <ul class="navbar-nav mb-2 mb-lg-0 ms-auto">
+                  <li class="nav-item dropdown">
+                    <button
+                      class="btn dropdown-toggle"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      <v-icon> mdi-account </v-icon>
+                      {{ user.name }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      <li>
+                        <a
+                          class="dropdown-item text-center"
+                          @click="profile()"
+                          style="cursor: pointer"
+                          >Profile</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          class="dropdown-item text-center"
+                          @click="onLogout()"
+                          style="cursor: pointer"
+                          >Logout</a
+                        >
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
               </div>
             </div>
           </nav>
@@ -251,7 +251,7 @@ export default {
   height: 100%;
   width: 0;
   position: fixed;
-  z-index: 1000; /* Pastikan ini lebih tinggi dari konten lainnya */
+  z-index: 1000;
   top: 0;
   left: -250px;
   background-color: #e5c54f;
@@ -318,5 +318,34 @@ export default {
 .navbar {
   z-index: 999;
   background-color: #fff6d6;
+}
+
+.dropdown-toggle:focus,
+.dropdown-toggle:hover {
+  background-color: #e5c54f;
+  color: black;
+}
+
+.dropdown-menu {
+  width: 150px;
+}
+
+@media (max-width: 768px) {
+  .navbar-nav .dropdown-menu {
+    width: auto;
+  }
+
+  .navbar-collapse {
+    justify-content: flex-end;
+  }
+
+  .navbar-toggler {
+    border: none;
+  }
+
+  .navbar-toggler:focus,
+  .navbar-toggler:hover {
+    background-color: transparent;
+  }
 }
 </style>
