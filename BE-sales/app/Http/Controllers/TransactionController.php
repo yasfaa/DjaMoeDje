@@ -123,7 +123,6 @@ class TransactionController extends Controller
         $transactions = $transactionsQuery->get();
 
         $transactions->each(function ($transaction) {
-            $this->updateOrderStatus($transaction);
             if ($transaction->status === 'pending') {
                 $this->updatePaymentStatus($transaction);
             }
@@ -192,7 +191,6 @@ class TransactionController extends Controller
         $transactions = $transactionsQuery->get();
 
         $transactions->each(function ($transaction) {
-            $this->updateOrderStatus($transaction);
             if ($transaction->status === 'pending') {
                 $this->updatePaymentStatus($transaction);
             }
@@ -289,9 +287,9 @@ class TransactionController extends Controller
                         'quantity' => $ingredient->quantity
                     ];
                 });
-    
+
                 $formattedMenu['customization'] = $customizations;
-    
+
                 return $formattedMenu;
             }),
         ];
@@ -318,7 +316,7 @@ class TransactionController extends Controller
                 $transaction->update(['status' => 'process']);
             }
             if ($status['status_code'] === "200" && $status['transaction_status'] === "expire") {
-                $transaction->update(['status' => 'expired']);
+                $transaction->update(['status' => 'canceled']);
             }
             $transaction->payment->update(['payment_link' => null]);
 
@@ -327,33 +325,33 @@ class TransactionController extends Controller
         }
     }
 
-    public function updateOrderStatus($transaction)
-    {
-        try {
-            $client = new Client();
-            $tracking_id = $transaction->courier->tracking_id;
-            $url = "https://api.biteship.com/v1/trackings/{$tracking_id}";
-            $response = $client->request('GET', $url, [
-                'headers' => [
-                    'Accept' => 'application/json',
-                    'Authorization' => 'Bearer ' . env('BITESHIP_API_KEY')
-                ]
-            ]);
+    // private function updateOrderStatus($transaction)
+    // {
+    //     try {
+    //         $client = new Client();
+    //         $tracking_id = $transaction->courier->tracking_id;
+    //         $url = "https://api.biteship.com/v1/trackings/{$tracking_id}";
+    //         $response = $client->request('GET', $url, [
+    //             'headers' => [
+    //                 'Accept' => 'application/json',
+    //                 'Authorization' => 'Bearer ' . env('BITESHIP_API_KEY')
+    //             ]
+    //         ]);
 
-            $data = json_decode($response->getBody(), true);
-            $status = isset($data['status']) ? $data['status'] : null;
+    //         $data = json_decode($response->getBody(), true);
+    //         $status = isset($data['status']) ? $data['status'] : null;
 
-            if ($status !== null) {
-                $transaction->status = $status;
-                $transaction->save();
-            } else {
-                Log::warning('Unable to retrieve valid status from Biteship API response.');
-            }
-        } catch (Exception $e) {
-            Log::error('Error retrieving Biteship order status: ' . $e->getMessage());
-        }
+    //         if ($status !== null) {
+    //             $transaction->status = $status;
+    //             $transaction->save();
+    //         } else {
+    //             Log::warning('Unable to retrieve valid status from Biteship API response.');
+    //         }
+    //     } catch (Exception $e) {
+    //         Log::error('Error retrieving Biteship order status: ' . $e->getMessage());
+    //     }
 
-    }
+    // }
 
     public function adminCreateOrder($orderId)
     {
