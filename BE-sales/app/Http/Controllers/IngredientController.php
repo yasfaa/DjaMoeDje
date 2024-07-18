@@ -46,7 +46,7 @@ class IngredientController extends Controller
             $ingredient = Ingredient::create([
                 'nama' => $request->input('nama_bahan'),
                 'menu_id' => $request->input('menu_id'),
-                'harga' => $request->input('harga_bahan', 0)
+                'harga' => $request->input('harga_bahan') ?? 0.00
             ]);
 
             return response()->json(['ingredient' => $ingredient, 'message' => 'Ingredient added successfully'], 201);
