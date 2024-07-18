@@ -76,7 +76,7 @@ class MenuController extends Controller
             'total' => 'required|numeric',
             'deskripsi' => 'required|string',
             'gambar' => 'required|array',
-            'gambar.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:4096',
+            'gambar.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
         ]);
 
         try {
@@ -149,7 +149,7 @@ class MenuController extends Controller
             'total' => 'required|numeric',
             'deskripsi' => 'required|string',
             'gambar' => 'nullable|array',
-            'gambar.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
+            'gambar.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
         ]);
 
         $menu->nama_menu = $request->input('nama_menu');
