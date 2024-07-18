@@ -87,11 +87,19 @@
                 v-model="ingredient.price"
               />
             </div>
-            <button type="button" class="btn btn-primary mb-5" @click="addOrUpdateIngredient">
+            <a style="font-size: 11px; color: red"
+              ><i class="fas fa-info-circle" style="color: #ff0000"></i>&nbsp;Masukkan harga jika
+              mempengaruhi harga menu</a
+            >
+            <button type="button" class="btn btn-primary mb-5 w-100" @click="addOrUpdateIngredient">
               Tambah Bahan Lainnya
             </button>
             <div class="modal-footer">
-              <button class="btn btn-primary me-4 justify-content-start" type="button" @click="closeDialog">
+              <button
+                class="btn btn-primary me-4 justify-content-start"
+                type="button"
+                @click="closeDialog"
+              >
                 Batal
               </button>
               <button class="btn btn-primary" type="submit">Simpan</button>
@@ -411,13 +419,13 @@ h2 {
 
 @media (max-width: 600px) {
   .form-box {
-  position: relative;
-  width: 95%;
-  height: auto;
-  background: #fffcf1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+    position: relative;
+    width: 95%;
+    height: auto;
+    background: #fffcf1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 </style>

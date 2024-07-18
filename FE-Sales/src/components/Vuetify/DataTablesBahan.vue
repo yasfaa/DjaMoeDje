@@ -60,11 +60,14 @@
             <v-chip
               v-for="(ingredient, index) in ingredients"
               :key="index"
+              :class="{ 'selected-card': selectedIngredientIndex === index }"
               class="ma-2"
               close
+              @click="editIngredient(index)"
               @click:close="removeIngredient(index)"
             >
-              {{ ingredient.name }} | {{ ingredient.price }}
+              {{ ingredient.name }} | {{ ingredient.price }} |
+              <v-icon size="small" @click.stop="removeIngredient(index)">mdi-delete</v-icon>
             </v-chip>
           </div>
           <div class="mb-3">
@@ -88,7 +91,11 @@
             Tambah Bahan Lainnya
           </button>
           <div class="modal-footer">
-            <button class="btn btn-primary me-4 justify-content-start" type="button" @click="closeAddDialog">
+            <button
+              class="btn btn-primary me-4 justify-content-start"
+              type="button"
+              @click="closeAddDialog"
+            >
               Batal
             </button>
             <button class="btn btn-primary" type="submit">Simpan</button>
@@ -118,7 +125,7 @@
             >
           </div>
           <div class="modal-footer">
-            <button class="btn me-4 justify-content-start" @click="closeEditDialog">Batal</button>
+            <button class="btn me-4 justify-content-start" type="button" @click="closeEditDialog">Batal</button>
             <button class="btn btn-primary" type="submit">Simpan</button>
           </div>
         </v-form>
@@ -128,7 +135,6 @@
 </template>
 
 <script>
-import { ref } from 'vue'
 import axios from 'axios'
 
 export default {
@@ -247,97 +253,84 @@ export default {
         this.ingredient.name = ''
         this.ingredient.price = ''
         this.selectedIngredientIndex = null
-      } else if (this.selectedIngredientIndex > index) {
-        this.selectedIngredientIndex--
       }
     },
+    editIngredient(index) {
+      this.ingredient = { ...this.ingredients[index] }
+      this.selectedIngredientIndex = index
+    },
     async addAllIngredients() {
+      const payload = this.ingredients.map((ingredient) => ({
+        nama: ingredient.name,
+        harga: ingredient.price
+      }))
+
       try {
-        if (this.ingredients.length === 0) {
-          this.$notify({
-            type: 'error',
-            title: 'Error',
-            text: 'No ingredients to add',
-            color: 'red'
-          })
-          return
-        }
-
-        const token = localStorage.getItem('access_token')
-
-        for (const ingredient of this.ingredients) {
-          const formData = new FormData()
-          formData.append('nama_bahan', ingredient.name)
-          formData.append('harga_bahan', ingredient.price)
-          formData.append('menu_id', this.menuId)
-
-          await axios.post(`${this.BASE_URL}/ingredient/add`, formData, {
+        const response = await axios.post(
+          `${this.BASE_URL}/ingredient/create/${this.menuId}`,
+          payload,
+          {
             headers: {
-              'Content-Type': 'multipart/form-data',
-              Authorization: `Bearer ${token}`
+              Authorization: 'Bearer ' + localStorage.getItem('access_token')
             }
-          })
-        }
-
-        this.clearForm()
-        this.retrieveBahans()
-
+          }
+        )
         this.$notify({
           type: 'success',
           title: 'Success',
-          text: 'Ingredients added successfully',
+          text: 'Bahan berhasil ditambahkan',
           color: 'green'
         })
+        this.retrieveBahans()
         this.dialogAdd = false
+        this.clearForm()
       } catch (error) {
         console.error(error)
-        const errorMessage = error.response?.data.message || 'An error occurred'
         this.$notify({
           type: 'error',
           title: 'Error',
-          text: errorMessage,
+          text: 'Gagal menambahkan bahan',
           color: 'red'
         })
       }
     },
     async saveEditedIngredient() {
-      const ingredientToUpdate = this.menus[this.selectedIngredientIndex]
-      const formData = new FormData()
-      formData.append('nama_bahan', this.ingredient.name)
-      formData.append('harga_bahan', this.ingredient.price)
-      formData.append('menu_id', this.menuId)
-
       try {
-        await axios.post(`${this.BASE_URL}/ingredient/update/${ingredientToUpdate.id}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${localStorage.getItem('access_token')}`
+        const payload = {
+          nama: this.ingredient.name,
+          harga: this.ingredient.price
+        }
+        const response = await axios.put(
+          `${this.BASE_URL}/ingredient/update/${this.menus[this.selectedIngredientIndex].id}`,
+          payload,
+          {
+            headers: {
+              Authorization: 'Bearer ' + localStorage.getItem('access_token')
+            }
           }
-        })
-
+        )
         this.$notify({
           type: 'success',
           title: 'Success',
-          text: 'Ingredient updated successfully',
+          text: 'Bahan berhasil diperbarui',
           color: 'green'
         })
-
         this.retrieveBahans()
         this.dialogEdit = false
+        this.clearForm()
       } catch (error) {
         console.error(error)
-        const errorMessage = error.response?.data.message || 'An error occurred'
         this.$notify({
           type: 'error',
           title: 'Error',
-          text: errorMessage,
+          text: 'Gagal memperbarui bahan',
           color: 'red'
         })
       }
     },
     clearForm() {
-      this.ingredient = { name: '', price: '' }
-      this.ingredients = []
+      this.ingredient.name = ''
+      this.ingredient.price = ''
       this.selectedIngredientIndex = null
     }
   }
