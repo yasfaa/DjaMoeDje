@@ -328,7 +328,7 @@ class TransactionController extends Controller
     public function updateOrderStatus(Request $request)
     {
         $request->validate([
-            'transactionId' => 'required|numeric|exist:transactions,id',
+            'transactionId' => 'required|numeric|exists:transactions,id',
             'status' => 'required|string',
         ]);
 

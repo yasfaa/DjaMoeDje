@@ -70,7 +70,7 @@ export default {
     },
     async updatestatus(transactionId, status) {
       try {
-        const response = await axios.post(`${this.BASE_URL}/order/update-status`, {
+        const response = await axios.post(`${BASE_URL}/order/update`, {
           transactionId: transactionId,
           status: status
         },{
