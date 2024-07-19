@@ -120,6 +120,8 @@ class TransactionController extends Controller
             $transactionsQuery->where('status', $statusFilter);
         }
 
+        $transactionsQuery->orderBy('created_at', 'desc');
+
         $transactions = $transactionsQuery->get();
 
         $transactions->each(function ($transaction) {
@@ -127,16 +129,6 @@ class TransactionController extends Controller
                 $this->updatePaymentStatus($transaction);
             }
         });
-
-        $transactions = Transaction::with(['payment', 'cartItems.menu.menuPictures', 'courier'])
-            ->where('user_id', $userId)
-            ->get();
-
-        if ($statusFilter) {
-            $transactions = $transactions->filter(function ($transaction) use ($statusFilter) {
-                return $transaction->status === $statusFilter;
-            });
-        }
 
         $response = $transactions->map(function ($transaction) {
             return [
@@ -187,6 +179,8 @@ class TransactionController extends Controller
         if ($statusFilter) {
             $transactionsQuery->where('status', $statusFilter);
         }
+
+        $transactionsQuery->orderBy('created_at', 'desc');
 
         $transactions = $transactionsQuery->get();
 
