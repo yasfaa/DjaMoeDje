@@ -108,6 +108,7 @@ export default {
         case 'return_in_transit':
           return 'text-bg-warning'
         case 'delivered':
+        case 'finished':
           return 'text-bg-info'
         case 'rejected':
         case 'courierNotFound':
@@ -115,7 +116,6 @@ export default {
         case 'cancelled':
         case 'disposed':
         case 'on_hold':
-        case 'expired':
           return 'text-bg-danger'
         default:
           return 'text-bg-secondary'
@@ -125,8 +125,8 @@ export default {
       switch (status) {
         case 'pending':
           return 'Menunggu Pembayaran'
-        case 'expired':
-          return 'Expired'
+        case 'finished':
+          return 'Pesanan Selesai'
         case 'process':
           return 'Pesanan Diproses'
         case 'confirmed':
@@ -199,7 +199,6 @@ export default {
                   <option value="delivery">Sedang Dikirim</option>
                   <option value="delivered">Telah Terkirim</option>
                   <option value="finished">Selesai</option>
-                  <option value="expired">Expired</option>
                   <option value="cancelled">Pesanan Dibatalkan</option>
                   <option value="rejected">Pesanan Ditolak</option>
                 </select>

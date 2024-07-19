@@ -70,15 +70,19 @@ export default {
     },
     async updatestatus(transactionId, status) {
       try {
-        const response = await axios.post(`${BASE_URL}/order/update`, {
-          transactionId: transactionId,
-          status: status
-        },{
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: 'Bearer ' + localStorage.getItem('access_token')
+        const response = await axios.post(
+          `${BASE_URL}/order/update`,
+          {
+            transactionId: transactionId,
+            status: status
+          },
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: 'Bearer ' + localStorage.getItem('access_token')
+            }
           }
-        })
+        )
 
         this.$notify({
           type: 'success',
@@ -113,6 +117,7 @@ export default {
         case 'return_in_transit':
           return 'text-bg-warning'
         case 'delivered':
+        case 'finished':
           return 'text-bg-info'
         case 'rejected':
         case 'courierNotFound':
@@ -120,7 +125,6 @@ export default {
         case 'cancelled':
         case 'disposed':
         case 'on_hold':
-        case 'expired':
           return 'text-bg-danger'
         default:
           return 'text-bg-secondary'
@@ -132,8 +136,8 @@ export default {
           return 'Menunggu Pembayaran'
         case 'process':
           return 'Pesanan Diproses'
-        case 'expired':
-          return 'Expired'
+        case 'finished':
+          return 'Pesanan Selesai'
         case 'confirmed':
           return 'Pesanan Dikonfirmasi'
         case 'allocated':
@@ -204,7 +208,6 @@ export default {
                   <option value="delivery">Sedang Dikirim</option>
                   <option value="delivered">Telah Terkirim</option>
                   <option value="finished">Selesai</option>
-                  <option value="expired">Expired</option>
                   <option value="cancelled">Pesanan Dibatalkan</option>
                   <option value="rejected">Pesanan Ditolak</option>
                 </select>

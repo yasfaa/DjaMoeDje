@@ -136,12 +136,12 @@ export default {
         case 'return_in_transit':
           return 'text-bg-warning'
         case 'delivered':
+        case 'finished':
           return 'text-bg-info'
         case 'rejected':
         case 'courierNotFound':
         case 'returned':
         case 'cancelled':
-        case 'expired':
         case 'disposed':
         case 'on_hold':
           return 'text-bg-danger'
@@ -157,7 +157,6 @@ export default {
         case 'returned':
         case 'cancelled':
         case 'disposed':
-        case 'expired':
         case 'on_hold':
           return 'mdi-close-circle'
         case 'process':
@@ -169,6 +168,7 @@ export default {
         case 'return_in_transit':
           return 'mdi-truck-fast'
         case 'delivered':
+        case 'finished':
           return 'mdi-check-circle'
         default:
           return 'mdi-alert-circle'
@@ -178,8 +178,8 @@ export default {
       switch (status) {
         case 'pending':
           return 'Menunggu Pembayaran'
-        case 'expired':
-          return 'Expired'
+        case 'finished':
+          return 'Pesanan selesai'
         case 'process':
           return 'Pesanan Diproses'
         case 'confirmed':
