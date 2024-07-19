@@ -4,6 +4,14 @@ import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 const BASE_URL = import.meta.env.VITE_BASE_URL_API
 import Navbar from '@/components/DashboardNavbar.vue'
+import markerIconUrl from '@/assets/img/marker.png'
+
+const defaultIcon = L.icon({
+  iconUrl: markerIconUrl,
+  iconSize: [38, 45],
+  iconAnchor: [20, 50],
+  popupAnchor: [-1, -1]
+})
 
 export default {
   components: {
@@ -116,7 +124,10 @@ export default {
 
           // Initialize marker if markerPosition is set
           if (this.markerPosition) {
-            this.marker = L.marker(this.markerPosition, { draggable: true }).addTo(this.map)
+            this.marker = L.marker(this.markerPosition, {
+              draggable: true,
+              icon: defaultIcon
+            }).addTo(this.map)
             this.marker.on('dragend', this.onMarkerDragEnd)
           }
         }
@@ -186,13 +197,14 @@ export default {
       if (this.marker) {
         this.marker.setLatLng(this.markerPosition)
       } else {
-        this.marker = L.marker(this.markerPosition, { draggable: true }).addTo(this.map)
+        this.marker = L.marker(this.markerPosition, { draggable: true, icon: defaultIcon }).addTo(
+          this.map
+        )
         this.marker.on('dragend', this.onMarkerDragEnd)
       }
     },
     async saveAddress() {
       const addressData = {
-        id: this.selectedAddresses.id,
         nama_penerima: this.address.nama_penerima,
         nomor_telepon: this.address.nomor_telepon,
         jalan: this.address.jalan,
@@ -253,7 +265,7 @@ export default {
       if (this.marker) {
         this.marker.setLatLng([lat, lng])
       } else {
-        this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map)
+        this.marker = L.marker([lat, lng], { draggable: true, icon: defaultIcon }).addTo(this.map)
         this.marker.on('dragend', this.onMarkerDragEnd)
       }
     },
@@ -450,12 +462,8 @@ export default {
                       @change="fillAddress"
                     >
                       <option value="" disabled>Pilih alamat</option>
-                      <option
-                        v-for="item in alamat"
-                        :key="item.id"
-                        :value="item.id"
-                      >
-                      {{ item.nama_penerima }} | {{ item.kecamatan }}, {{ item.kota }}
+                      <option v-for="item in alamat" :key="item.id" :value="item.id">
+                        {{ item.nama_penerima }} | {{ item.kecamatan }}, {{ item.kota }}
                       </option>
                     </select>
                   </div>
@@ -675,6 +683,29 @@ export default {
 a {
   text-decoration: none;
   color: unset;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+}
+
+.modal {
+  display: block;
+  z-index: 1050;
+}
+
+.modal-header {
+  background-color: #f8f9fa;
+}
+
+.modal-footer {
+  background-color: #f8f9fa;
 }
 
 .large-checkbox {
