@@ -325,33 +325,23 @@ class TransactionController extends Controller
         }
     }
 
-    // private function updateOrderStatus($transaction)
-    // {
-    //     try {
-    //         $client = new Client();
-    //         $tracking_id = $transaction->courier->tracking_id;
-    //         $url = "https://api.biteship.com/v1/trackings/{$tracking_id}";
-    //         $response = $client->request('GET', $url, [
-    //             'headers' => [
-    //                 'Accept' => 'application/json',
-    //                 'Authorization' => 'Bearer ' . env('BITESHIP_API_KEY')
-    //             ]
-    //         ]);
+    public function updateOrderStatus(Request $request)
+    {
+        $request->validate([
+            'transactionId' => 'required|numeric|exist:transactions,id',
+            'status' => 'required|string',
+        ]);
 
-    //         $data = json_decode($response->getBody(), true);
-    //         $status = isset($data['status']) ? $data['status'] : null;
+        try {
+            $transaction = Transaction::findOrFail($request->input('transactionId'));
+            $transaction->status = $request->input('status');
+            $transaction->save();
 
-    //         if ($status !== null) {
-    //             $transaction->status = $status;
-    //             $transaction->save();
-    //         } else {
-    //             Log::warning('Unable to retrieve valid status from Biteship API response.');
-    //         }
-    //     } catch (Exception $e) {
-    //         Log::error('Error retrieving Biteship order status: ' . $e->getMessage());
-    //     }
-
-    // }
+            return response()->json(['message' => 'Status transaksi berhasil diperbarui', 'transaction' => $transaction]);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Terjadi kesalahan saat memperbarui status transaksi.', 'error' => $e->getMessage()], 500);
+        }
+    }
 
     public function adminCreateOrder($orderId)
     {

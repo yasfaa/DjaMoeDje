@@ -86,6 +86,7 @@ Route::prefix('/order')->middleware(['auth:sanctum'])->group(function () {
     Route::middleware('role:User')->group(function () {
         Route::post('/checkout', [TransactionController::class, 'createOrder']);
         Route::get('/getOrder', [TransactionController::class, 'getUserOrders']);
+        Route::post('/update', [TransactionController::class, 'updateOrderStatus']);
     });
 
     Route::middleware('role:Admin')->group(function () {

@@ -68,6 +68,37 @@ export default {
       const paymentUrl = order.payment
       window.open(paymentUrl, '_blank')
     },
+    async updatestatus(transactionId, status) {
+      try {
+        const response = await axios.post(`${this.BASE_URL}/order/update-status`, {
+          transactionId: transactionId,
+          status: status
+        },{
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: 'Bearer ' + localStorage.getItem('access_token')
+          }
+        })
+
+        this.$notify({
+          type: 'success',
+          title: 'Success',
+          text: 'Status Diperbarui',
+          color: 'green'
+        })
+        await this.retrieveOrders()
+      } catch (error) {
+        console.error('Error updating status:', error)
+      }
+    },
+    async cancelOrder(order) {
+      const transactionId = order.id_transaksi
+      await this.updatestatus(transactionId, 'cancelled')
+    },
+    async finishOrder(order) {
+      const transactionId = order.id_transaksi
+      await this.updatestatus(transactionId, 'finished')
+    },
     getStatusBadge(status) {
       switch (status) {
         case 'pending':
@@ -249,6 +280,20 @@ export default {
                     v-if="order.status === 'pending'"
                   >
                     Bayar Sekarang
+                  </button>
+                  <button
+                    class="btn btn-sm btn-warning"
+                    @click="cancelOrder(order)"
+                    v-if="order.status === 'pending'"
+                  >
+                    Batalkan Pesanan
+                  </button>
+                  <button
+                    class="btn btn-sm btn-success"
+                    @click="finishOrder(order)"
+                    v-if="order.status === 'delivered'"
+                  >
+                    Selesaikan Pesanan
                   </button>
                 </div>
               </div>
