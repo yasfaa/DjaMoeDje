@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('menu_pictures', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('menu_id');
+            $table->foreignId('menu_id')->constrained()->onDelete('cascade');
             $table->string('file_path')->nullable();
             $table->timestamps();
         });
