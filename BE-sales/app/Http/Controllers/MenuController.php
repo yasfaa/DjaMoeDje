@@ -187,13 +187,12 @@ class MenuController extends Controller
             return response()->json(['error' => 'Menu tidak ditemukan.'], 404);
         }
 
-        // Hapus file foto dari storage
-        if (!is_null($menu->file_path)) {
-            $filePaths = json_decode($menu->file_path, true);
-            foreach ($filePaths as $path) {
-                if (Storage::exists($path)) {
-                    Storage::delete($path);
-                }
+        $menuPictures = $menu->menuPictures;
+
+        foreach ($menuPictures as $picture) {
+            $filePath = 'public/menu_images/' . $picture->file_path;
+            if (Storage::exists($filePath)) {
+                Storage::delete($filePath);
             }
         }
 
