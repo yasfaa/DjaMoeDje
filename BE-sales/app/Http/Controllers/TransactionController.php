@@ -92,7 +92,7 @@ class TransactionController extends Controller
 
                 if ($cartItem) {
                     $cartItem->update([
-                        'order_id' => $transactionId,
+                        'transaction_id' => $transactionId,
                     ]);
                 }
             }
@@ -409,17 +409,10 @@ class TransactionController extends Controller
             // echo json_encode($dataForBiteship, JSON_PRETTY_PRINT);
             $response = $this->biteship->createOrder($dataForBiteship);
 
-            if (isset($response['id'])) {
+            if (isset($response['courier'])) {
                 $transaction = Transaction::findOrFail($orderId);
                 $transaction->status = 'packing';
                 $transaction->save();
-
-                $transaction = Transaction::updateOrCreate(
-                    ['id' => $transaction->id],
-                    [
-                        'bsorder_id' => $response['id'],
-                    ]
-                );
 
                 $courier = courier::updateOrCreate(
                     ['transaction_id' => $transaction->id],

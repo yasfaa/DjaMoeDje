@@ -15,24 +15,23 @@ class Transaction extends Model
     protected $fillable = [
         'user_id',
         'address_id',
-        'order_uuid',
         'status',
         'total'
     ];
 
     public function cartItems()
     {
-        return $this->hasMany(CartItem::class, 'order_id', 'id');
+        return $this->hasMany(CartItem::class, 'transaction_id', 'id');
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
 
     public function address()
     {
-        return $this->belongsTo(Address::class, 'address_id');
+        return $this->belongsTo(Address::class);
     }
 
     public function courier()

@@ -12,9 +12,8 @@ return new class extends Migration {
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('address_id');
-            $table->unsignedBigInteger('bsorder_id')->nullable();
+            $table->foreignId('user_id')->constrained();
+            $table->foreignId('address_id')->constrained();
             $table->string('status');
             $table->decimal('total', 15, 2);
             $table->timestamps();

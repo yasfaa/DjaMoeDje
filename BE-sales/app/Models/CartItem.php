@@ -20,7 +20,7 @@ class CartItem extends Model
         'harga_item',
         'customization_price',
         'select',
-        'order_id'
+        'transaction_id'
     ];
 
     public function cart()
@@ -38,6 +38,6 @@ class CartItem extends Model
     }
     public function order()
     {
-        return $this->belongsTo(Transaction::class, 'order_id');
+        return $this->belongsTo(Transaction::class, 'transaction_id');
     }
 }
