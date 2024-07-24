@@ -124,15 +124,6 @@ class TransactionController extends Controller
 
         $transactions = $transactionsQuery->get();
 
-        // $transactions->each(function ($transaction) {
-        //     if ($transaction->status === 'pending') {
-        //         $this->updatePaymentStatus($transaction);
-        //     }
-        // });
-
-        // $transactions = Transaction::with(['payment', 'cartItems.menu.menuPictures', 'courier'])
-        //     ->where('user_id', $userId);
-
         $response = $transactions->map(function ($transaction) {
             return [
                 'id_transaksi' => $transaction->id,
@@ -186,14 +177,6 @@ class TransactionController extends Controller
         $transactionsQuery->orderBy('created_at', 'desc');
 
         $transactions = $transactionsQuery->get();
-
-        // $transactions->each(function ($transaction) {
-        //     if ($transaction->status === 'pending') {
-        //         $this->updatePaymentStatus($transaction);
-        //     }
-        // });
-
-        // $transactions = Transaction::with(['payment', 'cartItems.menu.menuPictures', 'courier']);
 
         $response = $transactions->map(function ($transaction) {
             return [
@@ -416,7 +399,7 @@ class TransactionController extends Controller
 
             if (isset($response['courier'])) {
                 $transaction = Transaction::findOrFail($orderId);
-                $transaction->status = 'packing';
+                $transaction->status = 'process';
                 $transaction->save();
 
                 $courier = courier::updateOrCreate(
