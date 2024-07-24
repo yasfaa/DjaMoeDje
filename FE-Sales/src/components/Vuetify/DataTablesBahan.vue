@@ -316,7 +316,7 @@ export default {
           nama_bahan: this.ingredient.name,
           harga_bahan: this.ingredient.price
         }
-        const response = await axios.post(
+        const response = await axios.put(
           `${this.BASE_URL}/ingredient/update/${this.menus[this.selectedIngredientIndex].id}`,
           payload,
           {
