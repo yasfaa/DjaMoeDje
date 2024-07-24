@@ -130,6 +130,9 @@ class TransactionController extends Controller
             }
         });
 
+        $transactions = Transaction::with(['payment', 'cartItems.menu.menuPictures', 'courier'])
+            ->where('user_id', $userId);
+
         $response = $transactions->map(function ($transaction) {
             return [
                 'id_transaksi' => $transaction->id,
@@ -189,6 +192,8 @@ class TransactionController extends Controller
                 $this->updatePaymentStatus($transaction);
             }
         });
+
+        $transactions = Transaction::with(['payment', 'cartItems.menu.menuPictures', 'courier']);
 
         $response = $transactions->map(function ($transaction) {
             return [
@@ -307,10 +312,10 @@ class TransactionController extends Controller
             $status = json_decode($response->getBody()->getContents(), true);
 
             if ($status['status_code'] === "200" && $status['transaction_status'] === "settlement") {
-                $transaction->update(['status' => 'process']);
+                $transaction->payment->update(['status' => 'process']);
             }
             if ($status['status_code'] === "200" && $status['transaction_status'] === "expire") {
-                $transaction->update(['status' => 'canceled']);
+                $transaction->payment->update(['status' => 'canceled']);
             }
             $transaction->payment->update(['payment_link' => null]);
 
@@ -491,6 +496,29 @@ class TransactionController extends Controller
 
                 $transaction = Transaction::findOrFail($courier->transaction_id);
                 $transaction->status = $payload['status'];
+                $transaction->save();
+
+                return response()->json(['message' => 'Webhook processed successfully'], 200);
+            } else {
+                Log::error('Invalid payload received', ['payload' => $payload]);
+                return response()->json(['message' => 'Invalid payload', 'payload' => $payload], 200);
+            }
+        } catch (Exception $e) {
+            Log::error('Error processing webhook', ['error' => $e->getMessage(), 'payload' => $payload]);
+            return response()->json(['message' => 'Error processing webhook', 'error' => $e->getMessage()], 200);
+        }
+    }
+
+    public function midtransWebhook(Request $request)
+    {
+        $payload = $request->all();
+        try {
+
+            if (isset($payload['order_id'])) {
+                $payment = payment::where('payment_uuid', $payload['order_id'])->firstOrFail();
+
+                $transaction = Transaction::findOrFail($payment->transaction_id);
+                $transaction->status = $payload['transaction_status'];
                 $transaction->save();
 
                 return response()->json(['message' => 'Webhook processed successfully'], 200);

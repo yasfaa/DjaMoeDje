@@ -70,6 +70,7 @@ Route::prefix('/customize')->middleware(['auth:sanctum', 'role:User'])->group(fu
 
 Route::get('/getMenu', [MenuController::class, 'index']);
 Route::get('menu/get/{id}', [MenuController::class, 'getOne']);
+Route::get('/midtrans/webhook', [TransactionController::class, 'midtransWebhook']);
 
 
 Route::prefix('/biteship')->group(function () {
