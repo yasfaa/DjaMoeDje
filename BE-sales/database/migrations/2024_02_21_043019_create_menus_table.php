@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('nama_menu');
             $table->double('total');
-            $table->string('deskripsi');
+            $table->text('deskripsi');
             $table->timestamps();
         });
         
