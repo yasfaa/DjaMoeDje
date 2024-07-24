@@ -399,7 +399,7 @@ class TransactionController extends Controller
 
             if (isset($response['courier'])) {
                 $transaction = Transaction::findOrFail($orderId);
-                $transaction->status = 'process';
+                $transaction->status = 'confirmed';
                 $transaction->save();
 
                 $courier = courier::updateOrCreate(
