@@ -518,7 +518,8 @@ class TransactionController extends Controller
                 $payment = payment::where('payment_uuid', $payload['order_id'])->firstOrFail();
 
                 $transaction = Transaction::findOrFail($payment->transaction_id);
-                $transaction->status = $payload['transaction_status'];
+                if($payload['transaction_status'] == 'settlement')
+                $transaction->status = 'process';
                 $transaction->save();
 
                 return response()->json(['message' => 'Webhook processed successfully'], 200);

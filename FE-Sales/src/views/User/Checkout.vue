@@ -300,11 +300,19 @@ export default {
       this.dialog = false
     },
     async proceedToCheckout() {
-      if (!this.selectedCourier) {
+      if (!this.address_id) {
         this.$notify({
           type: 'error',
           title: 'Error',
           text: 'Pilih alamat pengiriman terlebih dahulu'
+        })
+        return
+      }
+      if (!this.selectedCourier) {
+        this.$notify({
+          type: 'error',
+          title: 'Error',
+          text: 'Mohon maaf, ekspedisi pengiriman belum tersedia di kota anda'
         })
         return
       }

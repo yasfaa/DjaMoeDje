@@ -13,9 +13,6 @@ export default {
       orders: [],
       currentDropdownIndex: null,
       totalPayment: 0,
-      noteModal: false,
-      note: '',
-      noteIndex: null
     }
   },
   mounted() {
@@ -142,36 +139,6 @@ export default {
         console.error(error)
       }
     },
-    showNoteModal(index) {
-      this.noteIndex = index
-      this.note = this.orders[index].catatan || ''
-      this.noteModal = true
-    },
-    closeNoteModal() {
-      this.noteModal = false
-      this.note = ''
-      this.noteIndex = null
-    },
-    async saveNote() {
-      const index = this.noteIndex
-      const orderId = this.orders[index].id
-
-      try {
-        await axios.post(
-          `${BASE_URL}/cart/addNote/${orderId}`,
-          { catatan: this.note },
-          {
-            headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('access_token')
-            }
-          }
-        )
-        this.orders[index].catatan = this.note
-        this.closeNoteModal()
-      } catch (error) {
-        console.error(error)
-      }
-    },
     goToCustomization(cartItemId) {
       this.$router.push(`/customization/${cartItemId}`)
     }
@@ -256,12 +223,6 @@ export default {
                           color="red"
                           style="cursor: pointer"
                           @click="removeOrder(index)"
-                        ></v-icon>
-                        <v-icon
-                          class="mx-3 justify-content-end"
-                          icon="mdi-note-edit"
-                          style="cursor: pointer"
-                          @click="showNoteModal(index)"
                         ></v-icon>
                       </div>
                     </div>
