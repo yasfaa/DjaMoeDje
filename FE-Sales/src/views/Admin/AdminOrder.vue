@@ -190,7 +190,6 @@ export default {
                   <option value="" selected>Semua</option>
                   <option value="pending">Menunggu Pembayaran</option>
                   <option value="process">Pesanan Diproses</option>
-                  <option value="packing">Dikemas</option>
                   <option value="confirmed">Pesanan Dikonfirmasi</option>
                   <option value="allocated">Kurir Telah Dialokasikan</option>
                   <option value="picking_up">Kurir Sedang Menuju Titik Jemput</option>

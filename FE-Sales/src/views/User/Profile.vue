@@ -275,7 +275,11 @@ export default {
       } catch (error) {
         console.error(error)
         if (error.response && error.response.data.message) {
-          const errorMessage = error.response.data.message
+          this.$notify({
+          type: 'error',
+          title: 'Error',
+          text: 'isi email dengan format email'
+        })
           console.log(errorMessage)
         }
       }
