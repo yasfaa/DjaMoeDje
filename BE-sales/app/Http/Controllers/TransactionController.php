@@ -124,14 +124,14 @@ class TransactionController extends Controller
 
         $transactions = $transactionsQuery->get();
 
-        $transactions->each(function ($transaction) {
-            if ($transaction->status === 'pending') {
-                $this->updatePaymentStatus($transaction);
-            }
-        });
+        // $transactions->each(function ($transaction) {
+        //     if ($transaction->status === 'pending') {
+        //         $this->updatePaymentStatus($transaction);
+        //     }
+        // });
 
-        $transactions = Transaction::with(['payment', 'cartItems.menu.menuPictures', 'courier'])
-            ->where('user_id', $userId);
+        // $transactions = Transaction::with(['payment', 'cartItems.menu.menuPictures', 'courier'])
+        //     ->where('user_id', $userId);
 
         $response = $transactions->map(function ($transaction) {
             return [
@@ -187,13 +187,13 @@ class TransactionController extends Controller
 
         $transactions = $transactionsQuery->get();
 
-        $transactions->each(function ($transaction) {
-            if ($transaction->status === 'pending') {
-                $this->updatePaymentStatus($transaction);
-            }
-        });
+        // $transactions->each(function ($transaction) {
+        //     if ($transaction->status === 'pending') {
+        //         $this->updatePaymentStatus($transaction);
+        //     }
+        // });
 
-        $transactions = Transaction::with(['payment', 'cartItems.menu.menuPictures', 'courier']);
+        // $transactions = Transaction::with(['payment', 'cartItems.menu.menuPictures', 'courier']);
 
         $response = $transactions->map(function ($transaction) {
             return [
