@@ -93,6 +93,7 @@ class TransactionController extends Controller
                 if ($cartItem) {
                     $cartItem->update([
                         'transaction_id' => $transactionId,
+                        'cart_id' => null,
                     ]);
                 }
             }
@@ -106,7 +107,6 @@ class TransactionController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
 
     public function getUserOrders(Request $request)
     {
