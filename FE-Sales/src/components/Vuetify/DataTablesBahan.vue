@@ -125,7 +125,9 @@
             >
           </div>
           <div class="modal-footer">
-            <button class="btn me-4 justify-content-start" type="button" @click="closeEditDialog">Batal</button>
+            <button class="btn me-4 justify-content-start" type="button" @click="closeEditDialog">
+              Batal
+            </button>
             <button class="btn btn-primary" type="submit">Simpan</button>
           </div>
         </v-form>
@@ -260,32 +262,46 @@ export default {
       this.selectedIngredientIndex = index
     },
     async addAllIngredients() {
-      const payload = this.ingredients.map((ingredient) => ({
-        nama: ingredient.name,
-        harga: ingredient.price
-      }))
-
       try {
-        const response = await axios.post(
-          `${this.BASE_URL}/ingredient/create/${this.menuId}`,
-          payload,
-          {
+        if (this.ingredients.length === 0) {
+          this.$notify({
+            type: 'error',
+            title: 'Error',
+            text: 'No ingredients to add',
+            color: 'red'
+          })
+          return
+        }
+
+        const token = localStorage.getItem('access_token')
+
+        for (const ingredient of this.ingredients) {
+          const formData = new FormData()
+          formData.append('nama_bahan', ingredient.name)
+          formData.append('harga_bahan', ingredient.price)
+          formData.append('menu_id', this.menuId)
+
+          await axios.post(this.BASE_URL + '/ingredient/add', formData, {
             headers: {
+              'Content-Type': 'multipart/form-data',
               Authorization: 'Bearer ' + localStorage.getItem('access_token')
             }
-          }
-        )
-        this.$notify({
-          type: 'success',
-          title: 'Success',
-          text: 'Bahan berhasil ditambahkan',
-          color: 'green'
-        })
+          })
+        }
+
         this.retrieveBahans()
         this.dialogAdd = false
         this.clearForm()
+
+        this.$notify({
+          type: 'success',
+          title: 'Success',
+          text: 'Ingredients added successfully',
+          color: 'green'
+        })
       } catch (error) {
         console.error(error)
+        const errorMessage = error.response?.data.message || 'An error occurred'
         this.$notify({
           type: 'error',
           title: 'Error',
@@ -297,10 +313,10 @@ export default {
     async saveEditedIngredient() {
       try {
         const payload = {
-          nama: this.ingredient.name,
-          harga: this.ingredient.price
+          nama_bahan: this.ingredient.name,
+          harga_bahan: this.ingredient.price
         }
-        const response = await axios.put(
+        const response = await axios.post(
           `${this.BASE_URL}/ingredient/update/${this.menus[this.selectedIngredientIndex].id}`,
           payload,
           {

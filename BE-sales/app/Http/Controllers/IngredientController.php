@@ -81,11 +81,11 @@ class IngredientController extends Controller
             'harga_bahan' => 'nullable|numeric',
         ]);
 
-        if ($request->has('nama')) {
+        if ($request->has('nama_bahan')) {
             $ingredient->nama = $request->input('nama_bahan');
         }
 
-        if ($request->has('harga')) {
+        if ($request->has('nama_bahan')) {
             $ingredient->harga = $request->input('harga_bahan');
         }
 
