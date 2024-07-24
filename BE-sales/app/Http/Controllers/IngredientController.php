@@ -10,7 +10,7 @@ class IngredientController extends Controller
 {
     public function index(Request $request, $menuId)
     {
-        
+
         try {
             $ingredients = Ingredient::where('menu_id', $menuId)->get();
 
@@ -24,8 +24,8 @@ class IngredientController extends Controller
     {
         $cartItem = CartItem::findOrFail($cartItemId);
         if (!$cartItem) {
-                return response()->json(['message' => 'CartItem tidak ditemukan!'], 404);
-            }
+            return response()->json(['message' => 'CartItem tidak ditemukan!'], 404);
+        }
         try {
             $ingredients = Ingredient::where('menu_id', $cartItem->menu_id)->get();
 
@@ -85,7 +85,7 @@ class IngredientController extends Controller
             $ingredient->nama = $request->input('nama_bahan');
         }
 
-        if ($request->has('nama_bahan')) {
+        if ($request->has('harga_bahan')) {
             $ingredient->harga = $request->input('harga_bahan');
         }
 
@@ -93,6 +93,7 @@ class IngredientController extends Controller
 
         return response()->json(['message' => 'Ingredient updated successfully', 'ingredient' => $ingredient]);
     }
+
 
     public function destroy($id)
     {

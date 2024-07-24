@@ -44,7 +44,7 @@ Route::prefix('/ingredient')->middleware(['auth:sanctum'])->group(function () {
 
     Route::middleware('role:Admin')->group(function () {
         Route::post('/add', [IngredientController::class, 'store']);
-        Route::post('/update/{id}', [IngredientController::class, 'update']);
+        Route::put('/update/{id}', [IngredientController::class, 'update']);
         Route::delete('/delete/{id}', [IngredientController::class, 'destroy']);
         Route::get('/get/{id}', [IngredientController::class, 'getOne']);
 
