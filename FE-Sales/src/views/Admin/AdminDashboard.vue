@@ -197,7 +197,7 @@ export default {
           }
         })
 
-        this.menuId = response.data.menu.id // Assuming the response contains the saved menu ID
+        this.menuId = response.data.menu.id
         this.$refs.datatables.retrieveMenus()
 
         this.$notify({
