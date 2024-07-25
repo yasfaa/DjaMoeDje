@@ -296,7 +296,7 @@ export default {
         this.$notify({
           type: 'success',
           title: 'Success',
-          text: 'Ingredients added successfully',
+          text: 'Bahan berhasil ditambahkan',
           color: 'green'
         })
       } catch (error) {

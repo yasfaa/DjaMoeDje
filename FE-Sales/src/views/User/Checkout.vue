@@ -300,7 +300,7 @@ export default {
       this.dialog = false
     },
     async proceedToCheckout() {
-      if (!this.address_id) {
+      if (!this.selectedAddress.id) {
         this.$notify({
           type: 'error',
           title: 'Error',
