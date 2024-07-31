@@ -263,7 +263,11 @@ export default {
     },
     async addAllIngredients() {
       try {
-        if (this.ingredients.length === 0) {
+        if (this.ingredient.name && this.selectedIngredientIndex === null) {
+          this.ingredients.push({ ...this.ingredient })
+        } 
+
+        if (this.ingredients.length === 0 || this.ingredient.length) {
           this.$notify({
             type: 'error',
             title: 'Error',
@@ -348,6 +352,7 @@ export default {
       this.ingredient.name = ''
       this.ingredient.price = ''
       this.selectedIngredientIndex = null
+      this.ingredients = []
     }
   }
 }
