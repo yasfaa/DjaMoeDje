@@ -166,7 +166,7 @@ export default {
         case 'rejected':
         case 'courierNotFound':
         case 'returned':
-        case 'cancelled':
+        case 'canceled':
         case 'disposed':
         case 'on_hold':
           return 'text-bg-danger'
@@ -180,7 +180,7 @@ export default {
         case 'rejected':
         case 'courierNotFound':
         case 'returned':
-        case 'cancelled':
+        case 'canceled':
         case 'disposed':
         case 'on_hold':
           return 'mdi-close-circle'
@@ -225,7 +225,7 @@ export default {
           return 'Kurir Tidak Tersedia'
         case 'returned':
           return 'Pesanan Dikembalikan'
-        case 'cancelled':
+        case 'canceled':
           return 'Pesanan Dibatalkan'
         case 'disposed':
           return 'Pesanan Dibuang'
@@ -261,7 +261,7 @@ export default {
           return 'Pengiriman dibatalkan karena tidak ada kurir yang tersedia saat ini.'
         case 'returned':
           return 'Pesanan berhasil dikembalikan.'
-        case 'cancelled':
+        case 'canceled':
           return 'Pesanan dibatalkan.'
         case 'disposed':
           return 'Pesanan berhasil dibuang.'

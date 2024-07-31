@@ -113,7 +113,7 @@ export default {
         case 'rejected':
         case 'courierNotFound':
         case 'returned':
-        case 'cancelled':
+        case 'canceled':
         case 'disposed':
         case 'on_hold':
           return 'text-bg-danger'
@@ -149,7 +149,7 @@ export default {
           return 'Kurir Tidak Tersedia'
         case 'returned':
           return 'Pesanan Dikembalikan'
-        case 'cancelled':
+        case 'canceled':
           return 'Pesanan Dibatalkan'
         case 'disposed':
           return 'Pesanan Dibuang'
@@ -198,7 +198,7 @@ export default {
                   <option value="delivery">Sedang Dikirim</option>
                   <option value="delivered">Telah Terkirim</option>
                   <option value="finished">Selesai</option>
-                  <option value="cancelled">Pesanan Dibatalkan</option>
+                  <option value="canceled">Pesanan Dibatalkan</option>
                   <option value="rejected">Pesanan Ditolak</option>
                 </select>
               </div>
