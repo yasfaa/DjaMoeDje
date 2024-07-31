@@ -8,7 +8,6 @@
         <div class="col-lg-8 col-md-12">
           <div class="card border-2 pt-3" v-if="menu.id">
             <div class="row">
-              <!-- Column 1: Image Carousel -->
               <div class="col-md-6 order-1 order-md-1">
                 <div id="menuCarousel" class="carousel slide p-3" data-bs-ride="carousel">
                   <div class="carousel-inner">
@@ -57,7 +56,11 @@
             </div>
           </div>
         </div>
-        <div class="col-lg-4 col-md-12 order-3">
+        <div
+          class="col-lg-4 col-md-12 order-3"
+          v-if="!user || user.role !== 'Admin'"
+          @click.prevent.stop="addToCart(menu.id)"
+        >
           <div class="card p-3 order-controls">
             <h3 class="control-title mt-2">Atur Jumlah</h3>
             <div class="quantity-control my-3">
@@ -117,6 +120,29 @@ export default {
   },
   mounted() {
     this.retrieveMenu()
+
+    try {
+      const name = localStorage.getItem('name')
+      const role = localStorage.getItem('role')
+      if (name && role) {
+        this.user = { name, role }
+        this.isLoggedIn = true
+      } else {
+        this.isLoggedIn = false
+      }
+    } catch (error) {
+      console.error(error)
+      this.isLoggedIn = false
+      if (error.response && error.response.data.message) {
+        const errorMessage = error.response.data.message
+        this.$notify({
+          type: 'error',
+          title: 'Error',
+          text: errorMessage,
+          color: 'red'
+        })
+      }
+    }
   },
   methods: {
     formatPrice(price) {
@@ -164,13 +190,18 @@ export default {
       }
     },
     goToCustomize(menuId) {
+      if (!isLoggedIn) {
+        this.$router.push('/login') 
+        return
+      }
+      
       this.$router.push(`/menu/${menuId}/customize`)
     },
     async addToCart(menuId, quantity) {
       const isLoggedIn = !!localStorage.getItem('access_token') // Check if the user is logged in
 
       if (!isLoggedIn) {
-        this.$router.push('/login') // Redirect to login if not logged in
+        this.$router.push('/login') 
         return
       }
 

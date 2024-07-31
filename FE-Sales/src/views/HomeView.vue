@@ -11,11 +11,36 @@ export default {
   data() {
     return {
       menus: '',
-      showSuccessDialog: false
+      showSuccessDialog: false,
+      user: null,
+      isLoggedIn: false
     }
   },
   mounted() {
     this.retrieveMenus()
+
+    try {
+      const name = localStorage.getItem('name')
+      const role = localStorage.getItem('role')
+      if (name && role) {
+        this.user = { name, role }
+        this.isLoggedIn = true
+      } else {
+        this.isLoggedIn = false
+      }
+    } catch (error) {
+      console.error(error)
+      this.isLoggedIn = false
+      if (error.response && error.response.data.message) {
+        const errorMessage = error.response.data.message
+        this.$notify({
+          type: 'error',
+          title: 'Error',
+          text: errorMessage,
+          color: 'red'
+        })
+      }
+    }
   },
   methods: {
     formatPrice(price) {
@@ -38,10 +63,10 @@ export default {
       }
     },
     async addToCart(menuId) {
-      const isLoggedIn = !!localStorage.getItem('access_token') // Check if the user is logged in
+      const isLoggedIn = !!localStorage.getItem('access_token')
 
       if (!isLoggedIn) {
-        this.$router.push('/login') // Redirect to login if not logged in
+        this.$router.push('/login')
         return
       }
 
@@ -99,7 +124,7 @@ export default {
         <div class="menu-grid">
           <v-row>
             <v-col v-for="menu in menus" :key="menu.id" cols="12" sm="6" md="4">
-              <v-card class="menu-card">
+              <v-card class="menu-card" @click.prevent="goToMenu(menu.id)">
                 <div class="menu-image-container">
                   <v-img :src="getMenuImage(menu.id)" class="menu-image"></v-img>
                 </div>
@@ -108,7 +133,11 @@ export default {
                   <p class="menu-price m-0">Rp {{ formatPrice(menu.total) }}</p>
                   <v-spacer></v-spacer>
                   <button class="btn btn-primary" @click="goToMenu(menu.id)">Lihat Menu</button>
-                  <button class="btn btn-secondary mx-2" @click.prevent="addToCart(menu.id)">
+                  <button
+                    v-if="!user || user.role !== 'Admin'"
+                    class="btn btn-secondary mx-2"
+                    @click.prevent.stop="addToCart(menu.id)"
+                  >
                     + Keranjang
                   </button>
                 </v-card-actions>
@@ -123,14 +152,13 @@ export default {
     <v-dialog v-model="showSuccessDialog" max-width="400">
       <v-card>
         <v-card-title>Success</v-card-title>
-        <v-card-text> Menu berhasil dimasukkan ke dalam keranjang! </v-card-text>
+        <v-card-text>Menu berhasil dimasukkan ke dalam keranjang!</v-card-text>
         <v-card-actions>
           <v-btn color="primary" @click="showSuccessDialog = false">OK</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
-  <app-footer class="footer-section" />
 </template>
 
 <style scoped>
@@ -221,7 +249,7 @@ export default {
 .menu-image-container {
   position: relative;
   width: 100%;
-  padding-bottom: 100%; 
+  padding-bottom: 100%;
   background-color: rgba(255, 255, 255, 0.212);
 }
 
