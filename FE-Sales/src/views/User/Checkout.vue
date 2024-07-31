@@ -55,7 +55,8 @@ export default {
       selectedAddressId: null,
       selectedAddress: null,
       shippingRates: [],
-      dialog: false,
+      dialog1: false,
+      dialog2: false,
       selectedCourier: null
     }
   },
@@ -134,9 +135,26 @@ export default {
       })
     },
     openModal() {
-      this.dialog = true
+      this.dialog1 = true
+      this.loadingRegist = false
       this.$nextTick(() => {
         this.initMap()
+      })
+    },
+    openManualFormModal() {
+      this.dialog1 = false
+      this.dialog2 = true
+      this.resetForm()
+      this.$nextTick(() => {
+        this.initMap()
+      })
+    },
+    openAddressFormModal(selectedAddress) {
+      this.dialog1 = false
+      this.dialog2 = true
+      this.$nextTick(() => {
+        this.initMap()
+        this.selectAddress(selectedAddress)
       })
     },
     searchWithDelay() {
@@ -192,18 +210,51 @@ export default {
       this.address.kota = kota
       this.address.provinsi = provinsi
 
-      // Update map view and marker position, and set zoom to 16
-      this.map.setView(this.mapCenter, 22)
-      if (this.marker) {
-        this.marker.setLatLng(this.markerPosition)
-      } else {
-        this.marker = L.marker(this.markerPosition, { draggable: true, icon: defaultIcon }).addTo(
-          this.map
-        )
-        this.marker.on('dragend', this.onMarkerDragEnd)
-      }
+      this.$nextTick(() => {
+        if (this.map) {
+          this.map.setView(this.mapCenter, 22)
+
+          if (this.marker) {
+            this.marker.setLatLng(this.markerPosition)
+          } else {
+            this.marker = L.marker(this.markerPosition, {
+              draggable: true,
+              icon: defaultIcon
+            }).addTo(this.map)
+            this.marker.on('dragend', this.onMarkerDragEnd)
+          }
+        } else {
+          console.error('Map is still not initialized.')
+        }
+      })
     },
     async saveAddress() {
+      if (
+        !this.address.nama_penerima ||
+        !this.address.nomor_telepon ||
+        !this.address.jalan ||
+        !this.address.kecamatan ||
+        !this.address.kota ||
+        !this.address.provinsi ||
+        !this.address.kode_pos ||
+        !this.address.latitude ||
+        !this.address.longitude
+      ) {
+        this.$notify({
+          type: 'error',
+          title: 'Error',
+          text: 'Pastikan semua kolom sudah terisi.',
+          color: 'red'
+        })
+      }
+      if (!this.address.latitude || !this.address.longitude) {
+        this.$notify({
+          type: 'error',
+          title: 'Error',
+          text: 'Pastikan telah menaruh titik lokasi pengiriman.',
+          color: 'red'
+        })
+      }
       const addressData = {
         nama_penerima: this.address.nama_penerima,
         nomor_telepon: this.address.nomor_telepon,
@@ -223,7 +274,7 @@ export default {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
         })
-        this.dialog = false
+        this.dialog2 = false
         this.$notify({
           type: 'success',
           title: 'Success',
@@ -297,7 +348,8 @@ export default {
     },
     closeModal() {
       this.resetForm()
-      this.dialog = false
+      this.dialog1 = false
+      this.dialog2 = false
     },
     async proceedToCheckout() {
       if (!this.selectedAddress.id) {
@@ -438,7 +490,7 @@ export default {
 <template>
   <navbar />
   <div class="py-3 mt-5 container">
-    <div class="row mt-6">
+    <div class="row mt-1">
       <v-overlay :model-value="overlay" class="d-flex align-items-center justify-content-center">
         <v-progress-circular
           color="amber"
@@ -450,7 +502,7 @@ export default {
       <div class="container">
         <div class="row">
           <div class="col-lg-8">
-            <div class="row mb-2">
+            <div class="row mb-0">
               <div class="card">
                 <div class="card-body">
                   <h5 class="card-title">
@@ -477,36 +529,20 @@ export default {
                   </div>
                   <div v-if="selectedAddress">
                     <hr class="horizontal dark" />
-                    <div class="row">
-                      <div class="row">
-                        <div class="col">Nama Penerima</div>
-                        <div class="col">: {{ selectedAddress.nama_penerima }}</div>
-                        <div class="col">Nomor Penerima</div>
-                        <div class="col">: {{ selectedAddress.nomor_telepon }}</div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="row">
-                        <div class="col">Provinsi</div>
-                        <div class="col">: {{ selectedAddress.provinsi }}</div>
-                        <div class="col">Kota</div>
-                        <div class="col">: {{ selectedAddress.kota }}</div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="row">
-                        <div class="col">Kecamatan</div>
-                        <div class="col">: {{ selectedAddress.kecamatan }}</div>
-                        <div class="col">Kode Pos</div>
-                        <div class="col">: {{ selectedAddress.kode_pos }}</div>
-                      </div>
+
+                    <div class="fw-bolder fs-3">{{ selectedAddress.nama_penerima }}</div>
+                    <div class="fs-6">
+                      <div>{{ selectedAddress.jalan }}</div>
+                      <div>{{ selectedAddress.kecamatan }}, {{ selectedAddress.kota }}</div>
+                      <div>{{ selectedAddress.provinsi }}, {{ selectedAddress.kode_pos }}</div>
+                      <div>{{ selectedAddress.nomor_telepon }}</div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             <div class="row">
-              <div v-for="(order, index) in orders" :key="index" class="mb-2 card">
+              <div v-for="(order, index) in orders" :key="index" class="my-1 card">
                 <div class="card-body">
                   <h5 class="card-title">Pesanan {{ index + 1 }}</h5>
                   <div class="row">
@@ -572,18 +608,16 @@ export default {
             </div>
           </div>
         </div>
-        <div v-if="dialog">
+        <div v-if="dialog1">
           <div class="modal-backdrop fade show"></div>
           <div class="modal fade show d-block" tabindex="-1" aria-modal="true" role="dialog">
-            <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title">Tambah Alamat</h5>
-                  <button type="button" class="btn-close" @click="closeModal"></button>
+                  <h5 class="modal-title">Cari Alamat</h5>
+                  <v-icon size="large" @click="closeModal" color="red">mdi-close</v-icon>
                 </div>
                 <div class="modal-body">
-                  <!-- Leaflet Map -->
-                  <div id="mapid" style="height: 300px"></div>
                   <div class="">
                     <label for="searchQuery" class="form-label">Cari Lokasi</label>
                     <input
@@ -592,6 +626,7 @@ export default {
                       id="searchQuery"
                       v-model="searchQuery"
                       @input="searchWithDelay"
+                      placeholder="Cari Alamat Anda"
                     />
                   </div>
                   <div v-if="searchResults.length" class="mb-3 mt-3">
@@ -600,7 +635,7 @@ export default {
                       class="form-select"
                       id="addressSelect"
                       v-model="selectedAddress"
-                      @change="selectAddress(selectedAddress)"
+                      @change="openAddressFormModal(selectedAddress)"
                     >
                       <option
                         v-for="result in searchResults"
@@ -611,13 +646,39 @@ export default {
                       </option>
                     </select>
                   </div>
-                  <div v-else>
-                    <a style="font-size: 11px; color: red"
-                      ><i class="fas fa-info-circle" style="color: #ff0000"></i>&nbsp;Masukkan kode
-                      pos atau kelurahan atau kota anda</a
-                    >
-                  </div>
+                  <div v-else></div>
                   <v-progress-linear v-if="loadingRegist" indeterminate></v-progress-linear>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" @click="closeModal">
+                    Cancel
+                  </button>
+                  <button type="button" class="btn btn-primary" @click="openManualFormModal">
+                    Isi Manual
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-if="dialog2">
+          <div class="modal-backdrop fade show"></div>
+          <div class="modal fade show d-block" tabindex="-1" aria-modal="true" role="dialog">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Tambah Alamat</h5>
+                  <v-icon size="large" @click="closeModal" color="red">mdi-close</v-icon>
+                </div>
+                <div class="modal-body">
+                  <!-- Leaflet Map -->
+                  <div id="mapid" style="height: 300px"></div>
+                  <v-progress-linear v-if="loadingRegist" indeterminate></v-progress-linear>
+                  <a style="font-size: 11px; color: grey">
+                    Pastikan titik sesuai dengan alamat pengiriman</a
+                  >
+                  <br />
+                  <!-- Input untuk detail alamat -->
                   <label for="">Nama Penerima</label>
                   <input
                     type="text"
@@ -690,7 +751,7 @@ export default {
 
 a {
   text-decoration: none;
-  color: unset;
+  color: black;
 }
 
 .modal-backdrop {
@@ -710,10 +771,17 @@ a {
 
 .modal-header {
   background-color: #f8f9fa;
+  color: black;
+}
+
+.modal-body {
+  background-color: #f8f9fa;
+  color: black;
 }
 
 .modal-footer {
   background-color: #f8f9fa;
+  color: black;
 }
 
 .large-checkbox {
@@ -727,7 +795,7 @@ a {
 
 .sticky-menu {
   position: sticky;
-  top: 100px;
+  top: 80px;
   padding: 3px;
 }
 

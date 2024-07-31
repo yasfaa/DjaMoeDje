@@ -4,14 +4,14 @@ import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 const BASE_URL = import.meta.env.VITE_BASE_URL_API
 import Navbar from '@/components/DashboardNavbar.vue'
-import markerIconUrl from '@/assets/img/marker.png';
+import markerIconUrl from '@/assets/img/marker.png'
 
-const  defaultIcon = L.icon({
-    iconUrl: markerIconUrl,
-    iconSize:     [38, 45],
-    iconAnchor:   [20, 50],
-    popupAnchor:  [-1, -1]
-});
+const defaultIcon = L.icon({
+  iconUrl: markerIconUrl,
+  iconSize: [38, 45],
+  iconAnchor: [20, 50],
+  popupAnchor: [-1, -1]
+})
 
 export default {
   name: 'Profile',
@@ -20,7 +20,8 @@ export default {
   },
   data() {
     return {
-      dialog: false,
+      dialog1: false,
+      dialog2: false,
       users: {
         name: '',
         email: ''
@@ -63,7 +64,6 @@ export default {
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(this.map)
           this.map.on('click', this.updateMarkerPosition)
 
-          // Initialize marker if markerPosition is set
           if (this.markerPosition) {
             this.marker = L.marker(this.markerPosition, {
               draggable: true,
@@ -75,9 +75,26 @@ export default {
       })
     },
     openModal() {
-      this.dialog = true
+      this.dialog1 = true
+      this.loadingRegist = false
       this.$nextTick(() => {
         this.initMap()
+      })
+    },
+    openManualFormModal() {
+      this.dialog1 = false
+      this.dialog2 = true
+      this.resetForm()
+      this.$nextTick(() => {
+        this.initMap()
+      })
+    },
+    openAddressFormModal(selectedAddress) {
+      this.dialog1 = false
+      this.dialog2 = true
+      this.$nextTick(() => {
+        this.initMap()
+        this.selectAddress(selectedAddress)
       })
     },
     searchWithDelay() {
@@ -133,19 +150,51 @@ export default {
       this.address.kota = kota
       this.address.provinsi = provinsi
 
-      // Update map view and marker position, and set zoom to 16
-      this.map.setView(this.mapCenter, 22)
+      this.$nextTick(() => {
+        if (this.map) {
+          this.map.setView(this.mapCenter, 22)
 
-      if (this.marker) {
-        this.marker.setLatLng(this.markerPosition)
-      } else {
-        this.marker = L.marker(this.markerPosition, { draggable: true, icon: defaultIcon }).addTo(
-          this.map
-        )
-        this.marker.on('dragend', this.onMarkerDragEnd)
-      }
+          if (this.marker) {
+            this.marker.setLatLng(this.markerPosition)
+          } else {
+            this.marker = L.marker(this.markerPosition, {
+              draggable: true,
+              icon: defaultIcon
+            }).addTo(this.map)
+            this.marker.on('dragend', this.onMarkerDragEnd)
+          }
+        } else {
+          console.error('Map is still not initialized.')
+        }
+      })
     },
     async saveAddress() {
+      if (
+        !this.address.nama_penerima ||
+        !this.address.nomor_telepon ||
+        !this.address.jalan ||
+        !this.address.kecamatan ||
+        !this.address.kota ||
+        !this.address.provinsi ||
+        !this.address.kode_pos ||
+        !this.address.latitude ||
+        !this.address.longitude
+      ) {
+        this.$notify({
+          type: 'error',
+          title: 'Error',
+          text: 'Pastikan semua kolom sudah terisi.',
+          color: 'red'
+        })
+      }
+      if (!this.address.latitude || !this.address.longitude) {
+        this.$notify({
+          type: 'error',
+          title: 'Error',
+          text: 'Pastikan telah menaruh titik lokasi pengiriman.',
+          color: 'red'
+        })
+      }
       const addressData = {
         nama_penerima: this.address.nama_penerima,
         nomor_telepon: this.address.nomor_telepon,
@@ -165,7 +214,7 @@ export default {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
         })
-        this.dialog = false
+        this.dialog2 = false
         this.$notify({
           type: 'success',
           title: 'Success',
@@ -180,18 +229,18 @@ export default {
     },
     resetForm() {
       this.searchQuery = ''
-      this.searchResults = []
-      this.address = {
-        nama_penerima: '',
-        nomor_telepon: '',
-        jalan: '',
-        kecamatan: '',
-        kota: '',
-        provinsi: '',
-        kode_pos: '',
-        latitude: '',
-        longitude: ''
-      }
+      ;(this.searchResults = []),
+        (this.address = {
+          nama_penerima: '',
+          nomor_telepon: '',
+          jalan: '',
+          kecamatan: '',
+          kota: '',
+          provinsi: '',
+          kode_pos: '',
+          latitude: '',
+          longitude: ''
+        })
       if (this.marker) {
         this.marker.remove()
         this.marker = null
@@ -239,7 +288,8 @@ export default {
     },
     closeModal() {
       this.resetForm()
-      this.dialog = false
+      this.dialog1 = false
+      this.dialog2 = false
     },
     async getUser() {
       try {
@@ -276,10 +326,10 @@ export default {
         console.error(error)
         if (error.response && error.response.data.message) {
           this.$notify({
-          type: 'error',
-          title: 'Error',
-          text: 'isi email dengan format email'
-        })
+            type: 'error',
+            title: 'Error',
+            text: 'isi email dengan format email'
+          })
           console.log(errorMessage)
         }
       }
@@ -338,13 +388,11 @@ export default {
   }
 }
 </script>
-
 <template>
   <navbar />
   <div class="border-main">
     <div class="py-4 container-fluid">
       <div class="row">
-        <!-- Profil dan Alamat -->
         <div class="col-md-7 mt-6">
           <!-- Profil Card -->
           <div class="card shadow-lg">
@@ -415,18 +463,16 @@ export default {
                 Tambah Alamat
               </button>
               <!-- Modal untuk menambah alamat -->
-              <div v-if="dialog">
+              <div v-if="dialog1">
                 <div class="modal-backdrop fade show"></div>
                 <div class="modal fade show d-block" tabindex="-1" aria-modal="true" role="dialog">
                   <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">
                       <div class="modal-header">
-                        <h5 class="modal-title">Tambah Alamat</h5>
-                        <button type="button" class="btn-close" @click="closeModal"></button>
+                        <h5 class="modal-title">Cari Alamat</h5>
+                        <v-icon size="large" @click="closeModal" color="red">mdi-close</v-icon>
                       </div>
                       <div class="modal-body">
-                        <!-- Leaflet Map -->
-                        <div id="mapid" style="height: 300px"></div>
                         <div class="">
                           <label for="searchQuery" class="form-label">Cari Lokasi</label>
                           <input
@@ -435,16 +481,16 @@ export default {
                             id="searchQuery"
                             v-model="searchQuery"
                             @input="searchWithDelay"
+                            placeholder="Cari Alamat Anda"
                           />
                         </div>
-                        <!-- Select untuk memilih alamat dari hasil pencarian -->
                         <div v-if="searchResults.length" class="mb-3 mt-3">
                           <label for="addressSelect" class="form-label">Pilih Alamat</label>
                           <select
                             class="form-select"
                             id="addressSelect"
                             v-model="selectedAddress"
-                            @change="selectAddress(selectedAddress)"
+                            @change="openAddressFormModal(selectedAddress)"
                           >
                             <option
                               v-for="result in searchResults"
@@ -455,13 +501,38 @@ export default {
                             </option>
                           </select>
                         </div>
-                        <div v-else>
-                          <a style="font-size: 11px; color: red"
-                            ><i class="fas fa-info-circle" style="color: #ff0000"></i>&nbsp;Masukkan
-                            kode pos atau kelurahan atau kota anda</a
-                          >
-                        </div>
+                        <div v-else></div>
                         <v-progress-linear v-if="loadingRegist" indeterminate></v-progress-linear>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="closeModal">
+                          Cancel
+                        </button>
+                        <button type="button" class="btn btn-primary" @click="openManualFormModal">
+                          Isi Manual
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-if="dialog2">
+                <div class="modal-backdrop fade show"></div>
+                <div class="modal fade show d-block" tabindex="-1" aria-modal="true" role="dialog">
+                  <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Tambah Alamat</h5>
+                        <v-icon size="large" @click="closeModal" color="red">mdi-close</v-icon>
+                      </div>
+                      <div class="modal-body">
+                        <!-- Leaflet Map -->
+                        <div id="mapid" style="height: 300px"></div>
+                        <v-progress-linear v-if="loadingRegist" indeterminate></v-progress-linear>
+                        <a style="font-size: 11px; color: grey">
+                          Pastikan titik sesuai dengan alamat pengiriman</a
+                        >
+                        <br />
                         <!-- Input untuk detail alamat -->
                         <label for="">Nama Penerima</label>
                         <input
@@ -575,11 +646,6 @@ export default {
 
 .card-body {
   background-color: #fff;
-}
-
-.btn-close {
-  border: none;
-  background: transparent;
 }
 
 .text-xs {
