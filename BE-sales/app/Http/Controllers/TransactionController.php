@@ -506,6 +506,15 @@ class TransactionController extends Controller
                 $transaction->save();
 
                 return response()->json(['message' => 'Webhook processed successfully'], 200);
+            } else if (isset($payload['order_id'])) {
+                $payment = payment::where('payment_uuid', $payload['order_id'])->firstOrFail();
+
+                $transaction = Transaction::findOrFail($payment->transaction_id);
+                if($payload['transaction_status'] == 'expire')
+                $transaction->status = 'canceled';
+                $transaction->save();
+
+                return response()->json(['message' => 'Webhook processed successfully'], 200);
             } else {
                 Log::error('Invalid payload received', ['payload' => $payload]);
                 return response()->json(['message' => 'Invalid payload', 'payload' => $payload], 200);
