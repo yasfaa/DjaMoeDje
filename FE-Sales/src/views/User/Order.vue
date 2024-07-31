@@ -97,7 +97,7 @@ export default {
     },
     async cancelOrder(order) {
       const transactionId = order.id_transaksi
-      await this.updatestatus(transactionId, 'cancelled')
+      await this.updatestatus(transactionId, 'canceled')
     },
     async finishOrder(order) {
       const transactionId = order.id_transaksi
@@ -122,7 +122,7 @@ export default {
         case 'rejected':
         case 'courierNotFound':
         case 'returned':
-        case 'cancelled':
+        case 'canceled':
         case 'disposed':
         case 'on_hold':
           return 'text-bg-danger'
@@ -158,7 +158,7 @@ export default {
           return 'Kurir Tidak Tersedia'
         case 'returned':
           return 'Pesanan Dikembalikan'
-        case 'cancelled':
+        case 'canceled':
           return 'Pesanan Dibatalkan'
         case 'disposed':
           return 'Pesanan Dibuang'
@@ -207,7 +207,7 @@ export default {
                   <option value="delivery">Sedang Dikirim</option>
                   <option value="delivered">Telah Terkirim</option>
                   <option value="finished">Selesai</option>
-                  <option value="cancelled">Pesanan Dibatalkan</option>
+                  <option value="canceled">Pesanan Dibatalkan</option>
                   <option value="rejected">Pesanan Ditolak</option>
                 </select>
               </div>
@@ -277,18 +277,18 @@ export default {
                 <hr />
                 <div class="d-flex justify-content-end mb-2">
                   <button
+                    class="btn-cancel btn-sm me-2 "
+                    @click="cancelOrder(order)"
+                    v-if="order.status === 'pending'"
+                  >
+                    Batalkan Pesanan
+                  </button>
+                  <button
                     class="btn btn-sm btn-primary"
                     @click="payNow(order)"
                     v-if="order.status === 'pending'"
                   >
                     Bayar Sekarang
-                  </button>
-                  <button
-                    class="btn btn-sm btn-warning"
-                    @click="cancelOrder(order)"
-                    v-if="order.status === 'pending'"
-                  >
-                    Batalkan Pesanan
                   </button>
                   <button
                     class="btn btn-sm btn-success"
@@ -331,4 +331,17 @@ a {
   background-color: #007bff;
   border-color: #007bff;
 }
+
+.btn-cancel {
+  background-color: #fc0800;
+  border-color: transparent;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 14px;
+  color: white;
+  font-weight: bold;
+}
+
+
+
 </style>
