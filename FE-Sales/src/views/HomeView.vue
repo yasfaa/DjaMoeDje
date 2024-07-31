@@ -135,7 +135,7 @@ export default {
                   <button class="btn btn-primary" @click="goToMenu(menu.id)">Lihat Menu</button>
                   <button
                     v-if="!user || user.role !== 'Admin'"
-                    class="btn btn-secondary mx-2"
+                    class="btn btn-secondary ms-2"
                     @click.prevent.stop="addToCart(menu.id)"
                   >
                     + Keranjang
