@@ -122,6 +122,9 @@ export default {
       const paymentUrl = order.payment
       window.open(paymentUrl, '_blank')
     },
+    back() {
+      this.$router.push('/order')
+    },
     getStatusBadge(status) {
       switch (status) {
         case 'pending':
@@ -253,6 +256,12 @@ export default {
     <navbar />
     <div class="py-4 mt-6 container">
       <div class="row mt-6">
+        <nav class="ms-4 pb-0" style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a class="tebel" @click="back">Daftar Pesanan</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Detail Pesanan</li>
+          </ol>
+        </nav>
         <v-overlay :model-value="overlay" class="d-flex align-items-center justify-content-center">
           <v-progress-circular
             color="amber"
@@ -355,7 +364,7 @@ export default {
                 <span>:</span>
                 <span>Paxel {{ orders.courier_type }}</span>
               </div>
-              <div class="info-row">
+              <div v-if="orders.no_resi" class="info-row">
                 <span>No Resi </span>
                 <span>:</span>
                 <span>{{ orders.no_resi }}</span>
@@ -413,9 +422,14 @@ export default {
   user-select: none;
 }
 
-a {
+.tebel {
   text-decoration: none;
-  color: unset;
+  color: black;
+  font-weight: bold;
+}
+
+.tebel:hover {
+  cursor: pointer;
 }
 
 .card.equal-height {
@@ -446,6 +460,25 @@ a {
 
 .mb-4 {
   margin-bottom: 1.5rem !important;
+}
+
+.breadcrumb {
+    --bs-breadcrumb-padding-x: 0;
+    --bs-breadcrumb-padding-y: 0;
+    --bs-breadcrumb-margin-bottom: 0rem;
+    --bs-breadcrumb-bg: ;
+    --bs-breadcrumb-border-radius: ;
+    --bs-breadcrumb-divider-color: var(--bs-secondary-color);
+    --bs-breadcrumb-item-padding-x: 0.5rem;
+    --bs-breadcrumb-item-active-color: var(--bs-secondary-color);
+    display: flex;
+    flex-wrap: wrap;
+    padding: var(--bs-breadcrumb-padding-y) var(--bs-breadcrumb-padding-x);
+    margin-bottom: var(--bs-breadcrumb-margin-bottom);
+    font-size: var(--bs-breadcrumb-font-size);
+    list-style: none;
+    background-color: var(--bs-breadcrumb-bg);
+    border-radius: var(--bs-breadcrumb-border-radius);
 }
 
 @media (max-width: 576px) {

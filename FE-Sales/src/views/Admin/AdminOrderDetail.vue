@@ -280,6 +280,12 @@ export default {
     <navbar />
     <div class="py-4 mt-6 container">
       <div class="row mt-6">
+        <nav class="ms-4 pb-0" style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a class="tebel" @click="back">Daftar Pesanan</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Detail Pesanan</li>
+          </ol>
+        </nav>
         <v-overlay :model-value="overlay" class="d-flex align-items-center justify-content-center">
           <v-progress-circular
             color="amber"
@@ -432,9 +438,14 @@ export default {
   user-select: none;
 }
 
-a {
+.tebel {
   text-decoration: none;
-  color: unset;
+  color: black;
+  font-weight: bold;
+}
+
+.tebel:hover {
+  cursor: pointer;
 }
 
 .card.equal-height {
