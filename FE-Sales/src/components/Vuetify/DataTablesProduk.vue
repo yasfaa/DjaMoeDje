@@ -37,26 +37,28 @@
       </template>
 
       <template v-slot:item.deskripsi="{ item }">
-        <div>{{ item.deskripsi }}</div>
+        <div class="deskripsi">{{ item.deskripsi }}</div>
       </template>
       <template v-slot:item.gambar="{ item }">
-        <v-row>
-          <v-col
-            v-for="(gambar, index) in item.gambar"
-            :key="index"
-            cols="12"
-            sm="6"
-            md="4"
-            lg="3"
-            class="mx-2"
-          >
-            <img
-              :src="gambar ? gambar : 'https://via.placeholder.com/150'"
-              height="150"
-              alt="Menu Image"
-            />
-          </v-col>
-        </v-row>
+        <div class="gambar-cotainer">
+          <v-row>
+            <v-col
+              v-for="(gambar, index) in item.gambar"
+              :key="index"
+              cols="12"
+              sm="6"
+              md="4"
+              lg="3"
+              class="mx-4"
+            >
+              <img
+                :src="gambar ? gambar : 'https://via.placeholder.com/150'"
+                height="150"
+                alt="Menu Image"
+              />
+            </v-col>
+          </v-row>
+        </div>
       </template>
       <template v-slot:item.actions="{ item }">
         <v-icon size="large" class="me-2" @click="detailMenu(item)"> mdi-eye </v-icon>
@@ -165,7 +167,7 @@ export default {
       } catch (error) {
         console.error(error)
       }
-    },
+    }
   }
 }
 </script>
@@ -182,8 +184,23 @@ export default {
   align-items: center;
 }
 
+.deskripsi {
+  max-width: 300px;
+  white-space: normal;
+}
+
+.gambar-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
 .v-icon {
   cursor: pointer;
+}
+
+.v-table__wrapper {
+  overflow: none !important;
 }
 
 @media (max-width: 600px) {
