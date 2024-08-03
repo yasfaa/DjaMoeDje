@@ -308,6 +308,7 @@ export default {
 @media screen and (max-height: 450px) {
   .sidenav {
     padding-top: 15px;
+    z-index: 999;
   }
 
   .sidenav a {

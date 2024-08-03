@@ -241,6 +241,10 @@ export default {
   justify-content: center;
 }
 
+.sticky-bottom {
+  z-index: 1 !important;
+}
+
 .footer-content {
   width: 80%;
   border-radius: 10px;

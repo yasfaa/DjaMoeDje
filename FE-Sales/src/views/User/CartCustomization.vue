@@ -212,17 +212,6 @@ export default {
   cursor: pointer;
 }
 
-.sticky-footer {
-  position: sticky;
-  bottom: 0;
-  width: 100%;
-  background-color: white;
-  padding: 1rem 0;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: center;
-}
-
 .footer-content {
   width: 80%;
   border-radius: 10px;
@@ -235,6 +224,10 @@ export default {
 .text {
   font-size: 1.2rem;
   font-weight: bold;
+}
+
+.sticky-bottom  {
+  z-index: 1 !important;
 }
 
 .checkbox {
