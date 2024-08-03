@@ -88,8 +88,8 @@ export default {
 
         this.ingredients = response.data.map((ingredient) => ({
           ...ingredient,
-          selected: true, // Default to selected
-          quantity: 1 // Default quantity
+          selected: false,
+          quantity: 1
         }))
       } catch (error) {
         console.error(error)
@@ -113,9 +113,6 @@ export default {
         })
       } catch (error) {
         if (error.response && error.response.status === 404) {
-          this.ingredients.forEach((ingredient) => {
-            ingredient.selected = true
-          })
         } else {
           console.error(error)
         }
