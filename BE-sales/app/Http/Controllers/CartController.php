@@ -304,12 +304,10 @@ class CartController extends Controller
                 );
             }
         }
-        // Perbarui kustomisasi dan harga item
         $this->updateCartItemCustomization($cartItem);
 
         return response()->json([
             'message' => 'Customization added successfully',
-            'customizations' => $cartItem->customizations,
             'harga_item' => $cartItem->harga_item,
             'harga_dasar' => $cartItem->customization_price,
             'total_harga' => $cartItem->cart->harga
@@ -351,7 +349,6 @@ class CartController extends Controller
     {
         // Ambil semua kustomisasi dari item cart
         $ingredients = $cartItem->ingredients ?? collect();
-        $customizationDetails = [];
 
         // Ambil harga menu
         $menu = $cartItem->menu;
