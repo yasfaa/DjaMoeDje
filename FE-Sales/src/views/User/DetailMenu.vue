@@ -59,7 +59,6 @@
         <div
           class="col-lg-4 col-md-12 order-3"
           v-if="!user || user.role !== 'Admin'"
-          @click.prevent.stop="addToCart(menu.id)"
         >
           <div class="card p-3 order-controls">
             <h3 class="control-title mt-2">Atur Jumlah</h3>
@@ -115,7 +114,9 @@ export default {
       fileLinks: [],
       overlay: false,
       quantity: 1,
-      showSuccessDialog: false
+      showSuccessDialog: false,
+      user: null,
+      isLoggedIn: false
     }
   },
   mounted() {
@@ -169,7 +170,6 @@ export default {
 
         if (error.response && error.response.data.message) {
           const errorMessage = error.response.data.message
-          // Display notification with red color
           this.$notify({
             type: 'error',
             title: 'Error',
@@ -190,7 +190,7 @@ export default {
       }
     },
     goToCustomize(menuId) {
-      if (!isLoggedIn) {
+      if (!this.isLoggedIn) {
         this.$router.push('/login') 
         return
       }
@@ -198,7 +198,7 @@ export default {
       this.$router.push(`/menu/${menuId}/customize`)
     },
     async addToCart(menuId, quantity) {
-      const isLoggedIn = !!localStorage.getItem('access_token') // Check if the user is logged in
+      const isLoggedIn = !!localStorage.getItem('access_token')
 
       if (!isLoggedIn) {
         this.$router.push('/login') 

@@ -46,7 +46,10 @@
     <div class="row footer-content mb-2">
       <div class="d-flex justify-content-between align-items-center">
         <strong>Harga Menu: Rp {{ formatPrice(menuPrice) }}</strong>
-        <button class="btn btn-primary" @click="navigateToCart">Simpan</button>
+        <div>
+          <v-icon class="mx-2" size="large" @click="hapus" color="red"> mdi-delete </v-icon>
+          <button class="btn btn-primary" @click="navigateToCart">Simpan</button>
+        </div>
       </div>
     </div>
   </div>
@@ -68,11 +71,12 @@ export default {
       menuPrice: 0
     }
   },
-  mounted() {
-    this.retrieveIngredients()
-    this.retrieveCustomizations()
-    this.retrieveMenuPrice()
+  async mounted() {
+    await this.retrieveIngredients()
+    await this.retrieveCustomizations()
+    await this.retrieveMenuPrice()
   },
+
   methods: {
     formatPrice(price) {
       const numericPrice = parseFloat(price)
@@ -88,7 +92,7 @@ export default {
 
         this.ingredients = response.data.map((ingredient) => ({
           ...ingredient,
-          selected: false,
+          selected: true,
           quantity: 1
         }))
       } catch (error) {
@@ -104,11 +108,17 @@ export default {
         })
 
         const customizations = response.data.cart_item_ingredients
-        customizations.forEach((custom) => {
-          const ingredient = this.ingredients.find((ing) => ing.id === custom.ingredient_id)
-          if (ingredient) {
+        const customizationIds = new Set(customizations.map((custom) => custom.ingredient_id))
+
+        this.ingredients.forEach((ingredient) => {
+          if (customizationIds.has(ingredient.id)) {
+            const customization = customizations.find(
+              (custom) => custom.ingredient_id === ingredient.id
+            )
             ingredient.selected = true
-            ingredient.quantity = custom.quantity
+            ingredient.quantity = customization.quantity
+          } else {
+            ingredient.selected = false
           }
         })
       } catch (error) {
@@ -134,7 +144,7 @@ export default {
       if (quantity < 0) return
       const ingredient = this.ingredients.find((ing) => ing.id === ingredientId)
       ingredient.quantity = quantity
-      await this.saveAllCustomizations()
+      await this.saveCustomizations()
     },
     incrementIngredientQuantity(ingredientId, currentQuantity) {
       const newQuantity = currentQuantity + 1
@@ -147,9 +157,9 @@ export default {
       }
     },
     async toggleSelectIngredient() {
-      await this.saveAllCustomizations()
+      await this.saveCustomizations()
     },
-    async saveAllCustomizations() {
+    async saveCustomizations() {
       const customizations = this.ingredients.map((ingredient) => ({
         ingredient_id: ingredient.id,
         quantity: ingredient.selected ? ingredient.quantity : 0
@@ -169,8 +179,21 @@ export default {
         console.error(error)
       }
     },
+    async hapus() {
+      try {
+        await axios.delete(`${BASE_URL}/customize/delete/cartItem/${this.cartItemId}`, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token')
+          }
+        })
+        this.cartItemId = null
+        this.$router.push('/cart')
+      } catch (error) {
+        console.error(error)
+      }
+    },
     navigateToCart() {
-      this.$router.push('/cart') // Redirect back to cart after saving
+      this.$router.push('/cart')
     }
   }
 }

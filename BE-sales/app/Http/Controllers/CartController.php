@@ -403,7 +403,7 @@ class CartController extends Controller
         ], 200);
     }
 
-    public function deleteCustomization($cartItemId)
+    public function deleteCustomizationCart($cartItemId)
     {
         $cartItemIngredients = CartItemIngredient::where('cart_item_id', $cartItemId)->get();
 
@@ -415,7 +415,6 @@ class CartController extends Controller
             $cartItemIngredient->delete();
         }
 
-        $cartItem->customizations = null;
         $cartItem->customization_price = $menu->total;
         $cartItem->harga_item = $cartItem->customization_price * $cartItem->quantity;
         $cartItem->save();
@@ -435,6 +434,17 @@ class CartController extends Controller
             'harga_item' => $cartItem->harga_item,
             'harga_dasar' => $cartItem->customization_price,
             'total_harga' => $cartItem->cart->harga
+        ], 200);
+    }
+
+    public function deleteCustomizationMenu($cartItemId)
+    {
+
+        $cartItem = CartItem::findOrFail($cartItemId);
+        $cartItem->delete();
+
+        return response()->json([
+            'message' => 'Kustomisasi Berhasil Dihapus',
         ], 200);
     }
 

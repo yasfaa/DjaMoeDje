@@ -195,7 +195,10 @@ export default {
       }
     },
     async hapus() {
-      if (!this.cartItemId) return
+      if (!this.cartItemId) {
+        history.back()
+        return 
+      }
 
       try {
         await axios.delete(`${BASE_URL}/cart/delete/${this.cartItemId}`, {
@@ -203,10 +206,11 @@ export default {
             Authorization: 'Bearer ' + localStorage.getItem('access_token')
           }
         })
+
         this.cartItemId = null 
-        this.$router.push(`/menu/${this.menuId}`) 
+        this.$router.push(`/menu/${this.menuId}`)
       } catch (error) {
-        console.error(error)
+        console.error('Error deleting cart item:', error)
       }
     }
   }
