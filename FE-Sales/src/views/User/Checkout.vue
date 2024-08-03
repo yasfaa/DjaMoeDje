@@ -688,7 +688,7 @@ export default {
                   />
                   <label for="">Nomor Telepon</label>
                   <input
-                    type="text"
+                    type="number"
                     v-model="address.nomor_telepon"
                     class="form-control mb-2"
                     placeholder="Masukkan nomor telepon"
@@ -723,7 +723,7 @@ export default {
                   />
                   <label for="">Kode Pos</label>
                   <input
-                    type="text"
+                    type="number"
                     v-model="address.kode_pos"
                     class="form-control mb-2"
                     placeholder="Masukkan kode pos penerima"
