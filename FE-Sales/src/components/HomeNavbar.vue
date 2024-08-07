@@ -64,6 +64,39 @@
               </button>
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mb-2 mb-lg-0 ms-auto">
+                  <li class="nav-item dropdown me-3">
+                    <button
+                      class="btn position-relative"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      <v-icon> mdi-bell </v-icon>
+                      <span
+                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                      >
+                        {{ notificationCount }}
+                        <span class="visually-hidden">unread messages</span>
+                      </span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" style="width: 300px">
+                      <li
+                        v-for="notif in notification"
+                        :key="notif.order_id"
+                        class="px-3 py-2 border-bottom"
+                        @click="lihatDetail(notif)"
+                        style="cursor: pointer"
+                      >
+                        <div>
+                          <strong>{{ notif.nama }}</strong>
+                          <p class="mb-1">Nomor Pesanan: {{ notif.no_pesanan }}</p>
+                          <small class="text-muted">{{ timeAgo(notif.tanggal) }}</small>
+                        </div>
+                      </li>
+                      <li v-if="notification.length === 0" class="text-center py-2">
+                        <span>Tidak ada notifikasi</span>
+                      </li>
+                    </ul>
+                  </li>
                   <li class="nav-item dropdown">
                     <button
                       class="btn dropdown-toggle"
@@ -195,14 +228,16 @@ export default {
   data() {
     return {
       isLoggedIn: false,
+      isNotificationDropdownVisible: false,
       isActive: false,
       user: '',
       isNavbarHidden: false,
-      lastScrollPosition: 0,
+      notification: [],
       isNavbarVisible: true
     }
   },
   async mounted() {
+    this.retrieveNotif()
     try {
       const name = localStorage.getItem('name')
       const role = localStorage.getItem('role')
@@ -226,8 +261,46 @@ export default {
         })
       }
     }
-  },  
+  },
   methods: {
+    toggleNotificationDropdown() {
+      this.isNotificationDropdownVisible = !this.isNotificationDropdownVisible
+    },
+    async retrieveNotif() {
+      try {
+        const response = await axios.get(BASE_URL + '/auth/notif', {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token')
+          }
+        })
+        this.notification = response.data.order
+      } catch (error) {
+        console.error('Error fetching notifications:', error)
+      }
+    },
+    timeAgo(date) {
+      const now = new Date()
+      const past = new Date(date)
+      const diffInSeconds = Math.floor((now - past) / 1000)
+
+      const intervals = {
+        tahun: 31536000,
+        bulan: 2592000,
+        hari: 86400,
+        jam: 3600,
+        menit: 60
+      }
+
+      let counter
+      for (const i in intervals) {
+        counter = Math.floor(diffInSeconds / intervals[i])
+        if (counter > 0) return `${counter} ${i}${counter === 1 ? '' : ''} yang lalu`
+      }
+      return 'baru saja'
+    },
+    lihatDetail(notification) {
+      this.$router.push('/orders/' + notification.order_id)
+    },
     onLogout() {
       axios
         .post(
@@ -256,6 +329,11 @@ export default {
     },
     AdminProfile() {
       this.$router.push('/admin/profile')
+    }
+  },
+  computed: {
+    notificationCount() {
+      return this.notification.length
     }
   }
 }

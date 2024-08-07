@@ -153,7 +153,7 @@ class TransactionController extends Controller
                         'menu_id' => $menu->id,
                         'nama_menu' => $menu->nama_menu,
                         'quantity' => $cartItem->quantity,
-                        'harga_menu' => $menu->total,
+                        'harga_menu' => $cartItem->customization_price,
                         'customization' => $customizations,
                         'imagePath' => $imagePath,
                     ];
@@ -206,11 +206,33 @@ class TransactionController extends Controller
                         'menu_id' => $menu->id,
                         'nama_menu' => $menu->nama_menu,
                         'quantity' => $cartItem->quantity,
-                        'harga_menu' => $menu->total,
+                        'harga_menu' => $cartItem->customization_price,
                         'customization' => $customizations,
                         'imagePath' => $imagePath,
                     ];
                 }),
+            ];
+        });
+
+        return response()->json(['order' => $response]);
+    }
+
+    public function getAdminNotif(Request $request)
+    {
+        $transactionsQuery = Transaction::with(['payment', 'cartItems.menu', 'address']);
+
+        $transactionsQuery->where('status', 'process');
+
+        $transactionsQuery->orderBy('updated_at', 'desc');
+
+        $transactions = $transactionsQuery->get();
+
+        $response = $transactions->map(function ($transaction) {
+            return [
+                'order_id' => $transaction->id,
+                'tanggal' => $transaction->updated_at,
+                'nama' => $transaction->address->nama_penerima,
+                'no_pesanan' => $transaction->payment->payment_uuid,
             ];
         });
 
@@ -501,8 +523,8 @@ class TransactionController extends Controller
                 $payment = payment::where('payment_uuid', $payload['order_id'])->firstOrFail();
 
                 $transaction = Transaction::findOrFail($payment->transaction_id);
-                if($payload['transaction_status'] == 'settlement')
-                $transaction->status = 'process';
+                if ($payload['transaction_status'] == 'settlement')
+                    $transaction->status = 'process';
                 $transaction->save();
 
                 return response()->json(['message' => 'Webhook processed successfully'], 200);
@@ -510,8 +532,8 @@ class TransactionController extends Controller
                 $payment = payment::where('payment_uuid', $payload['order_id'])->firstOrFail();
 
                 $transaction = Transaction::findOrFail($payment->transaction_id);
-                if($payload['transaction_status'] == 'expire')
-                $transaction->status = 'canceled';
+                if ($payload['transaction_status'] == 'expire')
+                    $transaction->status = 'canceled';
                 $transaction->save();
 
                 return response()->json(['message' => 'Webhook processed successfully'], 200);

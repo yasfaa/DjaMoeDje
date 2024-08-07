@@ -17,6 +17,7 @@ Route::prefix('/auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::get('/user', [AuthController::class, 'edit'])->middleware('auth:sanctum');
+    Route::get('/notif', [TransactionController::class, 'getAdminNotif'])->middleware('auth:sanctum');
     Route::post('/update', [AuthController::class, 'update'])->middleware('auth:sanctum', 'role:User');
     Route::post('/update/admin', [AuthController::class, 'updateAdmin'])->middleware('auth:sanctum', 'role:Admin');
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');

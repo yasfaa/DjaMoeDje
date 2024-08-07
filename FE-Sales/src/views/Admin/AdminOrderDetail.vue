@@ -147,6 +147,9 @@ export default {
         this.overlay = false
       }
     },
+    async back() {
+      history.back()
+    },
     getStatusBadge(status) {
       switch (status) {
         case 'pending':
@@ -305,7 +308,7 @@ export default {
                     {{ getStatusText(orders.status) }}
                   </p>
                 </div>
-                <button class="btn btn-sm btn-primary" small @click="showDetail = !showDetail">
+                <button class="btn btn-sm btn-primary" small @click="showDetail = !showDetail" v-if="orders.no_resi">
                   {{ showDetail ? 'Sembunyikan' : 'Lihat Detail' }}
                 </button>
               </h5>

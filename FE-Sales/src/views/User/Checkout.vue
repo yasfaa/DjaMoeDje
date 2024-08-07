@@ -19,10 +19,6 @@ export default {
   },
   data() {
     return {
-      hideConfigButton: true,
-      showNavbar: true,
-      showSidenav: false,
-      showFooter: false,
       overlay: false,
       orders: [],
       totalPayment: '',

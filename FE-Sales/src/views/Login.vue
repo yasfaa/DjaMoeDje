@@ -14,8 +14,15 @@
                     <label for="">Email</label>
                   </div>
                   <div class="inputbox">
-                    <input class="input-type" type="password" v-model="loginPassword" required />
+                    <input class="input-type"
+                    :type="showPasswordLogin ? 'text' : 'password'" v-model="loginPassword" required />
                     <label for="">Password</label>
+                    <v-icon
+                      icon="mdi-eye-outline"
+                      color="black"
+                      @click="togglePasswordVisibility('login')"
+                      class="toggle-password"
+                    ></v-icon>
                   </div>
                   <button class="login-button" type="submit" style="color: white">Log in</button>
                   <div class="register">
@@ -36,8 +43,34 @@
                     <label for="">Email</label>
                   </div>
                   <div class="inputbox">
-                    <input class="input-type" type="password" v-model="registerPassword" required />
+                    <input
+                      class="input-type"
+                      :type="showPasswordRegister ? 'text' : 'password'"
+                      v-model="registerPassword"
+                      required
+                    />
                     <label for="">Create Password</label>
+                    <v-icon
+                      icon="mdi-eye-outline"
+                      color="black"
+                      @click="togglePasswordVisibility('register')"
+                      class="toggle-password"
+                    ></v-icon>
+                  </div>
+                  <div class="inputbox">
+                    <input
+                      class="input-type"
+                      :type="showPasswordRePassword ? 'text' : 'password'"
+                      v-model="registerRePassword"
+                      required
+                    />
+                    <label for="">Confirm Password</label>
+                    <v-icon
+                      icon="mdi-eye-outline"
+                      color="black"
+                      @click="togglePasswordVisibility('rePassword')"
+                      class="toggle-password"
+                    ></v-icon>
                   </div>
                   <button class="login-button" type="submit" style="color: white">Register</button>
                   <div class="register">
@@ -68,15 +101,16 @@ export default {
   data() {
     return {
       isRegister: false,
-      // Login Inpput
       loginEmail: '',
       loginPassword: '',
-      // Register Input
       registerName: '',
       registerEmail: '',
       registerPassword: '',
       registerRePassword: '',
-      passwordsNotMatch: false
+      passwordsNotMatch: false,
+      showPasswordLogin: false,
+      showPasswordRegister: false,
+      showPasswordRePassword: false
     }
   },
   mounted() {
@@ -131,7 +165,15 @@ export default {
         label.style.top = '50%'
       }
     },
-
+    togglePasswordVisibility(formType) {
+      if (formType === 'login') {
+        this.showPasswordLogin = !this.showPasswordLogin
+      } else if (formType === 'register') {
+        this.showPasswordRegister = !this.showPasswordRegister
+      }  else if (formType === 'rePassword') {
+        this.showPasswordRePassword = !this.showPasswordRePassword
+      }
+    },
     async onSubmit() {
       try {
         const response = await axios.post(BASE_URL + '/auth/login', {
@@ -168,6 +210,16 @@ export default {
     },
 
     async onRegist() {
+      if (this.registerPassword !== this.registerRePassword) {
+        this.passwordsNotMatch = true
+        this.$notify({
+            type: 'error',
+            title: 'Error',
+            text: 'Pastikan password dan konfirmasi password sama',
+            color: 'red'
+          })
+          return
+        }
       try {
         const response = await axios.post(BASE_URL + '/auth/register', {
           name: this.registerName,
@@ -316,5 +368,15 @@ h2 {
 .slide-enter,
 .slide-leave-to {
   opacity: 0;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1.2em;
+  color: rgb(60, 60, 60);
 }
 </style>
