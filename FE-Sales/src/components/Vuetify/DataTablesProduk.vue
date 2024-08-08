@@ -39,6 +39,11 @@
       <template v-slot:item.deskripsi="{ item }">
         <div class="deskripsi">{{ item.deskripsi }}</div>
       </template>
+
+      <template v-slot:item.stock_harian="{ item }">
+        <div class="deskripsi">{{ item.stock_harian }}</div>
+      </template>
+
       <template v-slot:item.gambar="{ item }">
         <div class="gambar-cotainer">
           <v-row>
@@ -122,6 +127,7 @@ export default {
             nama: menu.nama,
             harga: menu.total,
             deskripsi: menu.deskripsi,
+            stok_harian: menu.stok_harian,
             gambar: menu.imagePaths,
             actions: ''
           }

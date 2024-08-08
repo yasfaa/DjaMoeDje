@@ -6,7 +6,7 @@
     <div class="container">
       <div class="form-box">
         <div class="padding-container">
-          <div class="row ">
+          <div class="row">
             <v-form @submit.prevent="updateMenu">
               <h2>Edit Menu</h2>
               <div class="mb-3">
@@ -28,6 +28,10 @@
                 ></textarea>
               </div>
               <div class="mb-3">
+                <label for="InputStok" class="form-label">Stok Harian</label>
+                <input id="InputStok" type="number" class="form-control" v-model="menu.stock" />
+              </div>
+              <div class="mb-3">
                 <label for="FileInput" class="form-label">Gambar Menu</label>
                 <input
                   type="file"
@@ -43,7 +47,7 @@
               </div>
               <div class="modal-footer">
                 <button class="btn btn-primary mx-4" @click="cancelEdit">Cancel</button>
-                <button class="btn btn-primary " type="submit">Update Menu</button>
+                <button class="btn btn-primary" type="submit">Update Menu</button>
               </div>
             </v-form>
           </div>
@@ -69,6 +73,7 @@ export default {
         name: '',
         desc: '',
         price: '',
+        stock: '',
         images: []
       },
       selectedFiles: []
@@ -86,6 +91,7 @@ export default {
         const menu = response.data.menu
         this.menu.name = menu.nama_menu
         this.menu.desc = menu.deskripsi
+        this.menu.stock = menu.stok_harian
         this.menu.price = menu.total
         this.menu.images = response.data.fileLinks
       } catch (error) {
@@ -108,6 +114,7 @@ export default {
           formData.append('nama_menu', this.menu.name)
           formData.append('deskripsi', this.menu.desc)
           formData.append('total', this.menu.price)
+          formData.append('stok_harian', this.menu.stock)
 
           const response = await axios.post(`${this.BASE_URL}/menu/update/${menuId}`, formData, {
             headers: {
