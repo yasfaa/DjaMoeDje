@@ -75,6 +75,10 @@
               <v-icon icon="mdi-plus" class="icon-btn" @click="increaseQuantity"></v-icon>
             </div>
             <div class="subtotal">
+              <span>Sisa stok hari ini:</span>
+              <span class="menu-price">{{ menu.sisa_stok }}</span>
+            </div>
+            <div class="subtotal">
               <span>Subtotal:</span>
               <span class="menu-price">Rp. {{ formatPrice(menu.total * quantity) }}</span>
             </div>

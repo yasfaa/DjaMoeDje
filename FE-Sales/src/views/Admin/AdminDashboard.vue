@@ -25,6 +25,10 @@
               <textarea id="InputDeskripsi" class="form-control" v-model="menu.desc"></textarea>
             </div>
             <div class="mb-3">
+              <label for="InputStok" class="form-label">Stok Harian</label>
+              <input id="InputStok" type="number" class="form-control" v-model="menu.stock" />
+            </div>
+            <div class="mb-3">
               <label for="FileInput" class="form-label">Gambar Menu</label>
               <input
                 id="FileInput"
@@ -153,6 +157,7 @@ export default {
       this.menu.name = ''
       this.menu.desc = ''
       this.menu.price = ''
+      this.menu.stock = ''
       this.selectedFiles = []
       this.ingredient.name = ''
       this.ingredient.price = ''
@@ -188,6 +193,7 @@ export default {
         formData.append('nama_menu', this.menu.name)
         formData.append('deskripsi', this.menu.desc)
         formData.append('total', this.menu.price)
+        formData.append('stok_harian', this.menu.stock)
 
         const token = localStorage.getItem('access_token')
         const response = await axios.post(`${BASE_URL}/menu/add`, formData, {

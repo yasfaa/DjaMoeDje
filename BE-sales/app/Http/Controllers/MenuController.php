@@ -21,6 +21,7 @@ class MenuController extends Controller
                     'nama' => $menu->nama_menu,
                     'total' => $menu->total,
                     'deskripsi' => $menu->deskripsi,
+                    'stok_harian' => $menu->sisa_stok,
                     'imagePath' => null,
                 ];
 
@@ -50,6 +51,7 @@ class MenuController extends Controller
                     'id' => $menu->id,
                     'nama' => $menu->nama_menu,
                     'total' => $menu->total,
+                    'stok_harian' => $menu->stok_harian,
                     'deskripsi' => $menu->deskripsi,
                 ];
 
@@ -75,6 +77,7 @@ class MenuController extends Controller
             'nama_menu' => 'required|string',
             'total' => 'required|numeric',
             'deskripsi' => 'required|string',
+            'stok_harian' => 'required|integer',
             'gambar' => 'required|array',
             'gambar.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
         ]);
@@ -99,6 +102,8 @@ class MenuController extends Controller
                 'nama_menu' => $request->input('nama_menu'),
                 'total' => $request->input('total'),
                 'deskripsi' => $request->input('deskripsi'),
+                'stok_harian' => $request->input('stok_harian'),
+                'sisa_stok' => $request->input('stok_harian')
             ]);
 
             foreach ($fileNames as $fileName) {
@@ -148,6 +153,7 @@ class MenuController extends Controller
             'nama_menu' => 'required|string',
             'total' => 'required|numeric',
             'deskripsi' => 'required|string',
+            'stok_harian' => 'required|integer',
             'gambar' => 'nullable|array',
             'gambar.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
         ]);
@@ -155,6 +161,8 @@ class MenuController extends Controller
         $menu->nama_menu = $request->input('nama_menu');
         $menu->total = $request->input('total');
         $menu->deskripsi = $request->input('deskripsi');
+        $menu->stok_harian = $request->input('stok_harian');
+        $menu->sisa_stok = $request->input('stok_harian');
 
         $imageUrls = [];
 

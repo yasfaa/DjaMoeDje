@@ -16,6 +16,8 @@ return new class extends Migration {
             $table->double('total');
             $table->text('deskripsi');
             $table->timestamps();
+            $table->integer('stok_harian');
+            $table->integer('sisa_stok');
         });
         
     }

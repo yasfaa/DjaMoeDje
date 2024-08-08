@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\Menu;
+use App\Models\User;
 use App\Models\Address;
 use App\Models\CartItem;
 use App\Services\Biteship;
@@ -64,6 +65,7 @@ class CartController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $admin = User::where('role', 'Admin')->first();
         $cart = Cart::with([
             'items.menu.ingredient',
             'items.menu.menuPictures' => function ($query) {
@@ -104,6 +106,7 @@ class CartController extends Controller
                 'id' => $item->id,
                 'name' => $item->menu->nama_menu,
                 'deskripsi' => $item->menu->deskripsi,
+                'stok_harian' => $item->menu->sisa_stok,
                 'harga_menu' => $item->menu->total,
                 'quantity' => $item->quantity,
                 'harga_total_item' => $item->harga_item,
@@ -118,6 +121,7 @@ class CartController extends Controller
         return response()->json([
             'items' => $cartContents,
             'total_harga' => $totalHarga,
+            'buka' => $admin->remember_token
         ], 200);
     }
 

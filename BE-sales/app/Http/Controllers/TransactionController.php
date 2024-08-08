@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\Cart;
+use App\Models\Menu;
 use GuzzleHttp\Client;
 use App\Models\Address;
 use App\Models\courier;
@@ -91,6 +92,15 @@ class TransactionController extends Controller
                 $cartItem = CartItem::find($item['cart_item_id']);
 
                 if ($cartItem) {
+                    $menu = Menu::find($cartItem->menu_id);
+
+                    if ($menu->stok_harian < $cartItem->quantity) {
+                        throw new Exception('Stok tidak mencukupi untuk menu: ' . $menu->nama_menu);
+                    }
+
+                    $menu->stok_harian -= $cartItem->quantity;
+                    $menu->save();
+
                     $cartItem->update([
                         'transaction_id' => $transactionId,
                         'cart_id' => null,

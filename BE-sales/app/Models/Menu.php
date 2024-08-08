@@ -16,6 +16,8 @@ class Menu extends Model
         'nama_menu',
         'total',
         'deskripsi',
+        'stok_harian',
+        'sisa_stok'
     ];
 
     public function cartItems()
