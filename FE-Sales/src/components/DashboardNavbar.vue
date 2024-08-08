@@ -35,6 +35,13 @@
               style="font-size: 32px; padding-left: 30px; font-weight: bold"
               >DjaMoeDje</a
             >
+            <v-switch
+              v-model="isTokoBuka"
+              @change="toggleToko"
+              :label="isTokoBuka ? 'Toko Buka' : 'Toko Tutup'"
+              size="small"
+              color="pink"
+            ></v-switch>
             <div class="ms-auto mx-2">
               <button
                 class="navbar-toggler"
@@ -219,14 +226,28 @@ export default {
         role: ''
       },
       notification: [],
-      isNavbarVisible: true
+      isNavbarVisible: true,
+      isTokoBuka: false
     }
   },
   mounted() {
     this.fetchUserData()
     this.retrieveNotif()
+    this.fetchTokoStatus()
   },
   methods: {
+    async fetchTokoStatus() {
+      try {
+        const response = await axios.get(BASE_URL + '/auth/toogle/admin', {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token')
+          }
+        })
+        this.isTokoBuka = response.data.data === 'buka'
+      } catch (error) {
+        console.error('Error fetching toko status:', error)
+      }
+    },
     toggleNotificationDropdown() {
       this.isNotificationDropdownVisible = !this.isNotificationDropdownVisible
     },
@@ -310,6 +331,23 @@ export default {
     },
     lihatDetail(notification) {
       this.$router.push('/orders/' + notification.order_id)
+    },
+    async toggleToko() {
+      try {
+        const response = await axios.get(
+          BASE_URL + '/auth/toogle',
+          {
+            headers: {
+              Authorization: 'Bearer ' + localStorage.getItem('access_token')
+            }
+          },
+          { status: this.isTokoBuka ? 'buka' : 'tutup' }
+        )
+        console.log('Toko status updated:', response.data)
+      } catch (error) {
+        console.error('Error updating toko status:', error)
+        this.isTokoBuka = !this.isTokoBuka
+      }
     }
   },
   computed: {
@@ -318,6 +356,9 @@ export default {
     },
     notificationCount() {
       return this.notification.length
+    },
+    tokoStatusLabel() {
+      return this.isTokoBuka ? 'Toko Buka' : 'Toko Tutup'
     }
   }
 }
@@ -406,6 +447,15 @@ export default {
 
 .dropdown-menu {
   width: 150px;
+}
+
+.v-input__details {
+  grid-area: unset !important;
+}
+
+.v-switch .v-label {
+    padding-inline-start: 10px;
+    color: black !important;
 }
 
 @media (max-width: 768px) {

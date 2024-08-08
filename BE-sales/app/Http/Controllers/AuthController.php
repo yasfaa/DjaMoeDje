@@ -56,6 +56,34 @@ class AuthController extends Controller
         ]);
     }
 
+    function toogleBukaTutup(Request $request)
+    {
+        $auth = Auth::user();
+        $user = User::find($auth->id);
+
+        if (!$user) {
+            return response()->json(['message' => 'Pengguna tidak ditemukan'], 404);
+        }
+
+        $statusBaru = $user->remember_token === 'buka' ? 'tutup' : 'buka';
+
+        $user->update([
+            'remember_token' => $statusBaru,
+        ]);
+
+        return response()->json(['data' => $statusBaru], 200);
+    }
+
+    function toogleAdmin(Request $request)
+    {
+        $user = User::where('role', 'Admin')->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Pengguna tidak ditemukan'], 404);
+        }
+
+        return response()->json(['data' => $user->remember_token], 200);
+    }
     function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

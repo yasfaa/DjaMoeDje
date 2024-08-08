@@ -50,6 +50,13 @@
               style="font-size: 32px; padding-left: 30px; font-weight: bold"
               >DjaMoeDje</a
             >
+            <v-switch
+              v-model="isTokoBuka"
+              @change="toggleToko"
+              :label="isTokoBuka ? 'Toko Buka' : 'Toko Tutup'"
+              size="small"
+              color="pink"
+            ></v-switch>
             <div class="ms-auto mx-2">
               <button
                 class="navbar-toggler"
@@ -233,11 +240,13 @@ export default {
       user: '',
       isNavbarHidden: false,
       notification: [],
-      isNavbarVisible: true
+      isNavbarVisible: true,
+      isTokoBuka: false
     }
   },
   async mounted() {
     this.retrieveNotif()
+    this.fetchTokoStatus()
     try {
       const name = localStorage.getItem('name')
       const role = localStorage.getItem('role')
@@ -263,6 +272,18 @@ export default {
     }
   },
   methods: {
+    async fetchTokoStatus() {
+      try {
+        const response = await axios.get(BASE_URL + '/auth/toogle/admin', {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token')
+          }
+        })
+        this.isTokoBuka = response.data.data === 'buka'
+      } catch (error) {
+        console.error('Error fetching toko status:', error)
+      }
+    },
     toggleNotificationDropdown() {
       this.isNotificationDropdownVisible = !this.isNotificationDropdownVisible
     },
@@ -329,6 +350,23 @@ export default {
     },
     AdminProfile() {
       this.$router.push('/admin/profile')
+    },
+    async toggleToko() {
+      try {
+        const response = await axios.get(
+          BASE_URL + '/auth/toogle',
+          {
+            headers: {
+              Authorization: 'Bearer ' + localStorage.getItem('access_token')
+            }
+          },
+          { status: this.isTokoBuka ? 'buka' : 'tutup' }
+        )
+        console.log('Toko status updated:', response.data)
+      } catch (error) {
+        console.error('Error updating toko status:', error)
+        this.isTokoBuka = !this.isTokoBuka
+      }
     }
   },
   computed: {
@@ -421,6 +459,15 @@ export default {
 
 .button-side {
   padding: 16px;
+}
+
+.v-input__details {
+  grid-area: unset !important;
+}
+
+.v-switch .v-label {
+  padding-inline-start: 10px;
+  color: black !important;
 }
 
 @media screen and (max-height: 450px) {
