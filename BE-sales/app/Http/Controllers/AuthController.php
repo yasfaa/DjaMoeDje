@@ -24,15 +24,11 @@ class AuthController extends Controller
             'role' => 'User'
         ]);
 
-        if ($created) {
-            return response()->json([
-                'message' => 'Register berhasil!'
-            ], 201);
-        } else {
-            return response()->json([
-                'message' => 'Server error'
-            ], 500);
-        }
+        $created->sendEmailVerificationNotification();
+
+        return response()->json([
+            'message' => 'Akun telah berhasil dibuat'
+        ], 201);
     }
 
     public function login(Request $request)
@@ -43,6 +39,13 @@ class AuthController extends Controller
             ], 401);
         }
         $user = User::where('email', $request['email'])->firstOrFail();
+
+        if (is_null($user->email_verified_at)) {
+            return response()->json([
+                'message' => 'Verifikasi email terlebih dahulu.'
+            ], 403); 
+        }
+        
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([

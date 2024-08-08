@@ -8,6 +8,7 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\VerificationsController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -21,7 +22,12 @@ Route::prefix('/auth')->group(function () {
     Route::post('/update', [AuthController::class, 'update'])->middleware('auth:sanctum', 'role:User');
     Route::post('/update/admin', [AuthController::class, 'updateAdmin'])->middleware('auth:sanctum', 'role:Admin');
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+    Route::get('/toogle', [AuthController::class, 'toogleBukaTutup'])->middleware('auth:sanctum', 'role:Admin');
+    Route::get('/toogle/admin', [AuthController::class, 'toogleAdmin'])->middleware('auth:sanctum');
 });
+
+Route::get('/email/verify/{id}/{hash}', [VerificationsController::class, 'verify'])->name('verification.verify');
+Route::post('/email/resend', [VerificationsController::class, 'resend'])->name('verification.resend');
 
 Route::prefix('/address')->middleware(['auth:sanctum'])->group(function () {
     Route::post('/add', [AddressController::class, 'store']);
